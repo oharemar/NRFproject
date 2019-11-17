@@ -1,15 +1,16 @@
-from ANN_forNRF_basic import Network
+from ANN_forNRF import Network
 import pandas as pd
 import numpy as np
 import copy
 
 
-class NeuralTreeBasic():
+class NeuralTree():
 
-    def __init__(self, decision_tree = None):
+    def __init__(self, decision_tree = None, class_probs = None):
 
         self.decision_tree = decision_tree
         self.network = None # corresponding neural network classifier
+        self.class_probs = class_probs # normalized probabilities of classes in individual leaves
         self.weights = []
         self.biases = []
         self.inner_nodes = None
@@ -102,9 +103,14 @@ class NeuralTreeBasic():
         self.weights.append(second_hidden_layer_weights)
         self.biases.append(second_hidden_layer_biases)
 
-    def initialize_output_layer(self): # in basic version, weights and biases in this layer are purely random
-        weights = np.random.randn((self.decision_tree.n_classes_, len(self.leaves)),dtype=np.float64)
-        biases = np.random.randn((self.decision_tree.n_classes_,1),dtype=np.float64)
+    def initialize_output_layer(self): # in basic version
+        weights = np.zeros((self.decision_tree.n_classes_, len(self.leaves)),dtype=np.float64)
+        for label in range(self.decision_tree.n_classes_):
+            label_weights = [cls[label] for cls in self.class_probs]
+            label_weights = np.array(label_weights,dtype=np.float64)
+            weights[label,:] = label_weights
+
+        biases = np.zeros((self.decision_tree.n_classes_,1),dtype=np.float64) # initial biases are zero
 
         self.weights.append(weights)
         self.biases.append(biases)
@@ -118,13 +124,10 @@ class NeuralTreeBasic():
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
-    def train_NRF(self, training_data, epochs, mini_batch_size, eta, test_data=None):
 
-        self.network.SGD(training_data=training_data, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta,
-                         test_data=test_data)
+    def train_NRF(self, training_data, epochs, mini_batch_size,eta,test_data=None):
 
-
-
+        self.network.SGD(training_data=training_data,epochs=epochs,mini_batch_size=mini_batch_size,eta=eta,test_data=test_data)
 
 
 

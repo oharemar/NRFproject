@@ -1,4 +1,4 @@
-from ANN_forNRF_basic import Network
+from ANN_forNRF_withExtraLayerCombined_lessInitialModification import Network
 import pandas as pd
 import numpy as np
 import copy

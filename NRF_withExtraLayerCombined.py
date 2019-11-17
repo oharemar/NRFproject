@@ -1,15 +1,19 @@
-from ANN_forNRF_basic import Network
+from ANN_forNRF_withExtraLayerCombined import Network
+from NRF_basic import NeuralTreeBasic
 import pandas as pd
 import numpy as np
 import copy
 
 
-class NeuralTreeBasic():
+class NeuralTree_withExtraLayerCombined():
 
-    def __init__(self, decision_tree = None):
+    def __init__(self, decision_tree = None, class_probs = None):
+
 
         self.decision_tree = decision_tree
+        self.initialNRF = NeuralTreeBasic(self.decision_tree)
         self.network = None # corresponding neural network classifier
+        self.class_probs = class_probs # normalized probabilities of classes in individual leaves (leaves in same order as self.leaves)
         self.weights = []
         self.biases = []
         self.inner_nodes = None
@@ -17,6 +21,7 @@ class NeuralTreeBasic():
 
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
+        self.initialize_third_hidden_layer()
         self.initialize_output_layer()
         self.create_NN()
 
@@ -102,19 +107,41 @@ class NeuralTreeBasic():
         self.weights.append(second_hidden_layer_weights)
         self.biases.append(second_hidden_layer_biases)
 
-    def initialize_output_layer(self): # in basic version, weights and biases in this layer are purely random
-        weights = np.random.randn((self.decision_tree.n_classes_, len(self.leaves)),dtype=np.float64)
-        biases = np.random.randn((self.decision_tree.n_classes_,1),dtype=np.float64)
+    def initialize_third_hidden_layer(self,training_data,epochs,mini_batch_size,eta):
+        """here we allow modification of all weights and biases"""
+        final_leaves = list(self.decision_tree.apply(training_data))
+        X_train = []
+        for leaf,number in zip(final_leaves,range(len(final_leaves))):
+            index = self.leaves.index(leaf)
+            y_train = np.array(self.class_probs[index],dtype=np.float64).reshape((self.decision_tree.n_classes_,1))
+            X_train.append((training_data[number,:].reshape((self.decision_tree.n_features_,1)),y_train))
+
+        self.initialNRF.train_NRF(training_data=training_data,epochs =epochs,mini_batch_size=mini_batch_size,eta=eta,test_data = None)
+
+        weights = self.initialNRF.weights[-1]
+        biases = self.initialNRF.biases[-1]
 
         self.weights.append(weights)
         self.biases.append(biases)
 
+        """ještě je potřena dodělat verzi, která nebude modifikovat všechny váhy a biasy, ale jen ty v poslední vrstvě, což dává smysl, protože my bychom v tom prvním předtrénování ještě nechtěli moc měnit ty váhy v předchozích vrstvách
+        musíme tedy ještě malinko změnit backpropagation pro tento případ"""
+
+    def initialize_output_layer(self): # weights and biases in this layer are purely random
+            weights = np.random.randn((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
+            biases = np.random.randn((self.decision_tree.n_classes_, 1), dtype=np.float64)
+
+            self.weights.append(weights)
+            self.biases.append(biases)
+
     def create_NN(self):
+
+
 
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=6)
+                                        self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=6)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
@@ -123,28 +150,5 @@ class NeuralTreeBasic():
         self.network.SGD(training_data=training_data, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta,
                          test_data=test_data)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"""chce to lehce upravit metodu train_NRF - a sice backpropagation malinko, protože nám přibyla jedna vrstva"""
 
