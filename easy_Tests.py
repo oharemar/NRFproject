@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
-from NRF_basic import NeuralTreeBasic
+from ANN import Network
 import sklearn
 
 iris = load_iris()
@@ -66,16 +66,8 @@ leave_id = estimator.apply(X_test) # zjistím, které instance došly do toho li
 
 
 
-nrf = NeuralTreeBasic(estimator)
+#nrf = NeuralTreeBasic(estimator,class_probs=)
 
-print(nrf.inner_nodes)
-print(nrf.leaves)
-print(nrf.weights)
-print(nrf.biases)
-L = [1,2,3,4,5]
-L = [L]*2
-#L = 2*L
-print(L)
 
 k = [[10,11,12]]
 l = 4*k
@@ -97,3 +89,22 @@ for label in range(n_classes):
 biases = np.zeros((n_classes, 1), dtype=np.float64)  # initial biases are zero
 print(weights)
 print(biases)
+
+
+
+import math
+
+a = np.array([[1,2,3.1],[2.5,0,1.1]])
+print(a**2.0)
+
+
+net = Network([2,3,4])
+
+training_data = np.array([[1,2,3.1],[2.5,0,1.1]])
+X = np.array([[1,2,3.1],[2.5,0,1.1],[2.5,0,1.1]])
+x = training_data[1,:].reshape((3,1))
+
+a = np.array([1,1]).reshape((2,1))
+
+print(net.feedforward(a))
+print(np.dot(X,x))

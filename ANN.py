@@ -2,11 +2,11 @@ import numpy as np
 import random
 
 def sigmoid(z): # sigmoid function
-    return 1.0/(1.0+ np.exp(-z))
+    return 1.0/(1.0 + np.exp(-z))
 
 def sigmoid_prime (z): # derivation of sigmoid function
     """Derivative of the sigmoid function."""
-    return sigmoid(z)*(1- sigmoid(z))
+    return sigmoid(z)*(1.0 - sigmoid(z))
 
 
 class Network():

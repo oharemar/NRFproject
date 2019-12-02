@@ -44,7 +44,7 @@ class NeuralTreeBasic():
         for node_id in range(n_nodes):
             if (children_left[node_id] != children_right[node_id]): # if satisfied, we are in inner node or root
                 inner_nodes.append(node_id)
-                first_hidden_layer_biases.append(threshold[node_id]) # this appends bias to the actual node
+                first_hidden_layer_biases.append(-threshold[node_id]) # this appends bias to the actual node
                 actual_node_weight = [0 for j in range(n_features)]
                 actual_used_feature = feature[node_id]
                 actual_node_weight[actual_used_feature] = 1
@@ -103,8 +103,8 @@ class NeuralTreeBasic():
         self.biases.append(second_hidden_layer_biases)
 
     def initialize_output_layer(self): # in basic version, weights and biases in this layer are purely random
-        weights = np.random.randn((self.decision_tree.n_classes_, len(self.leaves)),dtype=np.float64)
-        biases = np.random.randn((self.decision_tree.n_classes_,1),dtype=np.float64)
+        weights = np.random.randn(self.decision_tree.n_classes_, len(self.leaves))
+        biases = np.random.randn(self.decision_tree.n_classes_,1)
 
         self.weights.append(weights)
         self.biases.append(biases)
@@ -114,7 +114,7 @@ class NeuralTreeBasic():
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=6)
+                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=0.2)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 

@@ -6,11 +6,11 @@ def sigmoid(z,gamma): # sigmoid function, gamma is hyperparameter
     return 1.0/(1.0+ np.exp(-gamma*z))
 def sigmoid_prime (z,gamma): # derivation of sigmoid function
     """Derivative of the sigmoid function."""
-    return gamma*(sigmoid(gamma*z)*(1- sigmoid(gamma*z)))
+    return gamma*(sigmoid(z,gamma)*(1- sigmoid(z,gamma)))
 def tanh(z,gamma): # tangent hyperbolic function, gamma is hyperparameter
     return (np.exp(2.0*gamma*z) - 1.0)/(np.exp(2.0*gamma*z) + 1.0)
 def derivative_tanh(z,gamma): # derivation of tanh function, gamma is hyperparameter
-    return gamma*(1.0 - (tanh(gamma*z))**2.0)
+    return gamma*(1.0 - (tanh(z,gamma))**2.0)
 
 
 class Network():

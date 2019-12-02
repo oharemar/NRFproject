@@ -6,20 +6,49 @@ import copy
 
 class NeuralTree():
 
-    def __init__(self, decision_tree = None, class_probs = None):
+    def __init__(self, decision_tree = None, X_train = None, y_train = None):
 
         self.decision_tree = decision_tree
         self.network = None # corresponding neural network classifier
-        self.class_probs = class_probs # normalized probabilities of classes in individual leaves
         self.weights = []
         self.biases = []
         self.inner_nodes = None
         self.leaves = None
+        self.training_data = X_train
+        self.training_labels = y_train
+        self.label_numbers = None
 
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
         self.initialize_output_layer()
         self.create_NN()
+
+
+    def get_weighted_probs(self):
+
+        listy = list(self.decision_tree.apply(self.training_data))
+        y_train = list(self.training_labels)
+        indexes = {}
+        numbers = {cls: {leaf: 0 for leaf in self.leaves} for cls in list(self.decision_tree.classes_)}
+        for leaf, index in zip(listy, range(len(listy))):
+            if leaf not in indexes.keys():
+                indexes.update({leaf: index})
+            label = y_train[index]
+            numbers[label][leaf] += 1
+
+        classic_probs = np.zeros((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
+        weighted_probs = np.zeros((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
+
+        for leaf, index in zip(self.leaves, range(len(self.leaves))):
+            classic_probs[:, index] = self.decision_tree.predict_proba(self.training_data[indexes[leaf], :].reshape(1, -1))
+            for label, row_index in zip(self.decision_tree.classes_, range(self.decision_tree.n_classes_)):
+                total_number = sum([numbers[label][lf] for lf in self.leaves])
+                label_leaf_number = numbers[label][leaf]
+                weighted_probs[row_index, index] = classic_probs[row_index, index] * (label_leaf_number / total_number)
+
+        self.label_numbers = numbers
+        return  weighted_probs
+
 
 
     def initialize_first_hidden_layer(self):
@@ -45,7 +74,7 @@ class NeuralTree():
         for node_id in range(n_nodes):
             if (children_left[node_id] != children_right[node_id]): # if satisfied, we are in inner node or root
                 inner_nodes.append(node_id)
-                first_hidden_layer_biases.append(threshold[node_id]) # this appends bias to the actual node
+                first_hidden_layer_biases.append(-threshold[node_id]) # this appends bias to the actual node
                 actual_node_weight = [0 for j in range(n_features)]
                 actual_used_feature = feature[node_id]
                 actual_node_weight[actual_used_feature] = 1
@@ -104,12 +133,8 @@ class NeuralTree():
         self.biases.append(second_hidden_layer_biases)
 
     def initialize_output_layer(self): # in basic version
-        weights = np.zeros((self.decision_tree.n_classes_, len(self.leaves)),dtype=np.float64)
-        for label in range(self.decision_tree.n_classes_):
-            label_weights = [cls[label] for cls in self.class_probs]
-            label_weights = np.array(label_weights,dtype=np.float64)
-            weights[label,:] = label_weights
 
+        weights = self.get_weighted_probs()
         biases = np.zeros((self.decision_tree.n_classes_,1),dtype=np.float64) # initial biases are zero
 
         self.weights.append(weights)
@@ -120,16 +145,36 @@ class NeuralTree():
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=6)
+                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[3,3],gamma_sigmoid=2)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
 
-    def train_NRF(self, training_data, epochs, mini_batch_size,eta,test_data=None):
+    def train_NRF(self, epochs, mini_batch_size,eta,test_data=None):
 
-        self.network.SGD(training_data=training_data,epochs=epochs,mini_batch_size=mini_batch_size,eta=eta,test_data=test_data)
+        train_labels_temp = list(self.training_labels)
+        train_labels = []
+        for label in train_labels_temp:
+            lab = np.zeros((self.decision_tree.n_classes_,1),dtype=np.float64)
+            index = list(self.decision_tree.classes_).index(label)
+            lab[index,0] = 1.0
+            train_labels.append(lab)
 
+        train_data = list(zip(list(self.training_data), train_labels))
+        train_data_aligned = []
+        for j in range(len(train_data)):
+            train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
 
+        self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,eta=eta,test_data=test_data)
+
+    def predict(self, X_test):
+        data = list(X_test)
+        data = [d.reshape(-1,1) for d in data]
+        predictions = []
+        for d in data:
+            prediction = np.argmax(self.network.feedforward(d))
+            predictions.append(prediction)
+        return np.array(predictions)
 
 
 

@@ -7,21 +7,21 @@ import copy
 
 class NeuralTree_withExtraLayerCombined():
 
-    def __init__(self, decision_tree = None, class_probs = None):
+    def __init__(self, decision_tree = None, X_train = None, y_train = None):
 
 
         self.decision_tree = decision_tree
-        self.initialNRF = NeuralTreeBasic(self.decision_tree)
         self.network = None # corresponding neural network classifier
-        self.class_probs = class_probs # normalized probabilities of classes in individual leaves (leaves in same order as self.leaves)
         self.weights = []
         self.biases = []
         self.inner_nodes = None
         self.leaves = None
+        self.training_data = X_train
+        self.training_labels = y_train
 
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
-        self.initialize_third_hidden_layer() # sem doplnit parametry
+        self.initialize_third_hidden_layer(100,20,0.3) # tyto parametry budeme měnit ještě
         self.initialize_output_layer()
         self.create_NN()
 
@@ -49,7 +49,7 @@ class NeuralTree_withExtraLayerCombined():
         for node_id in range(n_nodes):
             if (children_left[node_id] != children_right[node_id]): # if satisfied, we are in inner node or root
                 inner_nodes.append(node_id)
-                first_hidden_layer_biases.append(threshold[node_id]) # this appends bias to the actual node
+                first_hidden_layer_biases.append(-threshold[node_id]) # this appends bias to the actual node
                 actual_node_weight = [0 for j in range(n_features)]
                 actual_used_feature = feature[node_id]
                 actual_node_weight[actual_used_feature] = 1
@@ -107,45 +107,64 @@ class NeuralTree_withExtraLayerCombined():
         self.weights.append(second_hidden_layer_weights)
         self.biases.append(second_hidden_layer_biases)
 
-    def initialize_third_hidden_layer(self,training_data,epochs,mini_batch_size,eta):
-        """with backprop we now only modify weights and biases in last layer, that´s because we want other weights and biases remained unchanged"""
-        final_leaves = list(self.decision_tree.apply(training_data))
-        X_train = []
-        for leaf,number in zip(final_leaves,range(len(final_leaves))):
-            index = self.leaves.index(leaf)
-            y_train = np.array(self.class_probs[index],dtype=np.float64).reshape((self.decision_tree.n_classes_,1))
-            X_train.append((training_data[number,:].reshape((self.decision_tree.n_features_,1)),y_train))
+    def initialize_third_hidden_layer(self,epochs,mini_batch_size,eta):
+        """here we allow modification of only weights and biases in the last layer"""
+        train_data = list(zip(list(self.training_data),list(self.decision_tree.predict_proba(self.training_data))))
+        train_data_aligned = []
+        for j in range(len(train_data)):
+            train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1].reshape(-1,1)))
 
-        self.initialNRF.train_NRF(training_data=X_train,epochs =epochs,mini_batch_size=mini_batch_size,eta=eta,test_data = None)
+        initialNRF = NeuralTreeBasic(self.decision_tree)
 
-        weights = self.initialNRF.weights[-1]
-        biases = self.initialNRF.biases[-1]
+        initialNRF.network.SGD(train_data_aligned,epochs,mini_batch_size,eta)
+
+        weights = initialNRF.weights[-1]
+        biases = initialNRF.biases[-1]
 
         self.weights.append(weights)
         self.biases.append(biases)
 
-
     def initialize_output_layer(self): # weights and biases in this layer are purely random
-            weights = np.random.randn((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
-            biases = np.random.randn((self.decision_tree.n_classes_, 1), dtype=np.float64)
+            weights = np.random.randn(self.decision_tree.n_classes_, self.decision_tree.n_classes_)
+            biases = np.random.randn(self.decision_tree.n_classes_, 1)
 
             self.weights.append(weights)
             self.biases.append(biases)
 
     def create_NN(self):
 
-
-
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=6)
+                                        self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[3,3],gamma_sigmoid=3)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
-    def train_NRF(self, training_data, epochs, mini_batch_size, eta, test_data=None):
+    def train_NRF(self, epochs, mini_batch_size, eta, test_data=None):
 
-        self.network.SGD(training_data=training_data, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta,
+        train_labels_temp = list(self.training_labels)
+        train_labels = []
+        for label in train_labels_temp:
+            lab = np.zeros((self.decision_tree.n_classes_, 1), dtype=np.float64)
+            index = list(self.decision_tree.classes_).index(label)
+            lab[index, 0] = 1.0
+            train_labels.append(lab)
+
+        train_data = list(zip(list(self.training_data), train_labels))
+        train_data_aligned = []
+        for j in range(len(train_data)):
+            train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
+
+        self.network.SGD(training_data=train_data_aligned, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta,
                          test_data=test_data)
 
+    """chce to lehce upravit metodu train_NRF - a sice backpropagation malinko, protože nám přibyla jedna vrstva"""
 
+    def predict(self, X_test):
+        data = list(X_test)
+        data = [d.reshape(-1, 1) for d in data]
+        predictions = []
+        for d in data:
+            prediction = np.argmax(self.network.feedforward(d))
+            predictions.append(prediction)
+        return np.array(predictions)
