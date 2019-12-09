@@ -1,15 +1,16 @@
-from ANN_forNRF_withExtraLayerCombined import Network
-import pandas as pd
+from ANN_forNRFBoosted import Network
+from CostFunctions import *
 import numpy as np
 import copy
 
 
-class NeuralTree_withExtraLayer():
+class NeuralTree_analyticWeights():
 
-    def __init__(self, decision_tree = None, X_train = None, y_train = None):
-
+    def __init__(self, decision_tree = None, X_train = None, y_train = None, output_func = 'sigmoid',gamma_output = 1, gamma = [15,15]):
 
         self.decision_tree = decision_tree
+        self.gamma_output = gamma_output
+        self.gamma = gamma
         self.network = None # corresponding neural network classifier
         self.weights = []
         self.biases = []
@@ -17,12 +18,33 @@ class NeuralTree_withExtraLayer():
         self.leaves = None
         self.training_data = X_train
         self.training_labels = y_train
+        self.label_numbers = None
+        self.output_func = output_func
 
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
-        self.initialize_third_hidden_layer()
         self.initialize_output_layer()
-        self.create_NN()
+        self.create_NN(CrossEntropyCost)
+
+
+    def get_probs(self):
+
+        listy = list(self.decision_tree.apply(self.training_data))
+        y_train = list(self.training_labels)
+        indexes = {}
+        numbers = {cls: {leaf: 0 for leaf in self.leaves} for cls in list(self.decision_tree.classes_)}
+        for leaf, index in zip(listy, range(len(listy))):
+            if leaf not in indexes.keys():
+                indexes.update({leaf: index})
+            label = y_train[index]
+            numbers[label][leaf] += 1
+
+        classic_probs = np.zeros((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
+
+        for leaf, index in zip(self.leaves, range(len(self.leaves))):
+            classic_probs[:, index] = self.decision_tree.predict_proba(self.training_data[indexes[leaf], :].reshape(1, -1))
+
+        return classic_probs
 
 
     def initialize_first_hidden_layer(self):
@@ -106,38 +128,50 @@ class NeuralTree_withExtraLayer():
         self.weights.append(second_hidden_layer_weights)
         self.biases.append(second_hidden_layer_biases)
 
-    def initialize_third_hidden_layer(self):
-        """random weights and biases initialization"""
-        weights = np.random.randn(self.decision_tree.n_classes_, len(self.leaves))
-        biases = np.random.randn(self.decision_tree.n_classes_, 1)
+    def initialize_output_layer(self):
+
+        leaves_probs = self.get_probs()
+        weights = np.zeros((self.decision_tree.n_classes_,len(self.leaves)),dtype=np.float64)
+        biases = np.zeros((self.decision_tree.n_classes_,1),dtype=np.float64) # initial biases are zero
+
+        A = np.diag(np.ones(len(self.leaves)))
+        A = np.where(A==0,-1,A)
+        inverse_A = np.linalg.inv(A)
+
+        for label in range(self.decision_tree.n_classes_):
+            probs = leaves_probs[label,:].reshape(-1,1)
+            if self.output_func == 'sigmoid':
+                probs = sigmoid_inverse(probs,self.gamma_output)
+            if self.output_func == 'softmax':
+                probs = softmax_inverse(probs,self.gamma_output)
+            weight = np.dot(inverse_A,probs)
+            weights[label,:] = weight.reshape(1,-1)
 
         self.weights.append(weights)
         self.biases.append(biases)
 
-    def initialize_output_layer(self): # weights and biases in this layer are purely random
-            weights = np.random.randn(self.decision_tree.n_classes_, self.decision_tree.n_classes_)
-            biases = np.random.randn(self.decision_tree.n_classes_, 1)
-
-            self.weights.append(weights)
-            self.biases.append(biases)
-
-    def create_NN(self):
+    def create_NN(self, cost):
 
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[1,1],gamma_sigmoid=3.5)
+                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=self.gamma,
+                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
-    def train_NRF(self, epochs, mini_batch_size, eta, test_data=None):
 
+    def train_NRF(self, epochs, mini_batch_size,eta, lmbda = 0.0,
+            evaluation_data=None, monitor_evaluation_cost=False,
+            monitor_evaluation_accuracy=False, monitor_training_cost=False,
+            monitor_training_accuracy=False):
+        num_classes = self.decision_tree.n_classes_
         train_labels_temp = list(self.training_labels)
         train_labels = []
         for label in train_labels_temp:
-            lab = np.zeros((self.decision_tree.n_classes_, 1), dtype=np.float64)
+            lab = np.zeros((self.decision_tree.n_classes_,1),dtype=np.float64)
             index = list(self.decision_tree.classes_).index(label)
-            lab[index, 0] = 1.0
+            lab[index,0] = 1.0
             train_labels.append(lab)
 
         train_data = list(zip(list(self.training_data), train_labels))
@@ -145,8 +179,14 @@ class NeuralTree_withExtraLayer():
         for j in range(len(train_data)):
             train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
 
-        self.network.SGD(training_data=train_data_aligned, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta,
-                         test_data=test_data)
+        evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,
+                             eta=eta, num_classes=num_classes, lmbda=lmbda,
+                            evaluation_data=evaluation_data, monitor_evaluation_cost= monitor_evaluation_cost,
+                            monitor_evaluation_accuracy=monitor_evaluation_accuracy, monitor_training_cost=monitor_training_cost,
+                            monitor_training_accuracy=monitor_training_accuracy)
+
+
+        return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
 
     def predict(self, X_test):
         data = list(X_test)
@@ -156,4 +196,3 @@ class NeuralTree_withExtraLayer():
             prediction = np.argmax(self.network.feedforward(d))
             predictions.append(prediction)
         return np.array(predictions)
-

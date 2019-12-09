@@ -116,7 +116,7 @@ class NeuralTreeBasic():
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[7.5,7.5],gamma_sigmoid=2.5)
+                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[5.5,5.5],gamma_sigmoid=1.5)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 

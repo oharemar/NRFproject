@@ -84,8 +84,16 @@ predictions_DT = estimator.predict(X_test)
 
 print(classification_report(y_test,predictions_DT))
 
-from NRF_withExtraLayerCombined import *
-nrf2 = NeuralTree_withExtraLayerCombined(estimator,X_train,y_train)
+#from NRF_withExtraLayerCombined import *
+#nrf2 = NeuralTree_withExtraLayerCombined(estimator,X_train,y_train)
+
+from NRF_analyticWeights import *
+
+nrf2 = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='softmax',gamma_output=2,gamma = [1.3,1.3])
+
+#print(nrf2.weights[-1])
+
+
 '''
 partialNRF = nrf2.initialNRF
 X_trainLS = list(X_train)
@@ -96,14 +104,26 @@ for data in X_trainLS:
     print(estimator.predict_proba(data.reshape(1,-1)))
 
 '''
-nrf = NeuralTree(estimator,X_train,y_train)
-nrf.train_NRF(100,20,0.025)
-nrf2.train_NRF(100,15,0.22)
+#nrf = NeuralTree(estimator,X_train,y_train)
+#nrf.train_NRF(100,20,0.025)
+evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = nrf2.train_NRF(100,10,0.0035,0.1,monitor_training_cost=True,monitor_training_accuracy=True)
 predictions_NRT = nrf2.predict(X_test)
 #print(predictions_NRT)
-predictions_NR = nrf.predict(X_test)
+#predictions_NR = nrf.predict(X_test)
 
 print(classification_report(y_test,predictions_NRT))
-print(classification_report(y_test,predictions_NR))
+#print(classification_report(y_test,predictions_NR))
+
+
+import matplotlib.pyplot as plt
+
+x = range(0,100)
+plt.figure(1)
+plt.plot(x,training_cost)
+
+plt.figure(2)
+plt.plot(x,training_accuracy)
+
+plt.show()
 
 

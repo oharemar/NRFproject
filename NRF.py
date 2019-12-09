@@ -165,7 +165,8 @@ class NeuralTree():
         for j in range(len(train_data)):
             train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
 
-        self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,eta=eta,test_data=test_data)
+        self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,
+                         eta=eta,test_data=test_data)
 
     def predict(self, X_test):
         data = list(X_test)
