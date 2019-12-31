@@ -1,0 +1,112 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+
+\title{MASTER'S THESIS}
+\author{Bc. Martin Oharek }
+\date{December 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+\section{State-of-art classifiers}
+
+\section{Decision-Tree-Inspired NN architecture}
+In this section is provided detailed derivation of the basic neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article [ref] describing 1 to 1 transformation of arbitrary regression tree (random forest regressor) to the specifically designed neural network (ensemble of neural networks).
+
+Unfortunately, an approach presented in [ref] is not uniformly convertible to the classification problem. Based on this issue, the  alternative architecture and initial settings are proposed in order to simulate the exact behaviour of corresponding decision tree classifier.
+
+This reformulation provides a sensible opportunity to enhance the decision tree performance, because parameters of newly constructed neural network could be better adapted with usage of the backpropagation algorithm of neural networks and therefore achieve superior classification.
+
+\subsection{Architecture and initial settings}
+
+The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by [ref]. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is
+\begin{equation}
+    \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.5cm},
+\end{equation}
+where all math operations on vector $\boldsymbol{x}$ are element-wise. Also
+\begin{equation}
+    (\mathbf{1}_{\boldsymbol{x} \geq 0})_i = \begin{cases}
+    1, & \text{if}\hspace{0.25cm} x_i \geq 0 \\
+    0, & \text{otherwise}
+    \end{cases}\hspace{0.5cm},
+\end{equation}
+
+where $(\mathbf{1}_{\boldsymbol{x} \geq 0})_i$ is $i$-th element of $\mathbf{1}_{\boldsymbol{x} \geq 0}$.
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{ilustrace_in_space.png}
+\end{minipage}
+%\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{decision_tree_ilustrace.png}
+\end{minipage}
+\caption{In the left Figure are depicted 3 color-coded classes divided by the decision tree in the right Figure, that are separated by two hyperplanes: \\$x_1 - 2 = 0$ and $x_2 - 1 = 0$. Inner nodes of the decision tree are green colored with corresponding split function next to them, whereas the leaves are red colored. All nodes are numbered.}
+\label{fig:dec_ilust}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{ilustrace_basic_structure.png}
+\caption{Transformation of the decision tree in Figure \ref{fig:dec_ilust} to the neural network with two hidden layers. The first hidden layer detects the decisions of inner nodes same numbered as in \ref{fig:dec_ilust}. The second hidden layer retrieves leaf membership of input vector same as in the decision tree. Not null connections between neurons are bold higlighted with corresponding weights. Biases are written next to the neurons. All dashed connections indicates null connection (weight equals 0).}
+\label{fig:basic_arch}
+\end{figure}
+
+So perceptrons from the first and second hidden layer outputs $+1$ or $-1$. Why is it chosen in such manner will be clear from further explanations.
+
+\subsubsection{First hidden layer}
+
+The first hidden layer should copy decisions of all inner nodes present in the corresponding decision tree. The first hidden layer has same number of neurons as number of inner nodes. As was explained in the chapter about decision trees and random forests, each inner node $k \in \{1,...,L-1\}$ of the decision tree, where $L-1$ is total number of inner nodes (in fact, if $L-1$ is total number of inner nodes, then $L$ is total number of leaves present in the decision tree), possesses split function with parameters $j_k \in \{1,...,n\}$, which is one dimension in a $n$-dimensional space that is used for split and also $\alpha_{j_k}$, which is a threshold. Let's also define function $s_k$ as 
+\begin{equation}
+    s_k(\boldsymbol{x}) = x_{j_k} - \alpha_{j_k}\hspace{0.5cm}.
+\end{equation}
+It is apparent that equation $s_k(\boldsymbol{x}) = 0$ defines a hyperplane in $\mathbb{R}^n$, which splits the space in inner node $k$.
+
+In order to obtain all decisions of inner nodes in the corresponding neurons of our neural network, we initialize weights in neuron $k$ as $(0,..,0,1,0,..,0)^T$ with single 1 in $j_k$-th position and 0 otherwise. Bias is set to $-\alpha_{j_k}$. Hence, output of the first hidden layer is $(\tau(s_1(\boldsymbol{x})),\tau(s_2(\boldsymbol{x})),...,\tau(s_{L-1}(\boldsymbol{x}))$ and it precisely copies decisions of inner nodes, with +1 indicating that input vector belongs to the right side of the hyperplane and -1 otherwise (and +1 if it belongs to the hyperplane). This is also done for the inner nodes outside the path of the input vector. The illustration can be seen in Figure \ref{fig:first_hid_layer}.
+
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{first_hidden_layer_space.png}
+\end{minipage}
+%\hspace{0.5cm}
+\begin{minipage}[b]{0.45\linewidth}
+\centering
+\includegraphics[width=\textwidth]{first_hidden_layer.png}
+\end{minipage}
+\caption{Space in the left figure is divided by red (in inner node number 1) and black (in inner node number 2) hyperplanes. If we consider point $\boldsymbol{x} = (x_1,x_2)^T = (2.75,0.45)^T$ highlighted in left Figure, the output from the first hidden layer is +1 from neuron 1 (corresponding to the red hyperplane) and -1 from neuron 2 (corresponding to the black hyperplane).}
+\label{fig:first_hid_layer}
+\end{figure}
+
+\subsubsection{Second hidden layer}
+
+From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of the input vector $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer.
+
+We connect neuron $m$ in the first hidden layer to neuron $m'$ in the second hidden layer with not null weight if and only if inner node corresponding to the neuron $m$ belongs to the path from root node to the leaf corresponding to the neuron $m'$. The weight is initialized to +1 if the split by inner node $m$ is to the right child and -1 otherwise. If neuron $m$ is not part of the path from root to the leaf, the weight is initialized always to 0.
+
+Based on this setting, it could be simply deduced that number of not null connections from the first hidden layer (weights) to the (arbitrary) neuron $m'$ in the second hidden layer is same as length of the path from root to the leaf $m'$. This is illustrated in Figure \ref{fig:sec_hidd_len}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\textwidth]{sec_hidd.png}
+\caption{In the left figure is highlighted blue path from the root node 1 to the leaf 3. This has length 1 and also only one initialized not null connection from the first hidden layer exists, because only root node is part of the path. In the remaining figures are depicted paths for other leaves (blue colored) from the root node (except of leaf 6, which is in same depth as leaf 7). It is easy to see, that equality between length of the path from the root node to the particular leaf and number of not null connections from the first hidden layer to the corresponding neuron holds always.}
+\label{fig:sec_hidd_len}
+\end{figure}
+
+The leaf membership retrieval is depicted in the picture [PICTURE3].
+
+
+
+
+
+
+
+
+
+\end{document}

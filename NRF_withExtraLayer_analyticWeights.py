@@ -1,15 +1,17 @@
-from ANN_forNRF_withExtraLayerCombined_boosted import Network
+from ANN_withExtraLayer_analyticWeights_twoetas import Network
 from CostFunctions import *
 import numpy as np
 import copy
 
 
-class NeuralTree_extraLayer():
+class NeuralTree_extraLayer_analyticWeights():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1,learning_rate1 = 0.1,learning_rate2 = 0.1):
 
         self.decision_tree = decision_tree
+        self.learning_rate1 = learning_rate1
+        self.learning_rate2 = learning_rate2
         self.gamma_output = gamma_output
         self.gamma = gamma
         self.gamma_sigmoid = gamma_sigmoid
@@ -132,11 +134,23 @@ class NeuralTree_extraLayer():
         self.biases.append(second_hidden_layer_biases)
 
     def initialize_third_hidden_layer(self):
-        weights = np.random.randn(self.decision_tree.n_classes_, len(self.leaves)) / np.sqrt(len(self.leaves))
-        biases = np.random.randn(self.decision_tree.n_classes_, 1)
+        leaves_probs = self.get_probs()
+        weights = np.zeros((self.decision_tree.n_classes_, len(self.leaves)), dtype=np.float64)
+        biases = np.zeros((self.decision_tree.n_classes_, 1), dtype=np.float64)  # initial biases are zero
+
+        A = np.diag(np.ones(len(self.leaves)))
+        A = np.where(A == 0, -1, A)
+        inverse_A = np.linalg.inv(A)
+
+        for label in range(self.decision_tree.n_classes_):
+            probs = leaves_probs[label, :].reshape(-1, 1)
+            probs = sigmoid_inverse(probs, self.gamma_sigmoid) # assumed that penultimate layer is sigmoid layer
+            weight = np.dot(inverse_A, probs)
+            weights[label, :] = weight.reshape(1, -1)
 
         self.weights.append(weights)
         self.biases.append(biases)
+
     def initialize_output_layer(self):
 
         weights = np.random.randn(self.decision_tree.n_classes_, self.decision_tree.n_classes_)/np.sqrt(self.decision_tree.n_classes_)
@@ -151,12 +165,13 @@ class NeuralTree_extraLayer():
                                         len(self.inner_nodes),
                                         len(self.leaves),
                                         self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=self.gamma,
-                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func,gamma_sigmoid=self.gamma_sigmoid)
+                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func,gamma_sigmoid=self.gamma_sigmoid,
+                               learn_rate1=self.learning_rate1,learn_rate2=self.learning_rate2)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
 
-    def train_NRF(self, epochs, mini_batch_size,eta, lmbda = 0.0,
+    def train_NRF(self, epochs, mini_batch_size, lmbda = 0.0,
             evaluation_data=None, monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False, monitor_training_cost=False,
             monitor_training_accuracy=False):
@@ -175,7 +190,7 @@ class NeuralTree_extraLayer():
             train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
 
         evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,
-                             eta=eta, num_classes=num_classes, lmbda=lmbda,
+                            num_classes=num_classes, lmbda=lmbda,
                             evaluation_data=evaluation_data, monitor_evaluation_cost= monitor_evaluation_cost,
                             monitor_evaluation_accuracy=monitor_evaluation_accuracy, monitor_training_cost=monitor_training_cost,
                             monitor_training_accuracy=monitor_training_accuracy)

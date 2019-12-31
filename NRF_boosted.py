@@ -7,13 +7,17 @@ import copy
 
 class NeuralTreeBoosted():
 
-    def __init__(self, decision_tree = None, X_train = None, y_train = None):
+    def __init__(self, decision_tree = None, X_train = None, y_train = None,
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [2,2]):
 
         self.decision_tree = decision_tree
         self.network = None # corresponding neural network classifier
         self.weights = []
         self.biases = []
         self.inner_nodes = None
+        self.output_func = output_func
+        self.gamma_output = gamma_output
+        self.gamma = gamma
         self.leaves = None
         self.training_data = X_train
         self.training_labels = y_train
@@ -146,8 +150,8 @@ class NeuralTreeBoosted():
         self.network = Network(sizes = [self.decision_tree.n_features_,
                                         len(self.inner_nodes),
                                         len(self.leaves),
-                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=[2.5,2.5],
-                               gamma_output=1.1,cost=cost,output_func='sigmoid')
+                                        self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=self.gamma,
+                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 

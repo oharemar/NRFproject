@@ -12,21 +12,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 
-def get_network_dataset(training_data,training_labels,estimator):
-    train_labels_temp = list(training_labels)
-    train_labels = []
-    for label in train_labels_temp:
-        lab = np.zeros((estimator.n_classes_, 1), dtype=np.float64)
-        index = list(estimator.classes_).index(label)
-        lab[index, 0] = 1.0
-        train_labels.append(lab)
 
-    train_data = list(zip(list(training_data), train_labels))
-    train_data_aligned = []
-    for j in range(len(train_data)):
-        train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
-
-    return  train_data_aligned
+rf = RandomForestClassifier(n_estimators=10,criterion='entropy',max_depth=6,max_features=8)
 
 '''NRF_basic test'''
 '''
@@ -54,7 +41,7 @@ df = pd.get_dummies(df) # one hot encoding categorical variables
 scaler = StandardScaler()
 df = scaler.fit_transform(df)
 '''
-'''
+
 df = pd.read_csv("vehicle_silhouette_dataset.csv")
 df = df.sample(frac=1)
 y = df.loc[:,'vehicle_class']
@@ -63,15 +50,15 @@ le = LabelEncoder()
 y = le.fit_transform(y)
 scaler = StandardScaler()
 df = scaler.fit_transform(df)
-'''
 
+'''
 df = pd.read_csv("diabetes.csv")
 df = df.sample(frac=1)
 y = df.loc[:,'Outcome']
 df = df.loc[:,df.columns != 'Outcome']
 scaler = StandardScaler()
 df = scaler.fit_transform(df)
-
+'''
 df = np.array(df,dtype=np.float64)
 y = np.array(y)
 
@@ -86,10 +73,66 @@ print(classification_report(y_test,predictions_DT))
 
 #from NRF_withExtraLayerCombined import *
 #nrf2 = NeuralTree_withExtraLayerCombined(estimator,X_train,y_train)
+'''NRF_basic
+from NRF_basic_boosted import *
+nrf_basic = NeuralTreeBasic_boosted(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [3.5,3.5])
+'''
 
+'''NRF_classic
+from NRF_boosted import *
+nrf_classic = NeuralTreeBoosted(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [3.3,3.3])
+'''
+
+'''NRF_analyticWeights'''
 from NRF_analyticWeights import *
+nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [2.3,2.3])
+'''
+print(nrf_analyticsWeights.leaves)
+print(nrf_analyticsWeights.get_probs())
 
-nrf2 = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='softmax',gamma_output=2,gamma = [1.3,1.3])
+stats = {leaf:{'appeared':0,'correct':0} for leaf in nrf_analyticsWeights.leaves}
+print(X_test.shape[0])
+for j in range(X_test.shape[0]):
+    lf = estimator.apply(X_test[j,:].reshape(1,-1))
+    stats[lf[0]]['appeared'] += 1
+    pred = estimator.predict(X_test[j,:].reshape(1,-1))
+    if pred == y_test[j]:
+        stats[lf[0]]['correct'] += 1
+
+
+print(stats)
+print(nrf_analyticsWeights.leaves)
+print(nrf_analyticsWeights.get_probs())
+
+for leaf in stats.keys():
+    print(leaf)
+    print(stats[leaf]['correct']/stats[leaf]['appeared'])
+
+
+N = 0
+arr = []
+y_arr = []
+for j in range(X_train.shape[0]):
+    pred = estimator.predict(X_train[j,:].reshape(1,-1))
+    if pred == y_train[j]:
+        N += 1
+    else:
+        print(X_train[j,:])
+        arr.append(X_train[j,:])
+        y_arr.append(y_train[j])
+
+'''
+'''NRF_extraLayer_analyticWeights
+from NRF_withExtraLayer_analyticWeights import *
+nrf_EL_analyticsWeights = NeuralTree_extraLayer_analyticWeights(estimator,X_train,y_train,output_func='sigmoid',
+                                                                gamma = [2.3,2.3],gamma_sigmoid=2,gamma_output=1,
+                                                                learning_rate1=0.015,learning_rate2=0.15)
+'''
+
+'''NRF_extraLayer_classic
+from NRF_withExtraLayer import *
+nrf_EL= NeuralTree_extraLayer(estimator,X_train,y_train,output_func='sigmoid',gamma = [2.3,2.3],gamma_sigmoid=1,gamma_output=1.5)
+'''
 
 #print(nrf2.weights[-1])
 
@@ -104,10 +147,12 @@ for data in X_trainLS:
     print(estimator.predict_proba(data.reshape(1,-1)))
 
 '''
+nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [2.3,2.3])
+
 #nrf = NeuralTree(estimator,X_train,y_train)
 #nrf.train_NRF(100,20,0.025)
-evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = nrf2.train_NRF(100,10,0.0035,0.1,monitor_training_cost=True,monitor_training_accuracy=True)
-predictions_NRT = nrf2.predict(X_test)
+evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = nrf_analyticsWeights.train_NRF(30,10,0.0055,0.03,monitor_training_cost=True,monitor_training_accuracy=True)
+predictions_NRT = nrf_analyticsWeights.predict(X_test)
 #print(predictions_NRT)
 #predictions_NR = nrf.predict(X_test)
 
@@ -117,7 +162,7 @@ print(classification_report(y_test,predictions_NRT))
 
 import matplotlib.pyplot as plt
 
-x = range(0,100)
+x = range(0,30)
 plt.figure(1)
 plt.plot(x,training_cost)
 

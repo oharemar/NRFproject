@@ -4,14 +4,15 @@ from CostFunctions import *
 import math
 
 
-
-
 class Network():
 
-    def __init__(self , sizes, biases = None, weights = None , gamma=None,gamma_output = 6,
-                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid'):
-        self. num_layers = len(sizes)
+    def __init__(self , sizes, biases = None, weights = None , gamma=None,gamma_output = 2,
+                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid',gamma_sigmoid = 1,learn_rate1 = 0.1,learn_rate2 = 0.1):
+        self.num_layers = len(sizes)
+        self.learn_rate1 = learn_rate1
+        self.learn_rate2 = learn_rate2 # we must use two learning rates in order to slow down learning in all layer except the last one an two make learning in last layer quick
         self.sizes = sizes
+        self.gamma_sigmoid = gamma_sigmoid # koeficient v sigmoidu v předposlední vrstvě
         self.gamma_output = gamma_output
         self.gamma = gamma
         self.cost = cost
@@ -24,9 +25,9 @@ class Network():
             self.weights = weights
         else:
             if weight_initilizer == 'new':
-                self.weights = [np.random.randn(y, x)/np.sqrt(x) for x, y in zip(sizes [:-1], sizes [1:])] # here we divide with sqrt of number of connections to the respective neuron
+                self.weights = [np.random.randn(y, x) / np.sqrt(x) for x, y in zip(sizes[:-1], sizes[1:])]  # here we divide with sqrt of number of connections to the respective neuron
             else:
-                self.weights = [np.random.randn(y, x) for x, y in zip(sizes [:-1], sizes [1:])] # here we divide with sqrt of number of connections to the respective neuron
+                self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]  # here we divide with sqrt of number of connections to the respective neuron
 
     def feedforward(self, a):
         """Return the output of the network if "a" is input."""
@@ -35,13 +36,15 @@ class Network():
             if (number == 0 or number == 1):
                 a = tanh(np.dot(w, a) + b,gamma=self.gamma[number]) # gamma is hyperparameter
             else:
-                if self.output_func == 'sigmoid':
+                if number == 2:
+                    a = sigmoid(np.dot(w, a) + b, self.gamma_sigmoid)
+                elif self.output_func == 'sigmoid':
                     a = sigmoid(np.dot(w, a) + b,self.gamma_output)
                 elif self.output_func == 'softmax':
                     a = softmax(np.dot(w, a) + b,self.gamma_output)
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta, num_classes, lmbda = 0.0,
+    def SGD(self, training_data, epochs, mini_batch_size, num_classes, lmbda=0.0,
             evaluation_data=None, monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False, monitor_training_cost=False,
             monitor_training_accuracy=False):
@@ -67,7 +70,7 @@ class Network():
             random.shuffle(training_data)
             mini_batches = [training_data[k:k + mini_batch_size] for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
-                self.update_mini_batch(mini_batch, eta, lmbda, len(training_data))
+                self.update_mini_batch(mini_batch, lmbda, len(training_data))
             print("Epoch %s training complete" % j)
             if monitor_training_cost:
                 cost = self.total_cost(training_data, lmbda, num_classes)
@@ -78,7 +81,7 @@ class Network():
                 training_accuracy.append(accuracy)
                 print("Accuracy on training data: {} / {}".format(accuracy, n))
             if monitor_evaluation_cost:
-                cost = self.total_cost(evaluation_data, lmbda, num_classes,convert=True)
+                cost = self.total_cost(evaluation_data, lmbda, num_classes, convert=True)
                 evaluation_cost.append(cost)
                 print("Cost on evaluation data: {}".format(cost))
             if monitor_evaluation_accuracy:
@@ -87,8 +90,7 @@ class Network():
                 print("Accuracy on evaluation data: {} / {}".format(self.accuracy(evaluation_data), n_data))
         return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
 
-
-    def update_mini_batch(self, mini_batch, eta, lmbda, n):
+    def update_mini_batch(self, mini_batch, lmbda, n):
         """Update the network’s weights and biases by applying gradient descent using backpropagation
         to a single mini batch. The ‘‘mini_batch‘‘ is a list of tuples ‘‘(x, y)‘‘, ‘‘eta‘‘ is the learning rate,
         ‘‘lmbda‘‘ is the regularization parameter, and ‘‘n‘‘ is the total size of the training data set.
@@ -100,8 +102,12 @@ class Network():
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [(1-eta*(lmbda/n))*w - (eta / len(mini_batch)) * nw for w, nw in zip(self.weights,nabla_w)] # added regularization term to the cost function
-        self.biases = [b - (eta / len(mini_batch)) * nb for b, nb in zip(self.biases, nabla_b)]
+        self.weights = [(1 - self.learn_rate1 * (lmbda / n)) * w - (self.learn_rate1 / len(mini_batch)) * nw if
+                        number in [0,1,2] else (1 - self.learn_rate2 * (lmbda / n)) * w - (self.learn_rate2 / len(mini_batch)) * nw
+                        for w, nw,number in
+                        zip(self.weights, nabla_w,range(len(self.weights)))]  # added regularization term to the cost function
+        self.biases = [b - (self.learn_rate1 / len(mini_batch)) * nb if number in [0,1,2] else
+                       b - (self.learn_rate1 / len(mini_batch)) * nb for b, nb,number in zip(self.biases, nabla_b,range(len(self.weights)))]
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
@@ -137,7 +143,9 @@ class Network():
             if (number == 0 or number == 1):
                 activation = tanh(z,self.gamma[number])
             else:
-                if self.output_func == 'sigmoid':
+                if number == 2:
+                    activation = sigmoid(z, self.gamma_sigmoid)
+                elif self.output_func == 'sigmoid':
                     activation = sigmoid(z,self.gamma_output)
                 elif self.output_func == 'softmax':
                     activation = softmax(z,self.gamma_output)
@@ -149,7 +157,10 @@ class Network():
 
         for l in range(2, self.num_layers):
             z = zs[-l]
-            sp = derivative_tanh(z,self.gamma[self.num_layers - l - 1])
+            if l == 2:
+                sp = sigmoid_prime(z,self.gamma_sigmoid)
+            else:
+                sp = derivative_tanh(z,self.gamma[self.num_layers - l - 1])
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
@@ -175,11 +186,6 @@ class Network():
             cost += self.cost.fn(a, y) / len(data)
         cost += 0.5 * (lmbda / len(data)) * sum(np.linalg.norm(w) ** 2 for w in self.weights)
         return cost
-
-
-
-
-
 
 
 

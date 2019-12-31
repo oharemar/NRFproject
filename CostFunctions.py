@@ -77,7 +77,7 @@ class QuadraticCost():
     @staticmethod
     def delta(z,a,y,gamma):
         """Return the error delta from the output layer."""
-        return (a - y) * sigmoid_prime(z,gamma)
+        return (a - y) * sigmoid_prime(z,gamma) # this is working only for output layer with sigmoid function
 
 class LogLikelihoodCost():
     @staticmethod

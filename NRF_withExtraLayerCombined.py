@@ -1,5 +1,5 @@
-from ANN_forNRF_withExtraLayerCombined import Network
-from NRF_basic import NeuralTreeBasic
+from ANN_forNRF_withExtraLayerCombined_boosted import Network
+from NRF_basic_boosted import NeuralTreeBasic_boosted
 import pandas as pd
 import numpy as np
 import copy

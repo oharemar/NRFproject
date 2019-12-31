@@ -6,7 +6,8 @@ import copy
 
 class NeuralTree_analyticWeights():
 
-    def __init__(self, decision_tree = None, X_train = None, y_train = None, output_func = 'sigmoid',gamma_output = 1, gamma = [15,15]):
+    def __init__(self, decision_tree = None, X_train = None, y_train = None,
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15]):
 
         self.decision_tree = decision_tree
         self.gamma_output = gamma_output
@@ -24,7 +25,7 @@ class NeuralTree_analyticWeights():
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
         self.initialize_output_layer()
-        self.create_NN(CrossEntropyCost)
+        self.create_NN(LogLikelihoodCost)
 
 
     def get_probs(self):
