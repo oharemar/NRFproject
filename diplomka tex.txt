@@ -86,7 +86,7 @@ In order to obtain all decisions of inner nodes in the corresponding neurons of 
 
 \subsubsection{Second hidden layer}
 
-From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of the input vector $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer.
+From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of the input vector $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer. If there are $L-1$ neurons in the first hidden layer, then the second hidden layer consists of $L$ neurons, each one corresponding to the one individual leaf in the decision tree.
 
 We connect neuron $m$ in the first hidden layer to neuron $m'$ in the second hidden layer with not null weight if and only if inner node corresponding to the neuron $m$ belongs to the path from root node to the leaf corresponding to the neuron $m'$. The weight is initialized to +1 if the split by inner node $m$ is to the right child and -1 otherwise. If neuron $m$ is not part of the path from root to the leaf, the weight is initialized always to 0.
 
@@ -99,7 +99,58 @@ Based on this setting, it could be simply deduced that number of not null connec
 \label{fig:sec_hidd_len}
 \end{figure}
 
-The leaf membership retrieval is depicted in the picture [PICTURE3].
+If output from the first hidden layer is $\boldsymbol{v} = (\pm 1, \pm 1,....,\pm 1)^T$, which encodes all decisions of inner nodes of the decision tree, then output from the neuron $m'$ in the second hidden layer is $\tau(\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m'))$, where\\ $\boldsymbol{w}^{m'} = (w_1^{m'},w_2^{m'},...,w_{L-1}^{m'})^T$ is a vector of  weights for connections to neuron $m'$. These weights are not null if the corresponding inner node is involved in the path from root to the leaf $m'$ and are +1 if it is sent to the right child and -1 otherwise. For all inner nodes that are not involved in the root-leaf path are weights initialized to 0.
+
+Desired behaviour of the neuron $m'$ in the second hidden layer is to output +1 if the input vector ends in leaf $m'$ and -1 otherwise. For this purpose, $bias(m')$ must be correctly set. To do so, it is sufficient to notice that the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i)$ as the first term in the argument of $\tau(\cdot)$ function equals to the length of the path from root node to leaf $m'$, if and only if the input ends in leaf $m'$. For convenience, let us denote this length as $l(m')$. It is a simple consequence of the fact, that the number of not null weights $w_{i_k}^{m'}$ is same as $l(m')$ and also they have same magnitude ($|w_{i_k}^{m'}| = 1$) and same sign as $v_{i_k}$, where $i_k \in \{1,...,L-1\}, w_{i_k}^{m'} \neq 0$. Therefore, each member of the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i) = \sum_{i_k=1,w_{i_k}^{m'} \neq 0}^{L-1}(w_{i_k}^{m'}v_{i_k})$ equals to +1 and all members sum up to $l(m')$.
+
+Moreover, if the input does not end in leaf $m'$, then in the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i)$ exists a not null member in which interfere 2 integers (ones) with different signs, resulting in -1. Hence is clear, that if input does not end in leaf $m'$, the sum holds inequality $\sum_{i=1}^{L-1}(w_i^{m'}v_i) \leq l(m')-1 < l(m')$. For more precise intuition, the illustration is provided in Figure \ref{fig:sec_hidd_ilust}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\textwidth]{sec_hidd_ilust.png}
+\caption{Demonstration of inequality $\sum_{i=1}^{L-1}(w_i^{m'}v_i) \leq l(m')-1 < l(m')$ in case of leaf number 7 (corresponding to one neuron in the second hidden layer of our network), if input does not end in leaf $m'$. The red path in the picture indicates real path of input in the decision tree. Our sample input ends in leaf number 6, as could be seen from the illustration. The output from the first hidden layer would therefore be $\boldsymbol{v} = (v_1,v_2,v_3)^T = (+1,-1,-1)^T$. But weights corresponding to neuron 7 (leaf 7) are $\boldsymbol{w}^7 = (w_1^7,w_2^7,w_3^7)^T = (+1,-1,+1)^T$. After multiplying the values in red circles and summing the results up, we obtain $\sum_{i=1}^{L-1}(w_i^{7}v_i) = 2 < 3$, where 3 means the length of the root-leaf path. A decrease is caused due to the interference of different signs in a grey circle.}
+\label{fig:sec_hidd_ilust}
+\end{figure}
+
+After these considerations, the reasonable choice of $bias(m')$ is
+\begin{equation}
+    bias(m') = -l(m') + 0.5
+\label{eq:bias}    
+\end{equation}
+and then $\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')$ has following property:
+\begin{equation}
+    \sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')\begin{cases}
+    > 0, & \text{if input ends in leaf}\hspace{0.18cm} m' \\
+    < 0, & \text{otherwise}
+    \end{cases}
+\label{eq:sec_hidd_property}
+\end{equation}
+
+With respect to the property of $\tau(\cdot)$ function argument in \eqref{eq:sec_hidd_property}, the second hidden layer outputs a vector of $(-1,...,-1,+1,-1,...,-1)^T$ with a single positive 1 indicating the correct leaf membership of an input.
+
+To retain this $\tau(\cdot)$ argument property, it is sufficient to choose any other arbitrary constant in \eqref{eq:bias} in range $(0,1)$ instead of 0.5. But to stay consistent with [Neural Random Forest], we also used the proposed value of 0.5 in conducted experiments.
+
+At this stage, we already defined architecture and initial weights and biases settings of first two hidden layers in order to transform decision tree into neural network with the same properties. All that remains is to gain classification predictions from the second hidden layer.
+
+\subsubsection{Output layer}
+
+In this section is proposed architecture and initial setting for output layer, that will gain same predictions as the decision tree. Unfortunately, same method proposed for regression trees in [Neural Random Forest] is not directly applicable in the classification case. Therefore we propose an alternative for the classification case, that give same classification outcomes as the corresponding decision tree.
+
+The output layer will be constructed as follows: The number of neurons in output layer is equal to number of classes we desire to classify. Each neuron corresponds to only one particular class (one label). Neuron with the highest activation represents the predicted class of neural network. In the experiments were used two types of neurons in output layer - with sigmoid and softmax activation functions, as were discussed in Chapter [Activation functions].  To get the same performance as the decision tree, we must retrieve probability distributions stored in leaves from the leaf membership encoded in the second hidden layer. If the output layer outcomes the same probability values for classes as the decision tree, hence the neural network performs alike.
+
+Let's denote output from the second hidden layer as\\ $\boldsymbol{r} = (-1,...,-1,+1,-1,...,-1)^T$, where the position of +1 indicates the leaf where the input falls in. For each leaf $l \in \{1,...,L\}$ we denote a probability vector $\boldsymbol{p^l} = (p^l_1,p^l_2,...,p^l_C)^T$ with probabilities of individual classes, that are stored in leaf $l$, where $C$ is total number of classes. If $\boldsymbol{r}$ has +1 as the first element (corresponding to the first leaf), i.e. $r_1 = +1$, the output layer should outcome $\boldsymbol{p}^1$. If $r_2 = +1$, the outcome should be $\boldsymbol{p}^2$ etc.
+
+If we initialize biases in the output layer to 0, then appropriate initialization weights could be obtained by solving the system of linear equations with a regular matrix $\mathbb{A}$
+\begin{equation}
+    \mathbb{A}=\begin{pmatrix}
+    1 & -1 & -1 &\hdots & -1 \\
+    -1 & 1 & -1 & \hdots & -1\\
+    \vdots & \ddots & \ddots & \ddots&\vdots \\
+    -1 & \ddots & \ddots & \ddots&-1 \\
+    -1 & -1 & \hdots & -1 & 1
+    \end{pmatrix}\hspace{0.5cm}.
+\end{equation}
+
 
 
 
