@@ -438,7 +438,9 @@ plot(predictorEffects(lm_logcons_interceptsquared))#, ~ type + education))
 # otázka è.14
 #################################
 
-# vytvoøíme lineární regresní model pøi uvážení promìnných weight a origin
+# ALTERNATIVNÍ ODPOVÌÏ DOLE je lepší
+
+# vytvoøíme lineární regresní model pøi uvážení promìnných weight a origin a spotøebou transformovanou jako v pøedchozím pøípadì
 # využijeme stejnou vybranou transformaci spotøeby jako v pøedchozím pøípadì
 
 data1 = data_mpghp
@@ -467,13 +469,131 @@ p <- ggplot(data_mpghp, aes(x=weight, y=consumption, color = origin))+geom_point
   
 plot(p)
 
+
+# alternativní odpovìï
+
+# udìláme aditivní lin.model
+lm_weight_origin<-lm(consumption~weight+origin,data_mpghp)
+summary(lm_weight_origin)
+
+# data splitneme podle origin
+data_split_origin  <- split(data_mpghp, data_mpghp$origin)
+
+data_split_origin[['1']]$Fit <- predict(lm_weight_origin, data_split_origin[['1']])
+data_split_origin[['2']]$Fit  <- predict(lm_weight_origin, data_split_origin[['2']])
+data_split_origin[['3']]$Fit  <- predict(lm_weight_origin, data_split_origin[['3']])
+
+
+p <- ggplot(data_mpghp, aes(x=weight, y=consumption, color = origin))+geom_point()+
+  geom_line(data = data_split_origin[['1']], aes(x=weight,y=Fit), size = 0.8)+
+  geom_line(data = data_split_origin[['2']], aes(x=weight,y=Fit), size = 0.8)+
+  geom_line(data = data_split_origin[['3']], aes(x=weight,y=Fit), size = 0.8)+
+  
+plot(p)
+
+# nakonec bych pøidal i regresní pøímky pro dva rùzné modely na jednotlivých skupinách
+
+
 #################################
 # otázka è.15
 #################################
+# jako statistický test použijeme rozšíøení t-testu, tzv. one-way anova test.
+# je alternativou t-testu, pokud máme více než 2 faktory
+# tento test pøedpokládá normalitu dat v každém faktoru a stejné rozptyly napøíc faktory (mìlo by se ovìøit)
+# pokud bychom nesplnili tyto požadavky, lze použít jako alternativu Kruskalùv test
 
 
+# vykreslíme obrázky zvláš pro origin a pro cylinders
+
+install.packages('ggpubr')
+library("ggpubr")
+p <- ggline(data_mpghp, x = 'origin', y = 'consumption', 
+            add = c("mean_se", "jitter"), 
+            order = c("1", "2", "3"))
+            
+plot(p)
+
+p <- ggline(data_mpghp, x = 'cylinders', y = 'consumption', 
+            add = c("mean_se", "jitter"))#,color='origin')
+
+plot(p)
+
+# provedeme one-way ANOVA test zvláš pro origin a cylinders
+summary(aov(consumption~origin,data_mpghp))
+# díky velmi nízké p-hodnotì zamítáme nulovou hypotézu, která øíká, že støední hodnoty se napøíè jednotlivými zemìmi rovnají
+
+kruskal.test(consumption~origin,data_mpghp)
+# kruskalùv test to potvrzuje
 
 
+summary(aov(consumption~cylinders,data_mpghp))
+# i pro cylinders zamítáme nulovou hypotézu
+kruskal.test(consumption~cylinders,data_mpghp)
+# kruskalùv test to potvrzuje
+
+# Pokud by nastala situace, že by se støední hodnoty consumption rovnali pro nìjakou faktorovou promìnnou pro každý faktor, pak si myslím, že daná faktorová promìnná nebude mít
+# pøíliš velký vliv na vysvìtlovanou promìnnou(zanedbatelný èi žádný vliv), kvùli rovnostem støedních hodnot se jednotlivé hodnoty v rùzných faktorech budou 'dost podobat'
+
+# mùžeme to demonstrovat na pøíkladu
+?rep
+x <- seq(-20, 20, by = .1)
+x_1 <- rep(1,length(x))
+y_1 <- rnorm(x,mean=0,sd=1)
+plot(x_1,y_1)
+
+
+x_2 <- rep(2,length(x))
+y_2 <- rnorm(x,mean=0,sd=2)
+plot(x_2,y_2)
+
+x_3 <- rep(3,length(x))
+y_3 <- rnorm(x,mean=0,sd=0.5)
+plot(x_3,y_3)
+
+
+df1=data.frame(explanatory = y_1,independent = x_1)
+df2=data.frame(explanatory = y_2,independent = x_2)
+df3=data.frame(explanatory = y_3,independent = x_3)
+
+df = rbind(df1,df2,df3)
+df$independent = factor(df$independent)
+
+lm = lm(explanatory~independent,df)
+summary(lm)
+
+# vidíme, že v tomto pøípadì 'explanatory' pøíliš nezávisí na 'independent'
+# pokud zopakujeme experiment s jinými støedními hodnotami
+
+x <- seq(-20, 20, by = .1)
+x_1 <- rep(1,length(x))
+y_1 <- rnorm(x,mean=0,sd=1)
+plot(x_1,y_1)
+
+x_2 <- rep(2,length(x))
+y_2 <- rnorm(x,mean=1,sd=1)
+plot(x_2,y_2)
+
+x_3 <- rep(3,length(x))
+y_3 <- rnorm(x,mean=0.5,sd=0.5)
+plot(x_3,y_3)
+
+
+df1=data.frame(explanatory = y_1,independent = x_1)
+df2=data.frame(explanatory = y_2,independent = x_2)
+df3=data.frame(explanatory = y_3,independent = x_3)
+
+df = rbind(df1,df2,df3)
+df$independent = factor(df$independent)
+
+lm = lm(explanatory~independent,df)
+summary(lm)
+
+# zde už to vypadá jinak a závislost 'explanatory' na 'independent' je zøejmá
+
+
+#################################
+# otázka è.16
+#################################
 
 
 
