@@ -14,7 +14,6 @@ my_data <- read.table("auto-mpg-01rean.txt",header = TRUE)
 
 my_data = as.data.frame(my_data)
 my_data
-
 summary(my_data)
 
 # kontrola NaNs
@@ -473,6 +472,7 @@ plot(p)
 # alternativní odpovìï
 
 # udìláme aditivní lin.model
+
 lm_weight_origin<-lm(consumption~weight+origin,data_mpghp)
 summary(lm_weight_origin)
 
@@ -487,7 +487,7 @@ data_split_origin[['3']]$Fit  <- predict(lm_weight_origin, data_split_origin[['3
 p <- ggplot(data_mpghp, aes(x=weight, y=consumption, color = origin))+geom_point()+
   geom_line(data = data_split_origin[['1']], aes(x=weight,y=Fit), size = 0.8)+
   geom_line(data = data_split_origin[['2']], aes(x=weight,y=Fit), size = 0.8)+
-  geom_line(data = data_split_origin[['3']], aes(x=weight,y=Fit), size = 0.8)+
+  geom_line(data = data_split_origin[['3']], aes(x=weight,y=Fit), size = 0.8)
   
 plot(p)
 
@@ -594,6 +594,270 @@ summary(lm)
 #################################
 # otázka è.16
 #################################
+
+# z modelu vyhodíme úplnì faktorovou promìnnou car_name, jelikož je pro každou instanci unikátní a tudíž nesignifikantní pro náš pøípad
+# vydìláme car_name, constant_Weight, constants_weight2 a také producer
+
+lm_all  <- lm(consumption ~ (.-car_name-constant_weight-constant_weight2)*(.-car_name-constant_weight-constant_weight2), data = data_mpghp)
+summary(lm_all)
+
+# pøevedeme cylinders zpìt na numerickou promìnnou a pomocí ggpairs se podíváme na možnou kolinearitu mezi numerickými promìnnými
+data_mpghp$cylinders = as.numeric(data_mpghp$cylinders)
+
+View(data_mpghp)
+
+library(ggplot2)
+library(GGally)
+ggpairs(data_mpghp[c("cylinders","displacement","horsepower","weight","acceleration")])
+library(mctest)
+install.packages('mctest')
+imcdiag(data_mpghp[c("cylinders","displacement","horsepower","weight","acceleration")],data_mpghp$consumption)
+
+#data_mpghp = with(data_mpghp,rm('constant_weight','constant_weight2'))
+
+car::vif(lm_temp)
+
+# provedeme stepAIC jako první ze všech možných explanatory variables
+lm_start = lm(consumption~ (.-car_name-producer)^2,data_mpghp)
+lm_final <- stepAIC(lm_start,direction='backward')
+# finální regrese: consumption ~ cylinders + displacement + horsepower + weight + 
+#acceleration + model_year + origin + cylinders:horsepower + 
+ # cylinders:model_year + displacement:horsepower + displacement:acceleration + 
+  #displacement:model_year + displacement:origin + horsepower:weight + 
+  #horsepower:model_year + weight:acceleration + weight:model_year + 
+  #weight:origin + acceleration:model_year + acceleration:origin
+
+summary(lm_start)
+summary(lm_final)
+
+
+
+car::vif(lm_final)
+# vidíme vysokou multikolinearitu na základì VIF hodnot, tohle budeme øešit v dalších otázkách
+
+# nyní model validujeme
+# jako první zkontrolujeme normalitu reziduí
+plot(lm_final,which=2)
+# QQ plot nevypadá moc dobøe, zkontrolujeme shapirovým testem
+shapiro.test(residuals(lm_final))
+# podle shapiro testu bychom mìli zamítnout nulovou hypotézu, tedy normalitu
+# v dalších otázkách budeme zkoušet transformace consumption kvùli zlepšení normality reziduí
+
+#################################
+# otázka è.17
+#################################
+
+form = 'log(consumption) ~ cylinders + displacement + horsepower + weight + 
+acceleration + model_year + origin + cylinders:horsepower + 
+ cylinders:model_year + displacement:horsepower + displacement:acceleration + 
+ displacement:model_year + displacement:origin + horsepower:weight + 
+horsepower:model_year + weight:acceleration + weight:model_year + 
+  weight:origin + acceleration:model_year + acceleration:origin'
+
+# jako první udìláme logaritmickou transformaci
+lm_final_log = lm(form,data_mpghp)
+summary(lm_final_log)
+
+plot(lm_final_log,which=2)
+shapiro.test(residuals(lm_final_log))
+# vidíme, že tato tranformace pomohla a shapirùv test nezamítá normalitu
+# i QQ plot vypadá mnohem lépe
+
+
+
+# vyzkoušíme box-coxovu transformaci
+# zde je log-vìrohodnostní profil
+library(MASS)
+bc <- boxcox(lm_final)
+
+lambda <- bc$x[which.max(bc$y)]
+print(lambda)
+
+form_lambda = '(consumption^lambda - 1)/lambda ~ cylinders + displacement + horsepower + weight + 
+acceleration + model_year + origin + cylinders:horsepower + 
+cylinders:model_year + displacement:horsepower + displacement:acceleration + 
+displacement:model_year + displacement:origin + horsepower:weight + 
+horsepower:model_year + weight:acceleration + weight:model_year + 
+weight:origin + acceleration:model_year + acceleration:origin'
+
+lm_final_bc = lm(form_lambda,data_mpghp)
+summary(lm_final_bc)
+
+plot(lm_final_bc,which=2)
+
+# QQ plot vypadá výbornì, ovìøíme ještì shapiro testem
+shapiro.test(residuals(lm_final_bc))
+# test prošel bez problému
+
+# zdá se, že model s box-cox transformací je co se týèe R^2 statistiky a splnìní OLS požadavkù
+# na tom velmi podobnì jako model s log transformací
+# nakonec bych se asi rozhodl pro box-cox model, který vykazuje o chloupek lepší R^2 statistiku a normalitu reziduí
+
+
+#################################
+# otázka è.18
+#################################
+
+# Použili jsme log transformaci a v takovém pøípadì zmìna spotøeby v závislosti na váze
+# bude záviset na poèáteèní váze, od které zmìnu poèítáme (zmìna je nelineární), nelze tedy urèit obecnì, jaká bude procentuální zmìna
+
+# model z otázky 16 obsahuje kromì samotné weight i interakce s weight, takže pak není zøejmé, jaký pøesnì má vliv urèitá zmìna váhy na spotøebu
+# každopádnì pokud bychom zanedbali interakce s weight , pak má weight opaèný vliv než v modelu z otázky 9
+# tj, pøi zvyšování váhy spotøeba klesá - bez interakcí a ostatních nezávislých promìnných by ale takový model pak nedával s takovou závislostí pøíliš smysl
+
+
+#################################
+# otázka è.19
+#################################
+
+# zde identifikujeme kolinearitu, oddìláme kolineární promìnné a porovnáme nový model pomocí anova()
+
+# jako první si vykreslíme ggpairs pro detekci kolinearity pro numerické promìnné
+
+ggpairs(data_mpghp[c("cylinders","displacement","horsepower","weight","acceleration")])
+
+# vidíme velkou kolinearitu mezi cylinders,displacement,horsepower a weight
+# tohle jde vidìt i na grafu, který už jsme vykreslovali pro chrysler
+
+p <- ggplot(data_mpghp,aes(x=weight,y=consumption))+
+  geom_point(aes(size = displacement, colour = cylinders, shape = horsepower))
+
+data_mpghp$horsepower_discrete = cut(data_mpghp$horsepower,breaks=6)
+
+
+p <- ggplot(data_mpghp,aes(x=weight,y=consumption))+
+  geom_point(aes(size = displacement, colour = cylinders, shape = horsepower_discrete))
+
+print(p)
+
+
+# èím vyšší weight, tím vyšší displacement, horsepower,cylinders -> tyto promìnné jsou mezi sebou provázány
+
+# budeme postupnì iterativnì odebírat na základì VIF hodnot promìnné s nejvyšší hodnotou VIF s tresholdem 4
+
+#1.krok
+
+car::vif(lm(consumption~cylinders+displacement+horsepower+weight+acceleration, data_mpghp))
+# odebereme displacement, pokraèujeme
+
+# nakonec zùstane jen weight a acceleration
+car::vif(lm(consumption~weight+acceleration, data_mpghp))
+
+# staèilo by tedy z numerických promìnných zachovat pouze weight a acceleration, ostatní jsou kolineární s weight
+# tato korelace se dá odùvodnit i logicky, z fyzikálních dùvodù, kdy je zøejmé, že každá z velièin by se mìla mìnit stejným smìrem jako velièina jiná ("pokud bude víc válcù, bude vìtší výkon, vìtší zdvihový objem a vìtší hmotnost")
+
+# zkusíme tedy oproti vybranému modelu z otázky 16 vytvoøit znovu finální model na základì AIC
+# a porovnat s již získaným obecnìjším
+
+lm_start2 = lm(consumption~ (.-car_name-producer-displacement-cylinders-horsepower-horsepower_discrete)^2,data_mpghp)
+lm_final2 <- stepAIC(lm_start2,direction='backward')
+summary(lm_final2)
+shapiro.test(residuals(lm_final2))
+# zde neprochází normalita ani po log transformaci, to jsem zkoušel, ale uvést zde taky
+
+# nyní se podíváme na multikolinearitu v lm_final, vyøešíme ji na základì VIF hodnot,
+# zjemníme threshold na 6 a iterativnì budeme odebírat regresory s nejvyšší hodnotou VIF
+
+# postup byl dlouhý, uvedu jen závìr
+
+
+form = "consumption ~ cylinders +
+acceleration + origin  + displacement:horsepower + 
+displacement:model_year+displacement:origin + 
+horsepower:model_year + weight:acceleration 
++ acceleration:model_year + acceleration:origin"
+
+lm_test = lm(form,data_mpghp)
+summary(lm_test)
+car::vif(lm_test)
+
+plot(lm_test,which=2)
+shapiro.test(residuals(lm_test))
+# nemáme normalitu
+
+lm_test_final = stepAIC(lm_test,direction = 'backward')
+summary(lm_test_final)
+shapiro.test(residuals(lm_test_final)) # neprochází normalita
+
+anova(lm_test_final,lm_test) # poøád vychází o nìco lépe pùvodní model
+
+
+form1 = "log(consumption) ~ cylinders +
+acceleration + origin  + displacement:horsepower + 
+displacement:model_year+displacement:origin + 
+horsepower:model_year + weight:acceleration 
++ acceleration:model_year + acceleration:origin"
+
+lm_test1 = lm(form1,data_mpghp)
+summary(lm_test1)
+car::vif(lm_test1)
+
+plot(lm_test1,which=2)
+
+shapiro.test(residuals(lm_test1))
+# po log transformaci tohle normalitu reziduí splòuje
+
+
+lm_test_final1 = stepAIC(lm_test1,direction='backward')
+summary(lm_test_final1)
+
+anova(lm_test_final1,lm_test1) # takže zde mùžeme lm_test1 zahodit a uvažujeme lm_test_final1
+# zkontrolujeme normalitu
+shapiro.test(residuals(lm_test_final1)) # normalita prochází
+plot(lm_test_final1,which=2)
+
+plot(lm_test_final1,which=3)
+# plot na scale-location vypadá dobøe , homoskedasticitu nezamítáme
+
+sigma(lm_test_final1)
+
+
+#################################
+# otázka è.20
+#################################
+
+
+plot(lm_test_final1, which = 5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
