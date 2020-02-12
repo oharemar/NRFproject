@@ -1,0 +1,230 @@
+---
+title: "REAN protokol"
+author: "Martin Oharek"
+date: "12 února 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Knihovny
+Na začátek načteme doporučené knihovny
+```{r}
+lbs <- c('car','MASS','tidyverse','ggplot2','ISLR','graphics','effects','leaps','psych',
+         'lattice','lmtest','robustbase')
+
+install.lib <- lbs[!lbs %in% installed.packages()]
+for(libs in install.lib) install.packages(libs, dependences = TRUE)
+sapply(lbs, require, character = TRUE)
+```
+
+# Zpracování dat, průzkumová a grafická část
+
+## Otázka č.1: Zjistěte, zdali data neobsahují chybějící hodnoty (NA), pokud ano tak rozhodněte zdali můžete příslušná pozorování z dat odstranit.
+
+Jako první data načteme z příslušného souboru
+
+```{r}
+my_data <- read.table("auto-mpg-01rean.txt",header = TRUE)
+my_data = as.data.frame(my_data)
+```
+
+Potom se na data podíváme přes summary funkci
+```{r}
+summary(my_data)
+```
+
+Vidíme, že se vyskytuje 6 NaNs v proměnné horsepower a 9 NaNs v proměnné mpg. Odstranění příslušných řádků závisí na plánovaném využití datasetu. Pokud budeme chtít regresovat mpg, pak jistě budeme muset odstranit řádky s NaNy v mpg. Pokud budeme chtít regresovat navíc pomocí horsepower, pak budeme muset odstranit i řádky s NaNy v horsepower. V našem případě je celkově 15 řádků s Nany, což není vzhledem k celkovému počtu 406 mnoho, navíc budeme téměř ve všech pozdějších úlohách pracovat jak s mpg, tak horsepower dohromady, proto pro větší přehlednost budeme uvažovat pouze data bez NaNů již od začátku pro všechny následující úlohy.
+
+```{r}
+data_mpghp = my_data[!is.na(my_data$mpg) & !is.na(my_data$horsepower),]
+
+```
+
+## Otázka č.2: Které proměnné jsou kvantitativní a které kvalitativní? Jeli možno některé zařadit do obou skupin, pro kterou se rozhodnete? Které proměnné budete brát jako faktorové a proč?
+
+Za kvalitativní proměnné většinou bereme kategorické proměnné, které nabývají diskrétních hodnot. Kvantitativní jsou naopak spojité, numerické proměnné, které popisují číselnou velikost, množství,..
+
+Zřejmě kvantitativní proměnné v našem případě jsou mpg, displacement, horsepower, weight a acceleration. Faktorové jsou určitě origin a car_name. Do obou skupin lze zařadit cylinders a model_year. Jestli danou proměnnou brát jako faktorovou či nikoliv závisí na zkoumaném problému a plánovaném využití výsledného modelu. Např. pokud budeme chtít používat model i na automobily o jiném počtu válců než máme v datasetu, pak zvolíme cylinders jako numerickou proměnnou. Ale např. model_year bych určitě nebral jako numerickou proměnnou, zde nedává příliš smysl do modelu dosazovat jiné roky, než se kterými se setkáme v datasetu, nebo např. dosazovat neceločíselné hodnoty let. Předpokládat, že spotřeba se bude měnit lineárně i v budoucnu či v minulosti vzhledem k našim datům mi nepřijde správné.
+
+Momentálně zvolím cylinders i model_year jako kategorické proměnné.
+
+```{r}
+data_mpghp$origin = as.factor(data_mpghp$origin)
+data_mpghp$cylinders = as.factor(data_mpghp$cylinders)
+data_mpghp$model_year = as.factor(data_mpghp$model_year)
+
+
+```
+
+## Otázka č.3: Proměnnou mpg nahraďte proměnnou consumption, kde bude místo počtu ujetých mil na galon paliva uvedena hodnota počet litrů na 100km. Jednotky proměnné displacement převěďte z kubických palců na litry a weight z liber na kilogramy.
+
+```{r}
+data_mpghp$consumption = (100*3.785411)/(data_mpghp$mpg * 1.609344)
+data_mpghp$displacement = data_mpghp$displacement*0.016387064
+data_mpghp$weight = data_mpghp$weight*0.45359237
+
+```
+
+## Otázka č.4: Vykreslete histogramy a odhady hustot consumption, displacement, acceleration, horsepower, weight, model_year. Proměnnou consumption vykreslete pomocí scatterplotu spolu s ostatními proměnnými - závislost odezvy ("consumption") na vysvětlujících proměnných. Proložte body jak lineárním odhadem, tak vyhlazenou křivkou lokální regrese, buď pomocí LOESS (locally estimated scatterplot smoothing) nebo LOWESS (locally weighted scatterplot smoothing)(lines(lowess(X,Y))). Co lze z tohoto obrázku předpokládat o závislosti spotřeby auta na dalších proměnných. 
+
+Jako první vykreslíme histogramy.
+
+```{r}
+data_mpghp$model_year = as.numeric(as.character(data_mpghp$model_year))# změníme zpět na numerickou kvůli histogramu
+
+cols = c('consumption', 'displacement', 'acceleration', 'horsepower', 'weight', 'model_year')
+par(mfrow = c(2, 3))
+for (col in cols)
+{
+  hist(data_mpghp[,col],xlab = col,main = '')
+}
+
+```
+
+
+Nyní vykreslíme odhady hustot.
+
+```{r}
+
+par(mfrow = c(2, 3))
+for (col in cols)
+{
+  hist(data_mpghp[,col],xlab = col,freq=FALSE,main = '')
+  lines(density(data_mpghp[,col]), col="red", lwd=1)
+}
+```
+
+
+A naposledy scatterploty s křivkou lokální regrese.
+
+```{r}
+par(mfrow = c(2, 3))
+cols = c('displacement', 'acceleration', 'horsepower', 'weight', 'model_year')
+for (col in cols)
+{
+  scatter.smooth(data_mpghp[,col],data_mpghp[,'consumption'],
+                 xlab = col,ylab = 'consumption',main = '',lpars = list(col='blue',lwd=2))
+  abline(lm(data_mpghp[,'consumption'] ~ data_mpghp[,col],data = data_mpghp),col = 'red', lwd = 2)  
+}
+
+```
+
+Z obrázku vidíme, že se křivky "přibližně" podobají, z toho lze usoudit, že data jsou vhodná modelovat pomocí lineární regrese. Pokud by se křivky významně lišily, pak by už dopředu mohlo být jasnější, že (jednoduchý) lineární model nebude příliš vhodnou volbou a stálo by za to vybrat jiný (nelineární) model.
+
+Dále si můžeme všimnout poměrně logických trendů, které nám ověřují, že data jsou smysluplná, např. můžeme vidět, že se zvyšující se váhou či výkonem vozidla se zvyšuje i spotřeba, což souhlasí s jakousi empirickou a fyzikální znalostí problému. Také se s přibývajícími roky většinou spotřeba snižovala. Zde by bylo zajímavé si vykreslit (bude rozebráno v úkolu č.8) závislost výkonu či zrychlení v závislosti na model_year a ověřit, že deficit ve spotřebě negativně neovlivnil tyto proměnné.
+
+## Otázka č.5: Z proměnné car_name vytvořte proměnnou model podle prvního slova obsaženého v řetězci. Pro proměnné model_year, model, cylinders, origin a jejich vztah k odezvě consumption vykreslete krabicové diagramy (boxploty). Je mezi uvedenými proměnnými některá, pro kterou byste na základě krabicových diagramů navrhli sloučit určité úrovně dohromady? Je z těchto grafů vidět, že některá auta mají jinou, než očekávanou spotřebu?
+
+Ke splnění úlohy využijeme balíček "stringr", který nám usnadní práci.
+```{r}
+library('stringr')
+data_mpghp$producer = word(data_mpghp$car_name,1)
+data_mpghp$model_year = factor(data_mpghp$model_year) # model_year převedeme zpět na faktor
+```
+
+Na vykreslení boxplotu využijeme ggplot
+
+```{r}
+library(gplots)
+library(ggplot2)
+library(ggpubr)
+cols = c('model_year','producer','cylinders','origin')
+p1 <- ggplot(data_mpghp,aes(x=model_year,y=consumption, fill = model_year)) + 
+    geom_boxplot(notch=FALSE,outlier.color = 'black') + scale_fill_discrete(name='year')
+plot(p1)
+p2 <- ggplot(data_mpghp,aes(x=producer,y=consumption, fill = producer)) + 
+  geom_boxplot(notch=FALSE,outlier.color = 'black') + scale_fill_discrete(name='producer') +
+  theme(axis.text.x=element_text(angle=75))
+plot(p2)
+
+p3 <- ggplot(data_mpghp,aes(x=cylinders,y=consumption,fill = cylinders)) + 
+  geom_boxplot(notch=FALSE,outlier.color = 'black') + scale_fill_discrete(name='cylinders')
+plot(p3)
+
+p4 <- ggplot(data_mpghp,aes(x=origin,y=consumption,fill = origin)) + 
+  geom_boxplot(notch=FALSE,outlier.color = 'black') + scale_x_discrete(labels=c("1" = "USA", "2" = "Evropa","3" = "Japonsko"))+
+  scale_fill_discrete(name='origin',labels=c("1" = "USA", "2" = "Evropa","3" = "Japonsko"))
+plot(p4)
+
+
+```
+
+Dle podobnosti středních hodnot a mediánů by se da sloučit model_year na méně faktorů. Daly by se sloučit roky 70-73, 74-79, 80-82. Ostatní proměnné bych neslučoval, jelikož rozdíly středních hodnot a mediánů pro jednotlivé faktory jsou příliš velké.
+
+Jde vidět, že auta se 3 válci mají nižší spotřebu než auta se 4 a 5 válci, což trochu porušuje trend, který vidíme u 4 az 8 válcových aut, kde zpravidla čím větší počet válců, tím nižší spotřeba. Avšak to nemusí být nutně chyba, jelikož spotřebu ovlivňují i další nezávislé proměnné.
+
+
+## Otázka č.6: Pro kombinaci faktorizovaných proměnných cylinders a origin vykreslete spotřebu aut, aby bylo na obrázku vidět, jestli se liší spotřeba u aut pocházejících z různých kontinentů v závislosti na počtu válců a naopak.
+
+
+```{r}
+p <- ggplot(data_mpghp,aes(y=consumption))+
+  geom_point(aes(x = origin,colour=cylinders))+
+  scale_x_discrete(labels=c("1" = "USA", "2" = "Evropa","3" = "Japonsko"))
+print(p)
+```
+
+
+## Otázka č.7: Pro auta výrobce Chrysler vykreslete závislost spotřeby na váze automobilu, kde jednotlivé události označíte barvou podle počtu válců a velikosti bodů v grafu bude odpovídat objemu motoru. 
+
+```{r}
+data_chrysler = data_mpghp[data_mpghp[,'producer']=='chrysler',]
+p <- ggplot(data_chrysler,aes(x=weight,y=consumption))+
+  geom_point(aes(size = displacement, colour = cylinders))
+print(p)
+```
+
+## Otázka č.8: Navrhněte další zobrazení datového souboru. Proveďte ho a popište jeho účel.
+
+Už bylo zmíněno v otázce č.4, že z grafů bylo vidět snižování spotřeby v průběhu let. Bylo by proto zajímavé vykreslit jiné proměnné, např. výkon, váhu či zrychlení a podívat se, jak se tyto veličiny měnily s přibývajícím časem. Podíváme se tak na to, jestli snižování spotřeby v důsledky lidského rozvoje nemělo negativní vliv na ostatní klíčové parametry vozidla (jinak by takový vývoj byl poněkud kontraproduktivní, pokud samozřejmě nebylo cílem pouze snížit spotřebu i přes fakt, že získáme pomalejší, méně schopné vozidlo). Tyto veličiny bychom měli vykreslovat pro jednotlivé producery zvlášť. Zkusíme např. auta značky chrysler.
+
+```{r}
+p1 <- ggplot(data_chrysler,aes(x=model_year,y=acceleration))+
+  geom_point(aes(size = consumption))
+print(p1)
+
+```
+```{r}
+p2 <- ggplot(data_chrysler,aes(x=model_year,y=horsepower))+
+  geom_point(aes(size = consumption))
+print(p2)
+
+```
+```{r}
+p3 <- ggplot(data_chrysler,aes(x=model_year,y=weight))+
+  geom_point(aes(size = consumption))
+print(p3)
+
+```
+
+Vidíme, že spotřeba aut se v průběhu let u této značky snižovala a s ní většinou i výkon. Naopak zrychlení se zvyšovalo. Tohle souvisí s tím, že byla tendence značky snižovat hmotnost a tím pádem i se snížením výkonu motoru zvětšit zrychlení auta.
+
+## Otázka č.9: Sestavte jednoduchý regresní model, kde vysvětlovaná proměnná bude spotřeba automobilu. Na jeho základech zjistěte, zdali spotřeba automobilu závisí na hmotnosti automobilu. Pokud ano, o kolik se změní spotřeba automobilu pokud se hmotnost zvýší o 1000kg?
+
+Připravíme si jednoduché modely s interceptem i bez interceptu. Model bez interceptu má v tomto případě určitě smysl uvažovat (nejspíš i lepší smysl než model s interceptem), protože intuice a zkušenost říká, že auto vážící 0kg by mělo spotřebovat 0l paliva. Co se týká závislosti spotřeby na hmotnosti, je z předchozích scatterplotů zřejmé, že spotřeba na hmotnosti závisí. Ověříme si to i z hodnot t-statistik koeficientů z obou modelů.
+
+```{r}
+lm_intercept = lm(consumption ~ weight, data_mpghp)
+lm_nointercept = lm (consumption ~ weight - 1, data_mpghp)
+
+```
+
+Podíváme se na summary funkce obou modelů
+
+```{r}
+summary(lm_intercept)
+summary(lm_nointercept)
+```
+
+Hodnoty t-statistik jsou extrémně malé, což jakousi závislost spotřeby na váze potvrzuje. Abychom to mohli říct s větší jistotou, je potřeba první model validovat.
+Při změně váhy o 1000kg se v modelu s interceptem změní spotřeba (po zaokrouhlení) o 8.9. V modelu bez interceptu o 8.4. 
+
+## Otázka č.10: Dá se předešlý jednoduchý regresní model zlepšit pomocí logaritmické transformace odezvy? Jak se poté změní (navýší/poklesne) spotřeba automobilu při změně hmotnosti o 1000kg? Zdůvodněte, proč případné transformace je přínosná, nebo naopak nepřínosná.
+
+
+
+
+
