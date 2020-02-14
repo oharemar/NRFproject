@@ -220,9 +220,862 @@ summary(lm_nointercept)
 ```
 
 Hodnoty t-statistik jsou extrémně malé, což jakousi závislost spotřeby na váze potvrzuje. Abychom to mohli říct s větší jistotou, je potřeba první model validovat.
-Při změně váhy o 1000kg se v modelu s interceptem změní spotřeba (po zaokrouhlení) o 8.9. V modelu bez interceptu o 8.4. 
+Při změně váhy o 1000kg se v modelu s interceptem změní spotřeba (po zaokrouhlení) o 8,9. V modelu bez interceptu o 8,4. 
 
 ## Otázka č.10: Dá se předešlý jednoduchý regresní model zlepšit pomocí logaritmické transformace odezvy? Jak se poté změní (navýší/poklesne) spotřeba automobilu při změně hmotnosti o 1000kg? Zdůvodněte, proč případné transformace je přínosná, nebo naopak nepřínosná.
+
+
+Jako první se vykreslíme scatterplot bez i s log transformovanou spotřebou a podíváme se, jestli dostaneme "hezčí" graf.
+
+```{r}
+par(mfrow = c(1,2))
+plot(data_mpghp$weight,data_mpghp$consumption,xlab = 'weight',ylab='consumption')
+plot(data_mpghp$weight,log(data_mpghp$consumption),xlab = 'weight',ylab='log(consumption)')
+
+```
+
+Z grafů není patrné, že by log transformace měla vést k vyšší přesnosti modelu. Nastavíme lineární model. Zvolíme model s interceptem, zde není na místě používat argument (0,0), protože po získání hodnoty z modelu musíme provést zpětnou transformaci a exp(0) = 1.
+
+
+```{r}
+lm_logcons = lm(log(consumption)~weight,data_mpghp)
+```
+
+podíváme se na výstup ze summary funkce pro tento model
+```{r}
+summary(lm_logcons)
+```
+
+Z výstupu vidíme, že z hodnot R^2 statistiky můžeme usoudit, že model fituje transformovaná data přibližně stejně kvalitně jako model bez interceptu původní data. V čem tahle transformace ale mohla pomoci je zajištění validace OLS požadavků, k čemuž se často takové transformace v praxi využívají. Tímto se budeme zabývat v pozdějších otázkách. Nevýhoda této transformace je zhoršení interpretovatelnosti parametrů modelu vzhledem k původním hodnotám, jelikož se jedná o nelineární transformaci. Navíc v tomto případě nejde říct přesně, jaká bude změna spotřeby při změně váhy o 1000kg, protože ta se mění nekonstantně a závisí na počáteční hmotnosti, od které změnu měříme. Můžeme uvést např. změnu spotřeby při změne váhy z 1000kg na 2000kg, tj.
+```{r}
+c <- exp(predict(lm_logcons,data.frame(weight = 2000))) - exp(predict(lm_logcons,data.frame(weight = 1000)))
+print(c)
+```
+
+Z vykreslených grafů se zdá, že by mohla navíc k log transformaci pomoci ještě nějaká mocninná transformace, tím bychom mohli graf lépe "vyrovnat", pro zajímavost zkusíme druhou mocninnu.
+```{r}
+lm_logcons_squared = lm((log(consumption))^2~weight,data_mpghp)
+```
+
+Podíváme se na summary funkci.
+
+```{r}
+summary(lm_logcons_squared)
+```
+
+Proti modelu s log transformací vyšla vyšší R^2 statistika, což je pozitivní. Validace modelu nechám na později. Ještě si křivky vykreslíme spolu se scatterplotem.
+
+```{r}
+p <- ggplot(data_mpghp, aes(x=weight, y=consumption)) + geom_point() +
+  geom_line(aes(x = weight, y = lm_intercept$fitted.values, col="red"),size=0.8)+
+    geom_line(aes(x = weight, y = lm_nointercept$fitted.values, col="blue"),size=0.8)+
+  geom_line(aes(x = weight, y = exp(sqrt(lm_logcons_squared$fitted.values)),col="green") ,size = 0.8)+
+  geom_line(aes(x = weight, y = exp(lm_logcons$fitted.values),col="yellow"),size = 0.8)+
+   scale_color_discrete(name = 'models',labels = c('lm_nointercept','lm_log_squared','lm_intercept','lm_log'))
+plot(p)
+```
+
+
+## Otázka č.11: Vyzkoušejte transformovat nezávislou proměnnou hmotnost. Vyzkoušejte např. po částech konstantní transformaci a polynomiální transformace (kvadratickou a kubickou).
+
+Jako první provedeme po částech konstantní transformaci hmotnosti, intervaly zvolíme po 100kg a v každém intervalu bude hodnota zvolena jako střední hodnota původních hmotností spadajících do tohoto intervalu.
+
+```{r}
+breaks = seq(from = min(data_mpghp$weight), to = max(data_mpghp$weight)+100, by = 100)
+data_mpghp$constant_weight2 = cut(data_mpghp$weight, breaks = breaks, include.lowest = TRUE, right = FALSE)
+data_mpghp$constant_weight = replicate(length(data_mpghp$constant_weight2),0)
+for (i in levels(factor(data_mpghp$constant_weight2)))
+{
+  temp = mean(data_mpghp[data_mpghp$constant_weight2 == i,'weight'])
+  data_mpghp[data_mpghp$constant_weight2 == i,'constant_weight'] = temp
+}
+```
+
+Ve sloupci constant_weight jsou nyní hodnoty po částech konstantní transformace.
+
+Vytvoříme příslušné modely.
+```{r}
+lm_const = lm(consumption ~ constant_weight,data_mpghp)
+lm_quadratic = lm(consumption ~ I(weight^2),data_mpghp)
+lm_cubic = lm(consumption ~ I(weight^3),data_mpghp)
+```
+Modely si vypíšeme pomocí summary funkce.
+```{r}
+summary(lm_const)
+summary(lm_quadratic)
+summary(lm_cubic)
+```
+
+
+Nyní si vykreslíme scatterploty s proložením příslušnou křivkou.
+
+```{r}
+p_const <- ggplot(data_mpghp, aes(x=constant_weight, y=consumption)) + geom_point()+
+  geom_line(aes(x = constant_weight, y = lm_const$fitted.values ,colour = 'red'),size=0.8)
+
+
+p_quadratic <- ggplot(data_mpghp, aes(x=weight^2, y=consumption)) + geom_point()+
+  geom_line(aes(x = weight^2, y = lm_quadratic$fitted.values ,colour = 'red'),size=0.8)
+
+
+p_cubic <- ggplot(data_mpghp, aes(x=weight^3, y=consumption)) + geom_point()+
+  geom_line(aes(x = weight^3, y = lm_cubic$fitted.values ,colour = 'red'),size=0.8)
+figure <- ggarrange(p_const, p_quadratic, p_cubic,
+                    labels = c("p.č.konst.", "kvadratická", "kubická"),
+                    ncol = 2, nrow = 2)
+plot(figure)
+```
+
+
+## Otázka č.12: Pro vámi vybraný finální model ověřte předpoklady pro použití OLS, diskutujte výstup a model validujte pomocí příslušných testů na rezidua a pomocí příslušných obrázků (QQplot, residua vs fitted, residua vs regressors atd.)
+
+Potřebujeme ověřit:
+1. nezávilost a homoskedasticitu reziduí se střední hodnotou 0, což můžeme ověřit např. z residuals vs fitted plotu (nebo scale-location plot), homoskedasticitu můžeme ještě ověřit např. pomocí breusch-paganova testu (bptest)
+2. normalitu reziduí pomocí QQ plotu a např. sapirova testu
+
+Jako první ověříme klasický model bez transformace s i bez interceptu. Začneme normalitou. Vykreslíme QQplot.
+```{r}
+par(mfrow = c(1,2))
+plot(lm_intercept,which=2)
+plot(lm_nointercept,which=2)
+```
+Ty chvosty nevypadají příliš dobře, podíváme se na výsledek shapirova testu, uvedeme i model bez interceptu.
+```{r}
+shapiro.test(residuals(lm_intercept))
+shapiro.test(residuals(lm_nointercept))
+
+```
+
+Obě p-hodnoty jsou kriticky nízké, tedy test na normalitu neprošel. Zkusíme model s log transformovanou spotřebou.
+
+Začneme normalitou.
+```{r}
+plot(lm_logcons,which=2)
+```
+To už vypadá o něco lépe.
+```{r}
+shapiro.test(residuals(lm_logcons))
+```
+
+Shapirův test normalitu reziduí nezamítá. Podíváme se na homoskedasticitu reziduí.
+```{r}
+plot(lm_logcons,which=1)
+```
+Residuals vs fitted plot vypadá hezky. Podíváme se na bptest.
+```{r}
+bptest(lm_logcons)
+  
+```
+
+Zde vyšla p-hodnota nad 0.05, tedy homoskedasticitu nezamítáme. Tento model na OLS požadavky tedy prošel.
+
+Zkusím ještě model lm_logcons_squared.
+```{r}
+plot(lm_logcons_squared,which=2)
+```
+```{r}
+shapiro.test(residuals(lm_logcons_squared))
+```
+Zde vyšla p-hodnota dokonce o něco vyšší než u lm_logcons.
+```{r}
+plot(lm_logcons_squared,which=1)
+```
+A residuals vs fitted plot vypadá taky o něco lépe než v předchozím případě.
+```{r}
+bptest(lm_logcons_squared)
+  
+```
+Homoskedasticita je zde daleko lepší než v předchozím případě, což nám hezky potvrzuje i bptest.
+
+Při porovnání modelů log_cons a log_cons_squared se jeví jako lepší druhá varianta i vzhledem k R^2 statistice.
+
+
+
+## Otázka č.13: Vykreslete scatterplot skutečných spotřeb aut a hmotností a na základě vybraného modelu. Proložte skrze data odhadnutou regresní přímku a vykreslete 95% konfidenční intervaly, jak pro predikované hodnoty, tak pro regresní přímku (tzv. Confidence a Prediction band). Porovnejte s výsledkem z funkce plot(allEfects(model)).
+
+Vybral jsem model lm_logcons_squared. První vykreslíme obrázky pro transformovanou spotřebu.
+
+```{r}
+
+pred_transf = predict(lm_logcons_squared,data_mpghp,interval = 'prediction')
+conf_transf = predict(lm_logcons_squared,data_mpghp,interval = 'confidence')
+
+data <- cbind(data_mpghp, pred_transf)
+conf_transf = data.frame(conf_transf)
+conf_transf$weight = data_mpghp$weight
+
+# vykreslíme
+p1 <- ggplot(data, aes(x=weight, y=(log(consumption))^2)) + geom_point()+
+  geom_line(aes(y = lwr ,colour = 'red'),size=0.8) +
+  geom_line(aes(y = upr ,colour = 'red'),size=0.8) +
+  geom_line(data=conf_transf,aes(x=weight,y = lwr ,colour = 'blue'),size=0.8) +
+  geom_line(data=conf_transf,aes(x=weight,y = upr ,colour = 'blue'),size=0.8)+
+  scale_color_discrete(name = 'bands',labels = c('confident','prediction'))
+plot(p1)
+  
+```
+
+
+Nyní vykreslíme netransformovanou spotřebu a proložíme křivkou. Nejsem si jistý, jestli je interpretačně korektní transformovat confident a prediction bandy stejně jako hodnoty, raději to dělat nebudu.
+
+
+```{r}
+
+p <- ggplot(data, aes(x=weight, y=consumption)) + geom_point()+
+  geom_line(aes(x=weight,y=exp(sqrt(lm_logcons_squared$fitted.values)), colour = "red"),size = 0.8) +
+  scale_color_discrete(name = 'model',labels = c('lm_logcons_squared'))
+  
+plot(p)
+
+```
+
+
+Nyní zkusíme vykreslit výstup z allEffects.
+
+```{r}
+
+library(effects)
+plot(allEffects(lm_logcons_squared))
+
+```
+
+
+Plot vypadá stejně jako náš. Confident band souhlasí.
+
+
+## Otázka č.14: Přidejte k vysvětlujícím proměnným i proměnnou origin, navrhněte aditivní lineární model, a ve scatterplotu vykreslete 3 skupiny různými barvami a data proložte odpovídajícími regresními přímkami.
+
+Vyrobíme aditivní model.
+```{r}
+
+lm_weight_origin<-lm(consumption~weight+origin,data_mpghp)
+summary(lm_weight_origin)
+
+```
+
+
+Data rozdělíme podle origin a vykreslíme i s regresními přímkami.
+```{r}
+data_split_origin  <- split(data_mpghp, data_mpghp$origin)
+data_split_origin[['1']]$Fit <- predict(lm_weight_origin, data_split_origin[['1']])
+data_split_origin[['2']]$Fit  <- predict(lm_weight_origin, data_split_origin[['2']])
+data_split_origin[['3']]$Fit  <- predict(lm_weight_origin, data_split_origin[['3']])
+
+p <- ggplot(data_mpghp, aes(x=weight, y=consumption, color = origin))+geom_point()+
+  geom_line(data = data_split_origin[['1']], aes(x=weight,y=Fit), size = 0.8)+
+  geom_line(data = data_split_origin[['2']], aes(x=weight,y=Fit), size = 0.8)+
+  geom_line(data = data_split_origin[['3']], aes(x=weight,y=Fit), size = 0.8)
+  
+plot(p)
+
+```
+
+Vidíme, že regresní přímky z aditivního modelu pro jednotlivé země jsou velmi podobné. Jde vidět, že origin v tomto modelu příliš spotřebu neovlivňuje.
+
+## Otázka č.15: Porovnejte pomocí vhodného statistického testu shodnost středních hodnot spotřeby cen u automobilů pocházejících z různých kontinentů a podle počtu válců (faktorizovaná proměnná). Zdůvodněte zdali tyto statistické testy jsou vypovídající a zdali lze z nich určit důležitost daných proměnných pro predikci ceny automobilu.
+
+Jako statistický test použijeme rozšíření t-testu, tzv. one-way anova test.
+Je alternativou t-testu, pokud máme více než 2 faktory. Tento test předpokládá normalitu dat v každém faktoru a stejné rozptyly napříc faktory (mělo by se ověřit).
+Pokud bychom nesplnili tyto požadavky, lze použít jako alternativu Kruskalův test.
+
+
+Vykreslíme obrázky zvlášť pro origin a pro cylinders.
+```{r}
+library("ggpubr")
+p1 <- ggline(data_mpghp, x = 'origin', y = 'consumption', 
+            add = c("mean_se", "jitter"), 
+            order = c("1", "2", "3"))
+
+
+p2 <- ggline(data_mpghp, x = 'cylinders', y = 'consumption', 
+            add = c("mean_se", "jitter"))
+
+figure <- ggarrange(p1, p2,
+                    ncol = 2, nrow = 2)
+plot(figure)
+
+```
+
+Z obrázku vidíme, že střední hodnoty nabývají na první pohled různých hodnot mezi faktory. Podíváme se na výsledky testů.
+```{r}
+summary(aov(consumption~origin,data_mpghp))
+kruskal.test(consumption~origin,data_mpghp)
+
+summary(aov(consumption~cylinders,data_mpghp))
+kruskal.test(consumption~cylinders,data_mpghp)
+
+```
+
+
+V obou případech vidíme velmi nízkou p-hodnotu, která znamená, že zamítáme nulovou hypotézu, tedy rovnost středních hodnot. Kruskalův test to pro origin i cylinders potvrzuje.
+
+Pokud by nastala situace, že by se střední hodnoty consumption rovnali pro nějakou faktorovou proměnnou pro každý faktor, pak si myslím, že daná faktorová proměnná nebude mít
+příliš velký vliv na vysvětlovanou proměnnou (zanedbatelný či žádný vliv), kvůli rovnostem středních hodnot se jednotlivé hodnoty v různých faktorech budou 'dost podobat' a tím pádem v podstatě různé faktory nebudou mít vliv na změnu spotřeby.
+
+Můžeme tuto myšlenku demonstrovat na příkladu. Uměle vytvoříme 3-faktorovou proměnnou, kde se v každém faktoru bude rovnat střední hodnota vysvětlované veličiny (generovaná z normálního rozdělení). Následně uděláme stejný experiment, jen s tím rozdílem, že se střední hodnoty rovnat nebudou.
+
+```{r}
+x <- seq(-20, 20, by = .1)
+x_1 <- rep(1,length(x))
+y_1 <- rnorm(x,mean=0,sd=1)
+
+
+x_2 <- rep(2,length(x))
+y_2 <- rnorm(x,mean=0,sd=2)
+
+x_3 <- rep(3,length(x))
+y_3 <- rnorm(x,mean=0,sd=0.5)
+
+df1=data.frame(explanatory = y_1,independent = x_1)
+df2=data.frame(explanatory = y_2,independent = x_2)
+df3=data.frame(explanatory = y_3,independent = x_3)
+
+df = rbind(df1,df2,df3)
+df$independent = factor(df$independent)
+
+lm = lm(explanatory~independent,df)
+summary(lm)
+
+```
+
+Ze summary funkce vidíme, že žádná z faktorů neovlivňuje vysvětlovanou veličinu a tudíž je zbytečné regresovat podle této proměnné (obrovské p-hodnoty koeficientů).
+
+Nyní uvedeme případ, kdy se střední hodnoty rovnat nebudou.
+
+```{r}
+x <- seq(-20, 20, by = .1)
+x_1 <- rep(1,length(x))
+y_1 <- rnorm(x,mean=0,sd=1)
+
+x_2 <- rep(2,length(x))
+y_2 <- rnorm(x,mean=1,sd=1)
+
+x_3 <- rep(3,length(x))
+y_3 <- rnorm(x,mean=0.5,sd=0.5)
+
+
+df1=data.frame(explanatory = y_1,independent = x_1)
+df2=data.frame(explanatory = y_2,independent = x_2)
+df3=data.frame(explanatory = y_3,independent = x_3)
+
+df = rbind(df1,df2,df3)
+df$independent = factor(df$independent)
+
+lm = lm(explanatory~independent,df)
+summary(lm)
+
+```
+
+V tomto případě už je závislost zřejmá (p-hodnoty jsou extrémně nízké).
+
+## Otázka č.16: Zkonstruujte lineární model popisující spotřebu automobilu s využitím všech dostupných proměnných, kde bude přítomna interakce nejvýše dvou proměnných. Na základě kritérií jako jsou AIC, BIC, R^2, F, atd. vyberte nejvhodnější model. Ten validujte a okomentujte jeho výběr.
+
+V modelu nebudeme uvažovat všechny pomocné proměnné, co jsme si v průběhu zpracování protokolu vytvořili. Dále nebudeme uvažovat car_name, jelikož bychom dostali extrémní počet faktorů a také proměnnou producer kvůli vysokému počtu faktorů a také zřejmé kolinearitě s origin (mohli bychom sloučit producery z jedné země do jednoho, viz obrázek).
+
+```{r}
+p <- ggplot(data_mpghp, aes(x=producer, y=consumption, color = origin))+geom_point()+theme(axis.text.x = element_text(angle = 75))
+plot(p)
+
+```
+
+Proměnnou cylinders v případě vícerozměrné regrese budeme uvažovat jako numerickou proměnnou, jednak kvůli snížení počtu faktorů v modelu (origin dohromady s model_year už dají 14 faktorů) a také kvůli přesnější detekci multikolinearity mezi numerickými proměnnými.
+
+Nachystáme tedy maximálně veliký model s interakcemi.
+
+```{r}
+data_mpghp$cylinders = as.numeric(as.character(data_mpghp$cylinders))
+lm_all  <- lm(consumption ~ (.-car_name-producer-mpg-constant_weight-constant_weight2)*(.-car_name-producer-mpg-constant_weight-constant_weight2), data = data_mpghp)
+summary(lm_all)
+
+```
+
+Kolinearita v modelu je zřejmá. Vzhledem k následujícím otázkám její řešení odložíme na později a teď ji vynecháme.
+Použijeme AIC i BIC hodnoty k určení nejvhodnějšího modelu z lm_all. Pak výsledné modely z obou metod porovnáme pomocí anova() a vybereme ten vhodnější.
+
+Vypisovat celou proceduru by zabralo mnoho stran, tak zde vypisování outputu z funkce vynechám a uvedeme jen porovnání a summary výsledného modelu.
+
+```{r}
+lm_temp_aic <- stepAIC(lm_all,direction='backward', trace=FALSE) # AIC
+lm_temp_bic <- stepAIC(lm_all,direction='backward', k=log(nrow(data_mpghp)), trace=FALSE) # BIC
+
+```
+
+Porovnáme oba modely pomocí anova()
+
+```{r}
+anova(lm_temp_bic,lm_temp_aic)
+
+```
+
+Z nízké hodnoty vychází, že anova() preferuje model získaný metodou AIC. Budeme tedy pokračovat s lm_temp_aic. Detaily modelu vypíšeme pomocí summary funkce.
+```{r}
+summary(lm_temp_aic)
+```
+
+Pokusíme se nyní validovat OLS předpoklady. Začneme normalitou.
+```{r}
+plot(lm_temp_aic,which=2)
+
+```
+QQ plot nevypadá příliš dobře, je tam příliš velké odchýlení chvostů. Podíváme se na shapirův test.
+```{r}
+shapiro.test(residuals(lm_temp_aic))
+```
+
+p-hodnota je příliš nízká, shapirův test normalitu zamítá. OLS poždavaky tento model nesplňuje. V dalších otázkách budeme zkoušet různé transformace z důvodu zlepšení normality. Problémy s normalitou mohou být také způsobeny multikolinearitou v modelu, kterou budeme také teprve zkoumat.
+
+## Otázka č.17: Pro vybraný model z předchozí otázky vyzkoušejte jak logaritmickou transformaci odezvy, tak Box-Coxovu transformaci pro zlepšení normality reziduí. Vykreslete optimální log-věrohodnostní profil u Box-Coxovy transformace a porovnejte navrženou mocninou transformaci s logaritmickou. Pro který model se rozhodnete a proč?
+
+Jako první provedeme logaritmickou transformaci.
+
+```{r}
+form = 'log(consumption) ~ cylinders + displacement + horsepower + weight + 
+acceleration + model_year + origin + cylinders:horsepower + 
+cylinders:model_year + displacement:horsepower + displacement:acceleration + 
+displacement:model_year + displacement:origin + horsepower:weight + 
+horsepower:model_year + weight:acceleration + weight:model_year + 
+weight:origin + acceleration:model_year + acceleration:origin'
+
+lm_final_log = lm(form,data_mpghp)
+summary(lm_final_log)
+
+```
+
+Zkusíme tento model validovat.
+
+```{r}
+par(mfrow = c(1,2))
+plot(lm_final_log,which=1)
+plot(lm_final_log,which=2)
+
+
+```
+QQ plot i residuals vs fitted vypadají velmi hezky. Podíváme se, co říká Shapirův test.
+
+```{r}
+shapiro.test(residuals(lm_final_log))
+```
+
+Ten normalitu nezamítá, takže zde logaritmická transformace pomohla k lepšími splnění OLS požadavků.
+
+Zkusíme Box-Coxovu transformaci.
+```{r}
+library(MASS)
+bc <- boxcox(lm_temp_aic)
+lambda <- bc$x[which.max(bc$y)]
+
+```
+
+
+Nastavíme příslušný model.
+
+```{r}
+form_lambda = '(consumption^lambda - 1)/lambda ~ cylinders + displacement + horsepower + weight + 
+acceleration + model_year + origin + cylinders:horsepower + 
+cylinders:model_year + displacement:horsepower + displacement:acceleration + 
+displacement:model_year + displacement:origin + horsepower:weight + 
+horsepower:model_year + weight:acceleration + weight:model_year + 
+weight:origin + acceleration:model_year + acceleration:origin'
+
+lm_final_bc = lm(form_lambda,data_mpghp)
+summary(lm_final_bc)
+
+```
+
+
+A validujeme tento model.
+
+```{r}
+par(mfrow=c(1,2))
+
+plot(lm_final_bc,which=2)
+plot(lm_final_bc,which=1)
+
+```
+
+Oba ploty vypadají hezky, podíváme se ještě na normalitu pomocí Shapirova testu.
+
+```{r}
+shapiro.test(residuals(lm_final_bc))
+
+```
+Normalita krásně prochází.
+Zdá se, že model s box-cox transformací je co se týče R^2 statistiky a splnění OLS požadavků
+na tom velmi podobně jako model s log transformací nakonec bych se asi rozhodl pro box-cox model, který vykazuje o chloupek lepší R^2 statistiku a vyšší hodnotu p-statistiky Shapirova testu určující normalitu reziduí.
+
+
+
+## Otázka č.18: Pro model s log-transformovanou spotřebou v bodě 16 vypočtěte procentuální navýšení/pokles spotřeby automobilu při změně váhy o 1000kg. Porovnejte, jak se změnil vliv spotřeby na váze s porovnáním s modelem z bodu 8.
+
+Použili jsme log transformaci a v takovém případě změna spotřeby v závislosti na váze
+bude záviset na počáteční váze, od které změnu počítáme (změna je nelineární), nelze tedy určit obecně, jaká bude procentuální změna.
+
+Model z otázky 16 obsahuje kromě samotné weight i interakce s weight, takže pak není zřejmé, jaký přesně má vliv určitá změna váhy na spotřebu, každopádně pokud bychom zanedbali interakce s weight , pak má weight opačný vliv než v modelu z otázky 9, tj. při zvyšování váhy spotřeba klesá - bez interakcí a ostatních nezávislých proměnných by ale takový model pak nedával s takovou závislostí příliš smysl.
+
+## Otázka č.19: Spočtěte korelace mezi všemi dostupnými proměnnými, kde to dává smysl a u korelovaných proměnných se pokuste zdůvodnit důvod této korelace. Zkoumejte případnou multikolinearitu ve vašem finálním modelu z bodu 16 a pomocí podmíněné matice regresorů, VIF a dalších nástrojů validujte váš výběr.
+
+Na začátek zkoumání kolinearity vyzkoušíme vyzkoušíme kompletní aditivní model bez pomocných proměnných, car_name a producer a necháme si vypsat VIF hodnoty kvůli detekci kolinearity.
+
+```{r}
+lmm <- lm(consumption ~ (.)-car_name-producer-constant_weight-constant_weight2-mpg,data_mpghp)
+
+```
+
+```{r}
+kappa(lmm)
+vif(lmm)
+```
+
+Vidíme, že vyšší hodnoty VIF jsou u numerických proměnných cylinders,displacement,horsepowera weight, které by mohly být mezi sebou korelované To jde ostatně vidět i ze scatterplotů v první části protokolu. Podíváme se na výstup z ggpairs pro tyto proměnné.
+
+```{r}
+library(GGally)
+ggpairs(data_mpghp[c("cylinders","displacement","horsepower","weight")])
+```
+
+Mezi těmito proměnnými je zřejmá kolinearita.
+Z grafů jde vidět, že pokud jedna z proměnných "roste", pak "roste" i druhá, což v podstatě
+sedí i s fyzikálním cítěním úlohy, kde se zdá, že se zvyšující se váhou vozidla musí růst i spotřeba. Totéž, pokud zvyšujeme počet válců, zdvihový objem čí výkon, pak se také zvyšuje spotřeba.
+
+Z těchto proměnných bude tedy stačit uvažovat pouze jednu. Která to bude zjistíme postupným "vyhazováním" proměnných s nejvyšší VIF hodnotou. Tímto způsobem nakonec zůstane weight.
+
+
+```{r}
+lmm1 <- lm(consumption ~ (.)-car_name-producer-displacement-horsepower-cylinders-constant_weight-constant_weight2-mpg,data_mpghp)
+kappa(lmm1)
+vif(lmm1)
+```
+Podařilo se nám snížit číslo podmíněnosti kappa a také vidíme, že VIF hodnoty u zbývajících proměnných jsou dostatečně nízké, takže se nám kolinearitu podařilo tímto způsobem významně snížit.
+
+Nyní se zaměříme na multikolinearitu v našem fináním modelu z otázky 16. Vypíšeme si číslo podmíněnosti matice regresorů kappa a VIF hodnoty v modelu.
+
+
+```{r}
+kappa(lm_final_log)
+vif(lm_final_log)
+```
+
+Všechny hodnoty jsou velmi vysoké, multikolinearita v modelu je jasná a musíme ji co nejvíce snížit. Půjdeme na to tímto způsobem: iterativně budeme odebírat proměnné s nejvyšší VIF hodnotou. Někdy se stalo, že se VIF hodnoty pro více proměnných lišily např. na 3 desetinném míste -> zkusil jsem více možností zahazování a výsledné modely porovnal pomocí anova()
+threshold VIF hodnoty pro odebrání proměnné jsem nastavil na 3, ale v pozdějších fázích vyhazování se občas stalo, že jedna VIF hodnota byla nápadně vysoká proti ostatním a blízko 3 (2,8...), tak to jsem také zahodil. Celý postup byl velmi zdlouhavý. Uvedu finální model, který z této procedury vyšel nejlépe.
+
+```{r}
+form = "log(consumption) ~ cylinders+ origin + acceleration+
+horsepower:model_year + weight:acceleration"
+lm_final = lm(form,data_mpghp)
+vif(lm_final)
+kappa(lm_final)
+
+```
+
+Vidíme, že kolinearitu v modelu se nám podařilo velmi výrazně snížit. Podíváme se na model pomocí summary funkce.
+
+```{r}
+summary(lm_final)
+```
+
+Zkusíme tento model ještě validovat. Podíváme se na diagnostické ploty.
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm_final,which=1)
+plot(lm_final,which=2)
+plot(lm_final,which=3)
+
+
+```
+
+Ploty vypadají hezky, i když homoskedasticita reziduí v residuals vs fitted plotu je mírně podezřelá.
+
+```{r}
+shapiro.test(residuals(lm_final))
+```
+
+Shapirův test nezamítá normalitu.
+```{r}
+bptest(lm_final)
+```
+Bptest těsně zamítá homoskedasticitu.
+
+## Otázka č.20: Vykreslete tzv. partial regression plot a tzv. partial residual plot pro finální model. Okomentujte, co nám zmíněné grafy říkají o výsledném modelu.
+
+Tyto grafy znázorňují vliv jedné nezávislé proměnné na response variable při uvážení vlivu ostatních proměnných v modelu. Partial regression plot se hodí na detekci influenčních bodů,
+navíc sklon regresní přímky v těchto plotech je stejný jako sklon dané proměnné v původním vícerozměrném lineárním modelu. Naproti tomu partial residual plot je vhodný k detekci nelinearity mezi danou proměnnou, může nám odhalit vhodné transformace nezávislých proměnných k zajištění či zlepšení linearity.
+
+Jako první vykreslíme partial regression ploty.
+
+```{r}
+library(car)
+avPlots(lm_final)
+
+```
+
+Vidíme, že několik bodů bylo znázorněno jako podezřelé influenční body, budeme se jimi zabývat v dalších otázkách.
+
+Residual plot pomocí podobného balíčku vykreslit nemůžeme (nechce vykreslit pro model s interakcemi). Vykreslíme si interakce a faktorové proměnné alespoň pomocí balíčku effects, i když to není přesně to, co hledáme.
+
+```{r}
+library(effects)
+plot(Effect(c("horsepower","model_year"), lm_final, partial.residuals = TRUE), nrow = 1)
+plot(Effect(c("acceleration","weight"), lm_final, partial.residuals = TRUE), nrow = 1)
+plot(Effect(c("origin"), lm_final, partial.residuals = TRUE), nrow = 1)
+
+```
+Vidíme, že origin by se teoreticky jako proměnná dala vynechat, jelikož střední hodnoty log(consumption) se pro jednotlivé faktory téměr rovnají a jednotlivé klastry pro každý faktor mají i přibližně stejný rozptyl. Zkusil jsem udělat tuto úpravu a origin z finálního modelu odstranit. Tahle úprava ale vedla k porušení podmínky normality reziduí, proto jsem se tím dál nezabýval.
+
+Pro acceleration a cylinders vykreslíme partial residual ploty ručně.
+
+
+```{r}
+coef_acceleration <- lm_final$coefficients['acceleration']
+Y = residuals(lm_final) + coef_acceleration*data_mpghp[,'acceleration']
+X = data_mpghp[,'acceleration']
+plot(X,Y,main = 'Partial residual plot acceleration')
+gamLine(x=X,y=Y) # smooth křivka
+abline(lm(Y~X),col='red',lwd=2)
+
+```
+
+
+```{r}
+coef_cylinders <- lm_final$coefficients['cylinders']
+Y = residuals(lm_final) + coef_cylinders*data_mpghp[,'cylinders']
+X = data_mpghp[,'cylinders']
+plot(X,Y,main='Partial residual plot cylinders')
+quantregLine(x=X,y=Y)
+abline(lm(Y~X),col='red',lwd=2)
+
+```
+
+
+Pro acceleration i cylinders vypadá linearita dobře. Z toho plyne, že není potřeba aplikovat nějaké transformace vysvětlujících proměnných.
+
+## Otázka č.21: Prezentujte váš výsledný model pro predikci consumption, diskutujte výsledné parametry R^2 a sigma tohoto modelu. Pokud jste model nevalidovali v předchozích krocích, tak ho validujte (jak graficky, tak pomocí příslušných testů hypotéz).
+
+Výsledný model pro predikci je
+```{r}
+summary(lm_final)
+
+```
+
+Model byl v předchozích krocích validován, normalita reziduí je v pořádku, homoskedasticita vypadá z diagnostických grafů dobře, i když residual vs fitted plot obsahuje minimální náznak nějakého "pevného" vzoru, což by mohlo indikovat lehkou heteroskedasticitu. 
+Hodnota R^2 statistiky je 0.8899 (adjusted R^2 je 0.8846), což je považováno za velmi dobrou hodnotu. Hodnota sigma modelu je přibližně 0.114637.
+```{r}
+sigma(lm_final)
+```
+Model odhaduje nelineárně transformovanou veličinu log(consumption), což výrazně stěžuje interpretabilitu "kvality" regrese v případě netransformované veličiny consumption. To je bohužel nevýhoda tohoto modelu.
+
+## Otázka č.22: Obsahuje Váš model z bodu 19 nějaká vlivná pozorování? Pokuste se detekovat odlehlé a pákové body pomocí různých diagnostických nástrojů tzv. leave-one-out deletion regression.
+
+Podiváme se na cook distance a residuals vs leverage
+```{r}
+par(mfrow=c(1,2))
+plot(lm_final, which = 4)
+plot(lm_final, which = 5)
+```
+
+Vlivná pozorování jsou v plotech vyznačena 124,174 a 342.
+
+Vypíšeme influence.measures (leave one out regression) a podíváme se na podezřelé influenční body a jejich vliv na různé uvažované metriky (dffit,..).
+
+```{r}
+summary(influence.measures(lm_final))
+
+```
+
+Z tabulky můžeme vypozorovat, že všechny podezřelé body ovlivňují především covariance ratio
+a hlavní podezřelé body z regression vs leverage plotu také kvalitu fitu (dffits kritérium)
+
+Vzhledem k tabulce se jako nejvíce podezřelé body jeví 124,174,342 , které mají také největší cook distance. Tato 3 pozorování jsou adepty na odstranění.
+
+## Otázka č.23: Pokud jste odhalili nějaká vlivná pozorování, jak byste s nimi naložili a proč?
+
+Našli jsme několik influenčních bodů vzhledem k leave one out regression. Po prozkoumání a srovnání podezřelých hodnot s ostatními (např. s podobnou vahou, výkonem,...) jsem se nakonec rozhodl data z finálního modelu neodstraňovat ani nemodifikovat, protože se nezdá, že by tato pozorování byla ovlivněna nějakou systematickou chybou či by se až příliš nepravděpodobně odchylovala od ostatních záznamů.
+
+## Otázka č.24: Porovnejte regresní koeficienty, které jste obdrželi z výsledného klasického lineárního modelu (s a bez odhledlých pozorování) s robustními modely. Vyzkoušejte MM odhad (pro dva druhy funkce psi) a LTS odhad při použití (90% a 50% pozorování).
+
+
+První nastavíme nový dataset bez hlavních influenčních bodů (124,174,342).
+
+```{r}
+data_noinfluential = data_mpghp[!(rownames(data_mpghp) %in% c("124","174","342")),]
+```
+
+Finální klasický model jsme již v druhé části protokolu vybrali model s logaritmicky škálovanou spotřebou umocněnou na druhou.
+
+```{r}
+lm_logsquared_noinf = lm(log(consumption)^2 ~ weight,data_noinfluential)
+```
+
+Nachystáme robustní modely. V MM modelech použijeme jako psi ggw a bisquare.
+
+```{r}
+library(robustbase)
+library(rrcov)    
+library(robust)
+MM_bisquare_stars<- rlm(log(consumption)^2 ~ weight, method="MM",psi = psi.bisquare, data = data_mpghp)
+MM_ggw   <- rlm(log(consumption)^2 ~ weight, method="MM",psi = psi.ggw, data= data_mpghp)
+
+```
+
+
+A LTS s 50% a 90% pozorování.
+```{r}
+LTS_50  <- ltsReg(log(consumption)^2 ~ weight, alpha=0.5, data = data_mpghp)
+LTS_90  <- ltsReg(log(consumption)^2 ~ weight, alpha=0.9, data = data_mpghp)
+```
+
+Nyní vykreslíme scatter plot a regresní přímky všech modelů.
+
+```{r}
+p <- ggplot(data, aes(x=weight, y=log(consumption)^2)) + geom_point()+
+  geom_line(aes(x=weight,y=lm_logcons_squared$fitted.values,color = 'red'))+
+  geom_line(data = data_noinfluential,aes(x=weight,y=lm_logsquared_noinf$fitted.values,color='blue'))+
+  geom_line(aes(x=weight,y=MM_bisquare_stars$fitted.values,color='yellow')) +
+  geom_line(aes(x=weight,y=MM_ggw$fitted.values,color='orange')) +
+  geom_line(aes(x=weight,y=LTS_50$fitted.values,color='green')) +
+  geom_line(aes(x=weight,y=LTS_90$fitted.values,color='brown')) +
+  scale_color_discrete(name = 'methods',labels = c('classic','no influential points','MM_bisquare','MM_ggw','LTS 50%','LTS 90%'))
+plot(p)
+```
+
+
+Regresní přímky jsou v podstatě identické. Pokud by existovaly opravdu silné influenční body, které by odchylovaly přímku z klasického modelu, pak by se klasický model a robustní modely více lišily.
+
+## Otázka č.25: Diskutujte, jak by šlo případně zlepšit predikci, jaké transformace jednotlivých proměnných by mohli pomoci. Převedli byste některé další spojité proměnné na diskrétní (na faktory)? Jaké další kroky byste při analýze navrhli?
+
+Pokud se podíváme na signifikanci jednotlivých proměnných, vidíme, že horsepower:model_year79 až horsepower:model_year 82 jsou méně signifikantní než ostatní, navíc jsme v předchozích otázkách zjistili (z grafů), že by se proměnná model_year dala sloučit na méně faktorů. V tomto případě by možná mohlo pomoci nechat všechny faktory až na 80-82, které bychom sloučily dohromady. Rok 79 bych tam již nepřidával, hodnoty consumption pro tento faktor (a tedy střední hodnota) se od 80-82 značně liší, viz obrázek.
+
+```{r}
+
+p1 <- ggplot(data_mpghp,aes(x=model_year,y=consumption, fill = model_year)) + 
+  geom_boxplot(notch=FALSE,outlier.color = 'black') + scale_fill_discrete(name='year')
+plot(p1)
+
+
+```
+
+Co se týče transformací nezávislých proměnných, tak z partial residual plotu jsme nezaznamenali nějaké podezřelé nelineární chování, tím pádem bych transformace nevyužíval.
+Pokud se podíváme ještě jednou na kolinearitu v modelu
+```{r}
+
+vif(lm_final)
+
+```
+
+Vidíme, že acceleration by mohlo být korelované s acceleration:weight. Zkusíme proto acceleration odstranit (má vyšší VIF než acceleration:weight).
+
+```{r}
+
+lm_no_acceleration = lm(log(consumption)~cylinders + origin+horsepower:model_year+acceleration:weight,data_mpghp)
+summary(lm_no_acceleration)
+
+```
+Dostali jsme model, kde je o něco nižší kolinearita než v původním modelu a všechny použité nezávislé proměnné jsou značně signifikantní. Porovnáme pomocí anova() tento model s původním.
+
+```{r}
+
+anova(lm_no_acceleration,lm_final)
+
+```
+
+Vidíme, že anova preferuje více původní model.
+```{r}
+
+shapiro.test(residuals(lm_no_acceleration))
+
+```
+Navíc vidíme, že Shapirův test zamítá normalitu, tudíž tento model nesplňuje OLS předpoklady.
+
+## Otázka č.26: Představte si, že máte flotilu aut složenou z dostupných dat. Bez ohledu na nosnost auta (předpokládejme, že to zvládnou všechny) potřebujete převést pro známého z Brna hl. nádraží do Prahy do Trojanovy 13, 800kg nákladu. Jaké auto si vyberete a proč? O kolik se vám cesta prodraží a tudíž by vám měl kamarád zaplatit (neuvažujte amortizaci auta a vezměte cenu 30kč za palivo).
+
+Je zřejmé, že nemůžeme jen tak předpokládat pro libovolné auto, že pokud na něj naložíme nějakou zátěž, tak se jeho spotřeba bude chovat lineárně podle námi nalezeného modelu. Musíme na to jít jinak.
+
+Můj postup by byl takovýto:
+
+1. vyrobíme jednoduchý klasický model (lm(consumption ~ weight - 1)- použijeme model bez interceptu, protože auto vážící 0kg logicky nespotřebuje nic, tedy 0l paliva), který nám dá lineární odhad závislosti spotřeby na váze
+2. vytvoříme podobné skupiny aut vzhledem k několika nezávislým proměnným určujícím spotřebu (např. pomocí K-Means algoritmu, určitě by to šlo udělat i důkladněji a jinak)
+, za tyto proměnné zvolíme cylinders,horsepower,acceleration,displacement (zajímají mě především klastry na základě technických parametrů aut, proto origin ani model_year uvažovat nebudeme)
+3. jako poslední krok se podíváme na rezidua u jednotlivých skupin a zjistíme, jak moc přesně tyto skupiny opisují regresní přímku danou modelem a vezmeme tu skupinu, která bude mít nejmenší rezidua (suma reziduí^2 normovaná počtem členů ve skupině) a vizuálně bude opisovat nejlépe regresní přímku. U takových skupin lze očekávat velmi podobné hodnoty v ostatních proměnných (cylinders,horsepower,acceleration,displacement) a tedy můžeme předpokládat, že u aut s takovými technickými parametry se závislost spotřeby na váze automobilu chová "přibližně" lineárně - hrubě si to představuji tak, že zafixujeme ostatní proměnné kromě weight a sleduju změnu spotřeby jen na základě přidávání váhy. Nakonec vybereme jedno auto z této skupiny dle uvážení. Měli bychom vybrat nejlepšího reprezentanta dané skupiny (vektor nejblíže ke středu klastru), pokud bude takových aut více, pak vezmeme to nejlehčí, protože pak máme větší jistotu, že přidáním největší váhy se spotřeba změní lineárně (pokud v této skupině máme nejlehčí auto vážící 1000kg a nejtěžší 1500kg, pak u 1000kg auta naložením 500kg ještě stále můžu předpokládat lineární závislost spotřeby).
+
+Rozdělíme do 20 klastrů pomocí KMeans a nastavíme model
+
+```{r}
+data_temp = data_mpghp[,c('cylinders','displacement','horsepower','acceleration')]
+# naklastrujeme
+set.seed(2)
+clusters <- kmeans(data_temp, centers =  20, iter.max = 100)
+data_mpghp$clusters = clusters$cluster
+lm_classic <- lm(consumption ~ weight - 1, data_mpghp)
+```
+
+Jako první si vykreslíme regresní přímky a scatterploty všech 20 skupin, vizuálně jsem zúžil výběr na 3 adepty, které dobře opisují regresní přímku a ve kterých se vyskytují auta s dostatečným váhovým rozdílem (potřebujeme linearitu při naložení 800kg, takže pokud jsou auta ve skupině s přibližně stejnou hmotností, moc nám to nepomůže), grafy zde znázorním
+
+adepti: cluster 2,4,11
+
+```{r}
+
+p1 <- ggplot(data_mpghp[data_mpghp[,'clusters']==2,], aes(weight, consumption))+geom_point()+
+  geom_line(data = data_mpghp, aes(x=weight,y=lm_classic$fitted.values), size = 0.8)
+
+p2 <- ggplot(data_mpghp[data_mpghp[,'clusters']==4,], aes(weight, consumption))+geom_point()+
+  geom_line(data = data_mpghp, aes(x=weight,y=lm_classic$fitted.values), size = 0.8)
+
+p3 <- ggplot(data_mpghp[data_mpghp[,'clusters']==11,], aes(weight, consumption))+geom_point()+
+  geom_line(data = data_mpghp, aes(x=weight,y=lm_classic$fitted.values), size = 0.8)
+
+figure <- ggarrange(p1, p2, p3,
+                    labels = c("klastr 2", "klastr 4", "klastr 11"),
+                    ncol = 2, nrow = 2)
+plot(figure)
+
+```
+
+
+
+Nyní spočítáme a porovnáme sumu normovaných reziduí^2 pro tyto skupiny.
+
+
+```{r}
+
+res_2 = (lm_classic$residuals[data_mpghp[,'clusters']==2])^2
+sum_res_2 = (1/length(res_2))*sum(res_2)
+sum_res_2
+
+res_4 = (lm_classic$residuals[data_mpghp[,'clusters']==4])^2
+sum_res_4 = (1/length(res_4))*sum(res_4)
+sum_res_4
+
+res_11 = (lm_classic$residuals[data_mpghp[,'clusters']==11])^2
+sum_res_11 = (1/length(res_11))*sum(res_11)
+sum_res_11
+
+
+```
+
+Nejlépe vychází klastr číslo 11. Jako nejlepšího reprezentanta této skupiny vezmeme bod nejblíže středu klastru, tj. bod nejblíže k (vzhledem k euklidovské metrice)
+
+```{r}
+
+center = clusters$centers[11,]
+center
+```
+
+Nejbližší bod z této skupiny je Toyota Cressida z roku 81 vážící přibližně 1315kg. Volil bych tedy toto auto. Jako alternativu by ještě mohl být druhý nejbližší bod, kterým je auto Oldsmobile Omega Brougham z roku 79, které váží o něco méně, a to přibližně 1225kg.
+
+Vzhledem k předchozí úvaze by se u těchto aut s velmi podobnými technickými parametry měla spotřeba na zvyšující se (pouze) hmotnosti měnit přibližně lineárně.
+
+Kamarád by tedy za převoz 800kg nákladu zaplatil 
+(koeficient weight v lin. modelu)* (800kg) *(vzdálenost Brno hl.n. - Praha Trojanova 13 v jednotkách 100km)*30 =
+```{r}
+0.0083554*800*2.05*30
+```
+Tedy přibližně 411 Kč.
+
+
+
+
+
+
 
 
 
