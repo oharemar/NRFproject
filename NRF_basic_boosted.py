@@ -8,7 +8,7 @@ import copy
 class NeuralTreeBasic_boosted():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15]):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], cost = 'CrossEntropy'):
 
         self.decision_tree = decision_tree
         self.network = None # corresponding neural network classifier
@@ -26,7 +26,10 @@ class NeuralTreeBasic_boosted():
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
         self.initialize_output_layer()
-        self.create_NN(CrossEntropyCost)
+        if cost == 'CrossEntropy':
+            self.create_NN(CrossEntropyCost)
+        elif cost == 'LogLikelihood':
+            self.create_NN(LogLikelihoodCost)
 
 
 

@@ -4,13 +4,14 @@ from CostFunctions import *
 import math
 
 
+# proti Boosted klasickému je zde přidán Nesterov momentum v SGD
+
 class Network():
 
-    def __init__(self , sizes, biases = None, weights = None , gamma=None,gamma_output = 2,
-                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid',gamma_sigmoid = 1):
-        self.num_layers = len(sizes)
+    def __init__(self , sizes, biases = None, weights = None , gamma=None,gamma_output = 6,
+                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid', momentum = 0.9):
+        self. num_layers = len(sizes)
         self.sizes = sizes
-        self.gamma_sigmoid = gamma_sigmoid # koeficient v sigmoidu v předposlední vrstvě
         self.gamma_output = gamma_output
         self.gamma = gamma
         self.cost = cost
@@ -23,9 +24,18 @@ class Network():
             self.weights = weights
         else:
             if weight_initilizer == 'new':
-                self.weights = [np.random.randn(y, x) / np.sqrt(x) for x, y in zip(sizes[:-1], sizes[1:])]  # here we divide with sqrt of number of connections to the respective neuron
+                self.weights = [np.random.randn(y, x)/np.sqrt(x) for x, y in zip(sizes [:-1], sizes [1:])] # here we divide with sqrt of number of connections to the respective neuron
             else:
-                self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]  # here we divide with sqrt of number of connections to the respective neuron
+                self.weights = [np.random.randn(y, x) for x, y in zip(sizes [:-1], sizes [1:])] # here we divide with sqrt of number of connections to the respective neuron
+
+        self.velocity_weights = [] # nastavíme na 0
+        self.velocity_biases = [] # nastavíme na 0
+        for w in self.weights:
+            self.velocity_weights.append(np.zeros(w.shape))
+        for b in self.biases:
+            self.velocity_biases.append(np.zeros(b.shape))
+        self.momentum = momentum
+
 
     def feedforward(self, a):
         """Return the output of the network if "a" is input."""
@@ -34,15 +44,13 @@ class Network():
             if (number == 0 or number == 1):
                 a = tanh(np.dot(w, a) + b,gamma=self.gamma[number]) # gamma is hyperparameter
             else:
-                if number == 2:
-                    a = sigmoid(np.dot(w, a) + b, self.gamma_sigmoid) # zde je zatím sigmoid, mohli bychom zde poměnit (ReLu)
-                elif self.output_func == 'sigmoid':
+                if self.output_func == 'sigmoid':
                     a = sigmoid(np.dot(w, a) + b,self.gamma_output)
                 elif self.output_func == 'softmax':
                     a = softmax(np.dot(w, a) + b,self.gamma_output)
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta, num_classes, lmbda=0.0,
+    def SGD(self, training_data, epochs, mini_batch_size, eta, num_classes, lmbda = 0.0,
             evaluation_data=None, monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False, monitor_training_cost=False,
             monitor_training_accuracy=False):
@@ -79,7 +87,7 @@ class Network():
                 training_accuracy.append(accuracy)
                 print("Accuracy on training data: {} / {}".format(accuracy, n))
             if monitor_evaluation_cost:
-                cost = self.total_cost(evaluation_data, lmbda, num_classes, convert=True)
+                cost = self.total_cost(evaluation_data, lmbda, num_classes,convert=True)
                 evaluation_cost.append(cost)
                 print("Cost on evaluation data: {}".format(cost))
             if monitor_evaluation_accuracy:
@@ -87,6 +95,7 @@ class Network():
                 evaluation_accuracy.append(accuracy)
                 print("Accuracy on evaluation data: {} / {}".format(self.accuracy(evaluation_data), n_data))
         return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
+
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         """Update the network’s weights and biases by applying gradient descent using backpropagation
@@ -97,12 +106,18 @@ class Network():
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y, eta)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [(1 - eta * (lmbda / n)) * w - (eta / len(mini_batch)) * nw for w, nw in
-                        zip(self.weights, nabla_w)]  # added regularization term to the cost function
-        self.biases = [b - (eta / len(mini_batch)) * nb for b, nb in zip(self.biases, nabla_b)]
+
+        nabla_b = [(1 / (len(mini_batch))) * nb for nb in nabla_b]
+        nabla_w = [(1 / (len(mini_batch))) * nw for nw in nabla_w]
+
+        self.velocity_weights = [self.momentum*v + nw for v,nw in zip(self.velocity_weights,nabla_w)]
+        self.velocity_biases = [self.momentum*b + nb for b,nb in zip(self.velocity_biases,nabla_b)]
+
+        self.weights = [(1-eta*(lmbda/n))*w - eta * v for w, v in zip(self.weights,self.velocity_weights)] # added regularization term to the cost function
+        self.biases = [b - eta*vb for b, vb in zip(self.biases, self.velocity_biases)]
 
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
@@ -119,7 +134,7 @@ class Network():
         test_results = [(np.argmax(self.feedforward(x)), y)for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
-    def backprop(self, x, y): #
+    def backprop(self, x, y, eta): # zde použijeme nesterova a Adam
         """Return a tuple ‘‘(nabla_b , nabla_w)‘‘ representing the
         gradient for the cost function C_x. ‘‘nabla_b ‘‘ and
         ‘‘nabla_w ‘‘ are layer -by-layer lists of numpy arrays , similar
@@ -128,19 +143,23 @@ class Network():
 
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
+
+        weights = [w - eta*self.momentum*v for w,v in zip(self.weights,self.velocity_weights)]
+        biases = [b - eta*self.momentum*v for b,v in zip(self.biases,self.velocity_biases)]
+
+
         # feedforward
         activation = x
         activations = [x]  # list to store all the activations , layer by layer
         zs = []  # list to store all the z vectors , layer by layer
-        for b, w, number in zip(self.biases, self.weights, range(len(self.weights))):
+        for b, w, number in zip(biases, weights, range(len(weights))):
             z = np.dot(w, activation) + b
+            #print(z)
             zs.append(z)
             if (number == 0 or number == 1):
                 activation = tanh(z,self.gamma[number])
             else:
-                if number == 2:
-                    activation = sigmoid(z, self.gamma_sigmoid)
-                elif self.output_func == 'sigmoid':
+                if self.output_func == 'sigmoid':
                     activation = sigmoid(z,self.gamma_output)
                 elif self.output_func == 'softmax':
                     activation = softmax(z,self.gamma_output)
@@ -152,10 +171,7 @@ class Network():
 
         for l in range(2, self.num_layers):
             z = zs[-l]
-            if l == 2:
-                sp = sigmoid_prime(z,self.gamma_sigmoid)
-            else:
-                sp = derivative_tanh(z,self.gamma[self.num_layers - l - 1])
+            sp = derivative_tanh(z,self.gamma[self.num_layers - l - 1])
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
@@ -181,8 +197,3 @@ class Network():
             cost += self.cost.fn(a, y) / len(data)
         cost += 0.5 * (lmbda / len(data)) * sum(np.linalg.norm(w) ** 2 for w in self.weights)
         return cost
-
-
-
-
-

@@ -7,7 +7,8 @@ import copy
 class NeuralTree_extraLayer_analyticWeights():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1,learning_rate1 = 0.1,learning_rate2 = 0.1):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1,learning_rate1 = 0.1,learning_rate2 = 0.1,
+                 cost = 'CrossEntropy'):
 
         self.decision_tree = decision_tree
         self.learning_rate1 = learning_rate1
@@ -29,7 +30,10 @@ class NeuralTree_extraLayer_analyticWeights():
         self.initialize_second_hidden_layer()
         self.initialize_third_hidden_layer()
         self.initialize_output_layer()
-        self.create_NN(CrossEntropyCost)
+        if cost == 'CrossEntropy':
+            self.create_NN(CrossEntropyCost)
+        elif cost == 'LogLikelihood':
+            self.create_NN(LogLikelihoodCost)
 
 
     def get_probs(self):
@@ -151,7 +155,7 @@ class NeuralTree_extraLayer_analyticWeights():
         self.weights.append(weights)
         self.biases.append(biases)
 
-    def initialize_output_layer(self):
+    def initialize_output_layer(self): # zde je to random
 
         weights = np.random.randn(self.decision_tree.n_classes_, self.decision_tree.n_classes_)/np.sqrt(self.decision_tree.n_classes_)
         biases = np.random.randn(self.decision_tree.n_classes_, 1)

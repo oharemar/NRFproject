@@ -62,7 +62,7 @@ df = scaler.fit_transform(df)
 df = np.array(df,dtype=np.float64)
 y = np.array(y)
 
-estimator = DecisionTreeClassifier(max_leaf_nodes=6, random_state=0)
+estimator = DecisionTreeClassifier(max_leaf_nodes=6, random_state=0) # zde je random_state pevně, plodí nám tedy stejné stromy, musíme změnit
 
 X_train,X_test,y_train,y_test = train_test_split(df,y,test_size=0.33) # split to train and test dataset
 
@@ -85,7 +85,7 @@ nrf_classic = NeuralTreeBoosted(estimator,X_train,y_train,output_func='sigmoid',
 
 '''NRF_analyticWeights'''
 from NRF_analyticWeights import *
-nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [2.3,2.3])
+nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='softmax',gamma_output=1.5,gamma = [2.3,2.3])
 '''
 print(nrf_analyticsWeights.leaves)
 print(nrf_analyticsWeights.get_probs())
@@ -147,11 +147,11 @@ for data in X_trainLS:
     print(estimator.predict_proba(data.reshape(1,-1)))
 
 '''
-nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='sigmoid',gamma_output=1.5,gamma = [2.3,2.3])
+nrf_analyticsWeights = NeuralTree_analyticWeights(estimator,X_train,y_train,output_func='softmax',gamma_output=1.5,gamma = [2.3,2.3])
 
 #nrf = NeuralTree(estimator,X_train,y_train)
 #nrf.train_NRF(100,20,0.025)
-evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = nrf_analyticsWeights.train_NRF(30,10,0.0055,0.03,monitor_training_cost=True,monitor_training_accuracy=True)
+evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = nrf_analyticsWeights.train_NRF(20,10,0.0045,0.03,monitor_training_cost=True,monitor_training_accuracy=True)
 predictions_NRT = nrf_analyticsWeights.predict(X_test)
 #print(predictions_NRT)
 #predictions_NR = nrf.predict(X_test)
@@ -162,7 +162,7 @@ print(classification_report(y_test,predictions_NRT))
 
 import matplotlib.pyplot as plt
 
-x = range(0,30)
+x = range(0,20)
 plt.figure(1)
 plt.plot(x,training_cost)
 

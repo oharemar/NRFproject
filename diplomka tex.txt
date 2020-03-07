@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
@@ -11,33 +11,19 @@
 
 \maketitle
 
-\tableofcontents
+\section{Introduction}
+\section{State-of-art classifiers}
 
-\chapter{Introduction}
-
-\chapter{Classification}
-\section{State-of-the-art classification models}
-\subsection{Logistic regression}
-\subsection{Support vector machines (SVM)}
-\subsection{Random forest}
-\subsubsection{Decision tree}
-\subsubsection{Ensemble of decision trees}
-\subsection{Neural network (NN)}
-\subsubsection{Perceptron and neuron}
-\subsubsection{Activation functions}
-\subsubsection{Backpropagation algorithm}
-\section{Evaluation metrics}
-
-\chapter{Decision-Tree-Inspired NN architecture}
+\section{Decision-Tree-Inspired NN architecture}
 In this section is provided detailed derivation of the basic neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article [ref] describing 1 to 1 transformation of arbitrary regression tree (random forest regressor) to the specifically designed neural network (ensemble of neural networks).
 
-Unfortunately, an approach presented in \cite{NRF} is not uniformly convertible to the classification problem. Based on this issue, the  alternative architecture and initial settings are proposed in order to simulate the exact behaviour of corresponding decision tree classifier.
+Unfortunately, an approach presented in [ref] is not uniformly convertible to the classification problem. Based on this issue, the  alternative architecture and initial settings are proposed in order to simulate the exact behaviour of corresponding decision tree classifier.
 
 This reformulation provides a sensible opportunity to enhance the decision tree performance, because parameters of newly constructed neural network could be better adapted with usage of the backpropagation algorithm of neural networks and therefore achieve superior classification.
 
-\section{Architecture and initial settings}
+\subsection{Architecture and initial settings}
 
-The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by \cite{NRF}. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is
+The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by [ref]. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is
 \begin{equation}
     \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.5cm},
 \end{equation}
@@ -73,7 +59,7 @@ where $(\mathbf{1}_{\boldsymbol{x} \geq 0})_i$ is $i$-th element of $\mathbf{1}_
 
 So perceptrons from the first and second hidden layer outputs $+1$ or $-1$. Why is it chosen in such manner will be clear from further explanations.
 
-\subsection{First hidden layer}
+\subsubsection{First hidden layer}
 
 The first hidden layer should copy decisions of all inner nodes present in the corresponding decision tree. The first hidden layer has same number of neurons as number of inner nodes. As was explained in the chapter about decision trees and random forests, each inner node $k \in \{1,...,L-1\}$ of the decision tree, where $L-1$ is total number of inner nodes (in fact, if $L-1$ is total number of inner nodes, then $L$ is total number of leaves present in the decision tree), possesses split function with parameters $j_k \in \{1,...,n\}$, which is one dimension in a $n$-dimensional space that is used for split and also $\alpha_{j_k}$, which is a threshold. Let's also define function $s_k$ as 
 \begin{equation}
@@ -98,7 +84,7 @@ In order to obtain all decisions of inner nodes in the corresponding neurons of 
 \label{fig:first_hid_layer}
 \end{figure}
 
-\subsection{Second hidden layer}
+\subsubsection{Second hidden layer}
 
 From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of the input vector $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer. If there are $L-1$ neurons in the first hidden layer, then the second hidden layer consists of $L$ neurons, each one corresponding to the one individual leaf in the decision tree.
 
@@ -142,13 +128,13 @@ and then $\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')$ has following property:
 
 With respect to the property of $\tau(\cdot)$ function argument in \eqref{eq:sec_hidd_property}, the second hidden layer outputs a vector of $(-1,...,-1,+1,-1,...,-1)^T$ with a single positive 1 indicating the correct leaf membership of an input.
 
-To retain this $\tau(\cdot)$ argument property, it is sufficient to choose any other arbitrary constant in \eqref{eq:bias} in range $(0,1)$ instead of 0.5. But to stay consistent with \cite{NRF}, we also used the proposed value of 0.5 in conducted experiments.
+To retain this $\tau(\cdot)$ argument property, it is sufficient to choose any other arbitrary constant in \eqref{eq:bias} in range $(0,1)$ instead of 0.5. But to stay consistent with [Neural Random Forest], we also used the proposed value of 0.5 in conducted experiments.
 
 At this stage, we already defined architecture and initial weights and biases settings of first two hidden layers in order to transform decision tree into neural network with the same properties. All that remains is to gain classification predictions from the second hidden layer.
 
-\subsection{Output layer}
+\subsubsection{Output layer}
 
-In this section is proposed architecture and initial setting for output layer, that will gain same predictions as the decision tree. Unfortunately, same method proposed for regression trees in \cite{NRF} is not directly applicable in the classification case. Therefore we propose an alternative for the classification case, that give same classification outcomes as the corresponding decision tree.
+In this section is proposed architecture and initial setting for output layer, that will gain same predictions as the decision tree. Unfortunately, same method proposed for regression trees in [Neural Random Forest] is not directly applicable in the classification case. Therefore we propose an alternative for the classification case, that give same classification outcomes as the corresponding decision tree.
 
 The output layer will be constructed as follows: The number of neurons in output layer is equal to number of classes we desire to classify. Each neuron corresponds to only one particular class (one label). Neuron with the highest activation represents the predicted class of neural network. In the experiments were used two types of neurons in output layer - with sigmoid and softmax activation functions, as were discussed in Chapter [Activation functions].  To get the same performance as the decision tree, we must retrieve probability distributions stored in leaves from the leaf membership encoded in the second hidden layer. If the output layer outcomes the same probability values for classes as the decision tree, hence the neural network performs alike.
 
@@ -165,67 +151,8 @@ If we initialize biases in the output layer to 0, then appropriate initializatio
     \end{pmatrix}\hspace{0.5cm}.
 \end{equation}
 
-Matrix $\mathbb{A} \in \mathbb{R}^{L\times L}$, where $L$ is a total number of leaves in the decision tree. The determinant of matrix $\mathbb{A}$ is
-\begin{equation}
-    \text{det}\mathbb{A} = \begin{vmatrix}
-    1 & -1 & -1 &\hdots & -1 \\
-    -1 & 1 & -1 & \hdots & -1\\
-    \vdots & \ddots & \ddots & \ddots&\vdots \\
-    -1 & \ddots & \ddots & \ddots&-1 \\
-    -1 & -1 & \hdots & -1 & 1
-    \end{vmatrix} = (-1)^{2L-3}\cdot2^{L-1}\cdot(L-2)
-\label{eq:determinant}
-\end{equation}
-
-For the proof of \eqref{eq:determinant} see Chapter [Proves]. Matrix $\mathbb{A}$ is therefore always regular with except of $L = 2$. In this case, $\text{det}\mathbb{A} = 0$ and matrix $\mathbb{A}$ is singular. But for $L=2$, the decision tree has only root node and 2 leaves, which is rarely a well-functional model in practical use. It could have a good performance almost only in case of data with significantly unambigous geometric deployment, where occurs only 2 classes and exists one hyperplane that sufficiently separates them. As the conclusion, we will almost never encounter such an elementary model.
-
-In case of invertible activation function $\sigma$ in the output layer (in our experiments were used sigmoid and softmax activation functions, which are both invertible), we obtain appropriate weights for neuron $c$ (also represents class $c \in \{1,...,C\}$ that this neuron corresponds to) in output layer after solving the following system of linear equations:
-
-\begin{equation}
-    \mathbb{A}\begin{pmatrix}
-    w^c_1\\
-    w^c_2\\
-    \vdots\\
-    w^c_L
-    \end{pmatrix} = \sigma^{-1}(\begin{pmatrix}
-    p^1_c\\
-    p^2_c\\
-    \vdots\\
-    p^L_c
-    \end{pmatrix})\hspace{0.5cm},
-    \label{eq:lin_eq}
-\end{equation}
-
-where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from the second hidden layer to neuron $c$ in the output layer. In other words, the appropriate weights for neuron $c$ in the output layer are obtained as
-
-\begin{equation}
-    \begin{pmatrix}
-    w^c_1\\
-    w^c_2\\
-    \vdots\\
-    w^c_L
-    \end{pmatrix} = \mathbb{A}^{-1}(\sigma^{-1}(\begin{pmatrix}
-    p^1_c\\
-    p^2_c\\
-    \vdots\\
-    p^L_c
-    \end{pmatrix}))\hspace{0.5cm}.
-    \label{eq:weights_output}
-\end{equation}
-
-After initialization of biases to 0 and solving the system of linear equations for all neurons in the output layer (or computing the inverse of matrix $\mathbb{A}$) and for appropriate activation function chosen in advance, we gain also all initialization weights. This initial setting causes the neural network to output same predictions as from the corresponding decision tree and hence to get equally performing classification model.
-
-\section{NN models with decision-tree-initialization}
-
-Describe all five competitive models that we use in experiments with illustrations and algorithms. Discuss replacement of $\tau$ with tanh activation function and its influence on performance and backpropagation. Divide basic model to sparse setting and full connected setting. In sparse setting we allow to train with backpropagation only notnull connections, to preserve decision tree interpretation. That will help us also to demonstrate the effect of backpropagation. In full connected setting we train all parameters.
 
 
-\chapter{Experiments}
-
-\begin{thebibliography}{}
-\bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
-
-\end{thebibliography}
 
 
 

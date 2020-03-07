@@ -1,4 +1,4 @@
-from ANN_forNRFBoosted import Network
+from ANN_forNRFBoosted_NesterovMomentum import Network
 from CostFunctions import *
 import numpy as np
 import copy
@@ -201,5 +201,3 @@ class NeuralTree_analyticWeights():
             prediction = np.argmax(self.network.feedforward(d))
             predictions.append(prediction)
         return np.array(predictions)
-
-

@@ -6,8 +6,7 @@ import copy
 
 class NeuralTree_analyticWeights():
 
-    def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15],cost = 'CrossEntropy'):
+    def __init__(self, decision_tree = None, X_train = None, y_train = None, output_func = 'sigmoid',gamma_output = 1, gamma = [4,4]):
 
         self.decision_tree = decision_tree
         self.gamma_output = gamma_output
@@ -25,11 +24,7 @@ class NeuralTree_analyticWeights():
         self.initialize_first_hidden_layer()
         self.initialize_second_hidden_layer()
         self.initialize_output_layer()
-        if cost == 'CrossEntropy':
-            self.create_NN(CrossEntropyCost)
-        elif cost == 'LogLikelihood':
-            self.create_NN(LogLikelihoodCost)
-
+        self.create_NN(CrossEntropyCost)
 
 
     def get_probs(self):
@@ -149,7 +144,12 @@ class NeuralTree_analyticWeights():
                 probs = sigmoid_inverse(probs,self.gamma_output)
             if self.output_func == 'softmax':
                 probs = softmax_inverse(probs,self.gamma_output)
-            weight = np.dot(inverse_A,probs)
+
+            weight = np.dot(inverse_A,probs).reshape(-1,1)
+            if self.output_func == 'sigmoid':
+                weight = sigmoid(weight,self.gamma_output)
+            if self.output_func == 'softmax':
+                weight = softmax(weight,self.gamma_output)
             weights[label,:] = weight.reshape(1,-1)
 
         self.weights.append(weights)
@@ -201,5 +201,3 @@ class NeuralTree_analyticWeights():
             prediction = np.argmax(self.network.feedforward(d))
             predictions.append(prediction)
         return np.array(predictions)
-
-

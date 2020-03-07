@@ -1,6 +1,7 @@
-from NRF_analyticWeights import *
 from statistics import mode
+import numpy as np
 import random
+from helpful_functions import *
 
 class NeuralRandomForest():
 
@@ -8,8 +9,7 @@ class NeuralRandomForest():
                  output_func = 'sigmoid',cost_func = 'CrossEntropy',gamma_output = 1, gamma = [15,15]):
         self.random_forest = random_forest
         self.NRF_ensemble = []
-        if cost_func == 'CrossEntropy':
-            self.cost_func = CrossEntropyCost
+        self.cost_func = cost_func
         self.output_func = output_func
         self.NRF_type = NRF_type
         self.training_data = X_train
@@ -17,12 +17,65 @@ class NeuralRandomForest():
         self.gamma_output = gamma_output
         self.gamma = gamma
 
-    def get_NRF_ensemble(self,epochs,mini_batch,eta,lmbda):
+    def get_NRF_ensemble(self,epochs,mini_batch,eta,lmbda,eta2 = 0.01):
+
+        if self.NRF_type == 'NRF_analyticWeights':
+            from NRF_analyticWeights import NeuralTree_analyticWeights
+        elif self.NRF_type == 'NRF_analyticWeights_adam':
+            from NRF_analyticWeights_adam import NeuralTree_analyticWeights
+        elif self.NRF_type == 'NRF_analyticWeights_nesterov':
+            from NRF_analyticWeights_nesterov import NeuralTree_analyticWeights
+        elif self.NRF_type == 'NRF_basic':
+            from NRF_basic_boosted import NeuralTreeBasic_boosted
+        elif self.NRF_type == 'NRF_basic_adam':
+            from NRF_basic_boosted_adam import NeuralTreeBasic_boosted_adam
+        elif self.NRF_type == 'NRF_basic_nesterov':
+            from NRF_basic_boosted_nesterov import NeuralTreeBasic_boosted_nesterov
+        elif self.NRF_type == 'NRF_extraLayer':
+            from NRF_withExtraLayer import NeuralTree_extraLayer
+        elif self.NRF_type == 'NRF_extraLayer_analyticWeights':
+            from NRF_withExtraLayer_analyticWeights import NeuralTree_extraLayer_analyticWeights
+
         for estimator in self.random_forest.estimators_:
             if self.NRF_type == 'NRF_analyticWeights':
                 nrf = NeuralTree_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
-                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma)
-                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=True,monitor_training_cost=True)
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_analyticWeights_adam':
+                nrf = NeuralTree_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_analyticWeights_nesterov':
+                nrf = NeuralTree_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_basic':
+                nrf = NeuralTreeBasic_boosted(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_basic_adam':
+                nrf = NeuralTreeBasic_boosted_adam(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_basic_nesterov':
+                nrf = NeuralTreeBasic_boosted_nesterov(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_extraLayer':
+                nrf = NeuralTree_extraLayer(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func)
+                nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+                self.NRF_ensemble.append(nrf)
+            elif self.NRF_type == 'NRF_extraLayer_analyticWeights':
+                nrf = NeuralTree_extraLayer_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+                 output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func, learning_rate1=eta, learning_rate2=eta2)
+                nrf.train_NRF(epochs,mini_batch,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
                 self.NRF_ensemble.append(nrf)
 
     def predict(self, X_test):
@@ -35,12 +88,16 @@ class NeuralRandomForest():
         predictions = predictions.tolist()
         final_predictions = []
         for nrf_preds in predictions:
+            x = np.array(nrf_preds)
+            val = most_common_value(x)
+            final_predictions.append(val)
+            '''
             try:
                 val = mode(nrf_preds) # we choose the most frequent element of the list
                 final_predictions.append(val)
             except:
                 val = random.choice(nrf_preds) # if all values are same common, we pick one random value
                 final_predictions.append(val)
-
+            '''
 
         return np.array(final_predictions)

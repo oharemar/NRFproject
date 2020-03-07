@@ -21,7 +21,9 @@ def sigmoid_inverse(z,gamma):
     return res
 
 def tanh(z,gamma): # tangent hyperbolic function, gamma is hyperparameter
-    return (np.exp(2.0*gamma*z) - 1.0)/(np.exp(2.0*gamma*z) + 1.0)
+    ret = (np.exp(2.0*gamma*z) - 1.0)/(np.exp(2.0*gamma*z) + 1.0)
+    ret = np.where(np.isnan(ret),1,ret)
+    return ret
 def derivative_tanh(z,gamma): # derivation of tanh function, gamma is hyperparameter
     return gamma*(1.0 - (tanh(z,gamma))**2.0)
 

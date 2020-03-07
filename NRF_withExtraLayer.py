@@ -7,7 +7,7 @@ import copy
 class NeuralTree_extraLayer():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1, cost = 'CrossEntropy'):
 
         self.decision_tree = decision_tree
         self.gamma_output = gamma_output
@@ -27,7 +27,10 @@ class NeuralTree_extraLayer():
         self.initialize_second_hidden_layer()
         self.initialize_third_hidden_layer()
         self.initialize_output_layer()
-        self.create_NN(CrossEntropyCost)
+        if cost == 'CrossEntropy':
+            self.create_NN(CrossEntropyCost)
+        elif cost == 'LogLikelihood':
+            self.create_NN(LogLikelihoodCost)
 
 
     def get_probs(self):
