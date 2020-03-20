@@ -2,6 +2,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
+\usepackage{makecell}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
 
 \title{MASTER'S THESIS}
 \author{Bc. Martin Oharek }
@@ -26,7 +30,64 @@
 \subsubsection{Perceptron and neuron}
 \subsubsection{Activation functions}
 \subsubsection{Backpropagation algorithm}
-\section{Evaluation metrics}
+\section{Evaluation}
+
+This section is focused on the summary and description of the evaluation metrics used in the experimental part, alongside the pros and cons of each metric and suitable application. This section includes only metrics that are applied in the testing phase. The correct choice of evaluation is the main and crucial task in the case of searching for optimal classification model. In practice, there exist numerous evaluation methods applied frequently to many classification tasks, each fits better in different cases. Before we choose set of evaluation metrics, we must be aware of the processed data and classification model to set our evaluation correctly. Also the purpose and future application scope of our model is significant. If this foremost analysis of the data and model is neglected or done wrong, we could end up choosing bad-shaped evaluation techniques and therefore misinterpret the performance of our model.
+
+In the literature could be found significant amount of studies addressing the choice of evaluation metrics in the case of either binary classification \cite{evaluation1,evaluation2} or multi-class classification \cite{multieval1,multieval2}.
+
+The classification models in this thesis are tested on multiple datasets, both binary and multi-class classification oriented. Consequently, there is not any particular property that could discriminate correct (the most correct) setting of evaluation methods in general, unless we study each dataset separately, which is not the purpose of this thesis at all. We only desire to compare classification performance quality of neural random forest mainly to the performance of regular random forests and provide the evidence of the superiority of neural random forests. Therefore we select subset of worldwide-accepted, well-functional evaluation techniques, summarize them and describe them separately. Combination of these metrics provides sufficient evaluation to build a conclusion.
+
+Firstly, we define important notation that is referenced in the upcoming descriptions. This applies generally to the multi-class classification with arbitrary number of classes (labels). Set of all classes is denoted as $\mathbb{C}$.
+
+\begin{definition}
+\textit{Positive} class $c \in \mathbb{C}$ is such label, which is in the current scope of interest. Other classes $d \neq c$, $d \in \mathbb{C}$, are called \textit{negative} classes.
+\label{definition_pos_neg}
+\end{definition}
+
+To clarify \ref{definition_pos_neg}, if we test the  classification performance of our model with respect to class $c \in \mathbb{C}$, then $c$ is called positive class and other labels $d \neq c$, $d \in \mathbb{C}$, are called negative classes. It is important to realize, that there could be many positive classes. It depends chiefly on the current scope of interest. For instance, computing accuracy of class $c_1 \in \mathbb{C}$ means that $c_1$ is (currently) positive class and other classes are negative. In the following, current positive class will be put into parentheses (such as $\text{TP}(c), \text{FN}(c)$ etc.) Also the instances belonging to the positive, resp. negative class could be referenced as positive, resp. negative instances.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    
+       $\text{TP}(c)$ &\makecell{count of positive instances of class $c \in \mathbb{C}$ \\ correctly predicted } \\ \hline
+         $\text{FP}(c)$& \makecell{count of negative instances \\ predicted incorrectly as positive class $c$ }  \\ \hline
+         $\text{TN}(c)$ &\makecell{count of negative instances (with respect to the positive class $c$) \\ correctly predicted  }\\ \hline
+         $\text{FN}(c)$ & \makecell{count of positive instances of class c incorrectly predicted as negative \\ class (with respect to the positive class $c$) }\\ \hline
+    \end{tabular}
+    \caption{Definitions of TP,FP,TN and FN.}
+    \label{tab:definitions}
+\end{table}
+ 
+
+
+\subsubsection{Accuracy} 
+
+
+Probably the most applied evaluation metric in the machine learning society, which provides quick and simple evaluation of the classification performance. Outcome of this metric is the ratio between number of correctly classified instances and number of all instances. Accuracy metric will be denoted as $Acc$.
+
+\begin{equation}
+    Acc(c) = \frac{\text{number of correctly classified instances}}{\text{number of all instances}}
+\end{equation}
+
+Altough gaining this simple value for one classification model is very easy and quick, this metric possesses some significant drawbacks \cite{multieval1} and therefore relying only on this metric during final evaluation is dangerous. It does not take into account membership of instances to either positive or negative classes. Serious problem arises especially when processing imbalanced data \cite{imbalance}, which is the case of many real-world applications (fraud and malware detection \cite{bakalarka}).
+
+For instance, imagine data distributed into two classes, class 0 with 98\% occurrence and class 1 with only 2\% occurrence. This dataset is clearly significantly imbalanced. Moreover, we put higher preference on correctly classifying minority class 1 (e.g. consider class 1 as malware type communication and class 0 as arbitrary safe network communication, it could be basically anything rare vs. normal). Also define naive classifier to constantly classifying any instance as class 0. In this case, accuracy of this model is $Acc = 98\%$, which is very high. Based only on this value, the classification performance of our naive model is perfect. But claiming that this model is good is wrong, since it completely fails in classifying minority class, which has the highest priority. So even that accuracy is very high, the model itself is absolutely useless.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \chapter{Decision-Tree-Inspired NN architecture}
 In this section is provided detailed derivation of the basic neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article \cite{NRF} describing 1 to 1 transformation of arbitrary regression tree (random forest regressor) to the specifically designed neural network (ensemble of neural networks).
@@ -286,6 +347,18 @@ Final competitive model is the compound of 'NRT extra layer' and reference model
 
 \begin{thebibliography}{}
 \bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
+
+\bibitem{evaluation1}G. Canbek, S. Sagiroglu, T. T. Temizel and N. Baykal, "Binary classification performance measures/metrics: A comprehensive visualized roadmap to gain new insights," 2017 International Conference on Computer Science and Engineering (UBMK), Antalya, 2017, pp. 821-826
+
+\bibitem{evaluation2}Koyejo, O. & Natarajan, Nagarajan \& Ravikumar, P. & Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
+
+\bibitem{multieval1}Hossin, Mohammad & M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
+
+\bibitem{multieval2} Branco, Paula \& Torgo, Luís & Ribeiro, Rita. (2017). Relevance-Based Evaluation Metrics for Multi-class Imbalanced Domains. Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics). 698-710. 10.1007/978-3-319-57454-7\_54. 
+
+\bibitem{imbalance}Chawla, Nitesh. (2005). Data Mining for Imbalanced Datasets: An Overview. 10.1007/0-387-25465-X\_40. 
+
+\bibitem{bakalarka}bakalarka
 
 \end{thebibliography}
 
