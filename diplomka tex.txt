@@ -23,8 +23,35 @@
 \section{State-of-the-art classification models}
 \subsection{Logistic regression}
 \subsection{Support vector machines (SVM)}
-\subsection{Random forest}
-\subsubsection{Decision tree}
+\section{Random forest}
+
+Random forest algorithm is a popular machine learning method used primarily on the classification and regression tasks. Its functionality is based on collecting predictions from several independent classifiers (ensemble of decision trees) and merging their outcomes into final prediction. It belongs to the group of supervised learning algorithms. In this thesis is usage of random forests restricted only to the classification tasks, so the theoretical part of this section will be limited only to the random forests used for classification. Main goal is to find a decision function $f: \mathbb{X} \rightarrow \mathbb{R}$, where $X \subset \mathbb{R}^d$ is the input space in the $d$-dimensional real-valued space, which outputs the response (class, label).
+
+Random Forest nowadays is a widespread method exploited frequently in various domains, such as computer vision \cite{computer_vision}, text classification \cite{text_rec}, bioinformatics \cite{bioinf}, network threat detection \cite{random_forest_intrusion} etc. The individual classifiers - decision trees - could be also used as a clustering algorithm [ref Egypt článek].
+Popularity of random forests is gained due to excellent generalization and application to wide-ranged spectrum of classification tasks with registering competitive classification quality in comparison with other state-of-the-art methods, such as logistic regression, support vector machines, neural networks etc. Also the method itself is in its basics quite simple and therefore is fast, easy implementable and could be analyzed and interpreted with instant gain of variable importances \cite{rf_imp}.
+
+Unlike the neural networks, it has far less parameters to tune and is better-applicable to the small-sample sized (high-dimensional) datasets. With the usage of randomization, bagging, bootstrapping and other techniques based on randomness, random forests overcome easily problems of overfitting \cite{rf_overfit}.
+
+\subsection{Decision tree}
+
+As was mentioned previously, random forest consists of independent classifiers called decision trees (Figure \ref{fig:dec_tree}).
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=\textwidth]{dec_tree.png}
+\end{minipage}
+%\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=\textwidth]{dec_tree_graph.png}
+\end{minipage}
+\caption{In the left part of the figure is illustrated decision tree with depth = 2. The first circle in red color is called root node. Two beige circles in the intermediate layer are inner nodes and green rectangles are leaf nodes, where probabilities of individual classes are stored . Each input vector $\boldsymbol{x} = (x_1,x_2) \in \mathbb{R}^2$ starts from the root node and traverses down the tree by applying subsequent split criterions in nodes until it reaches the leaf node. In the right figure is visualized segregation of input space by the hyperplanes (defined in root node and inner nodes of the decision tree) parallel to the axes (black lines).}
+\label{fig:dec_tree}
+\end{figure}
+
+
+
 \subsubsection{Ensemble of decision trees}
 \subsection{Neural network (NN)}
 \subsubsection{Perceptron and neuron}
@@ -440,6 +467,22 @@ Final competitive model is the compound of 'NRT extra layer' and reference model
 \bibitem{imbalance_data}HE, H. a E. A. GARCIA. Learning from Imbalanced Data. IEEE Transactions on Knowledge and Data Engineering. 2009, (9), 1264-1284.
 
 \bibitem{imbalance3} Akosa, J.S. (2017). Predictive Accuracy : A Misleading Performance Measure for Highly Imbalanced Data.
+
+\bibitem{random_forest_intrusion}Random Forest Modeling for Network Intrusion Detection System
+Citation DataProcedia Computer Science, ISSN: 1877-0509, Vol: 89, Page: 213-217 , 2016
+
+\bibitem{computer_vision} Random Forest and computer vision
+http://pages.iai.uni-bonn.de/frintrop\_simone//BVW13/BVW-gall.pdf
+
+\bibitem{bioinf}R. D´ıaz-Uriarte and S. Alvarez de Andr´es. Gene selection and classification of
+microarray data using random forest. BMC Bioinformatics, 7:1–13, 2006.
+
+\bibitem{text_rec}Bernard, Simon \& Heutte, Laurent \& Adam, Sébastien. (2007). Using Random Forests for Handwritten Digit Recognition. Proceedings of the International Conference on Document Analysis and Recognition, ICDAR. 2. 1043-1047. 10.1109/ICDAR.2007.4377074. 
+
+\bibitem{rf_overfit}Ali, Jehad \& Khan, Rehanullah \& Ahmad, Nasir \& Maqsood, Imran. (2012). Random Forests and Decision Trees. International Journal of Computer Science Issues(IJCSI). 9. 
+
+\bibitem{rf_imp}PARR, Terence, Kerem TURGUTLU, Christopher CSISZAR a Jeremy HOWARD. Beware Default Random Forest Importances. Explained.ai [online]. 2018 [cit. 2018-05-15]. Dostupné z: http://explained.ai/rf-importance/index.html
+
 
 \end{thebibliography}
 
