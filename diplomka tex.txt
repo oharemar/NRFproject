@@ -69,13 +69,90 @@ To clarify \ref{definition_pos_neg}, if we test the  classification performance 
 Probably the most applied evaluation metric in the machine learning society, which provides quick and simple evaluation of the classification performance. Outcome of this metric is the ratio between number of correctly classified instances and number of all instances. Accuracy metric will be denoted as $Acc$.
 
 \begin{equation}
-    Acc(c) = \frac{\text{number of correctly classified instances}}{\text{number of all instances}}
+    Acc = \frac{\text{number of correctly classified instances}}{\text{number of all instances}}
 \end{equation}
 
-Altough gaining this simple value for one classification model is very easy and quick, this metric possesses some significant drawbacks \cite{multieval1} and therefore relying only on this metric during final evaluation is dangerous. It does not take into account membership of instances to either positive or negative classes. Serious problem arises especially when processing imbalanced data \cite{imbalance}, which is the case of many real-world applications (fraud and malware detection \cite{bakalarka}).
+Altough gaining this simple value for one classification model is very easy and quick, this metric possesses some significant drawbacks \cite{multieval1} and therefore relying only on this metric during final evaluation is dangerous. It does not take into account membership of instances to either positive or negative classes. Serious problem arises especially when processing imbalanced data \cite{imbalance}, which is the case of many real-world applications (fraud and malware detection \cite{bakalarka} etc.).
 
 For instance, imagine data distributed into two classes, class 0 with 98\% occurrence and class 1 with only 2\% occurrence. This dataset is clearly significantly imbalanced. Moreover, we put higher preference on correctly classifying minority class 1 (e.g. consider class 1 as malware type communication and class 0 as arbitrary safe network communication, it could be basically anything rare vs. normal). Also define naive classifier to constantly classifying any instance as class 0. In this case, accuracy of this model is $Acc = 98\%$, which is very high. Based only on this value, the classification performance of our naive model is perfect. But claiming that this model is good is wrong, since it completely fails in classifying minority class, which has the highest priority. So even that accuracy is very high, the model itself is absolutely useless.
 
+\subsubsection{Precision}
+
+Another evaluation metric is called precision and is class-sensitive. In the contrast to the accuracy, it is computed for any particular class $c \in \mathbb{C}$ as
+\begin{equation}
+    Precision(c) = \frac{\text{TP}(c)}{\text{TP}(c)+\text{FP}(c)}
+\end{equation}
+
+It expresses the ratio between correctly predicted positive instances and all instances predicted as positive. In other words, it shows how precise is our classification model in predicting positive class.
+
+This metric is also dependent on the rate of imbalance among current data. Let's suppose adding negative instances to the dataset. Then 
+
+$$\text{FP}^{\text{less}}(c) \leq \text{FP}^{\text{more}}(c) \implies Precision^{\text{less}}(c) \geq Precision^{\text{more}}(c)$$
+
+So even if our classifier predicts all positive instances correctly, the precision tends to decrease with increasing number of negative instances.
+
+\subsubsection{Recall}
+
+This metric is computed for class $c \in \mathbb{C}$ as
+
+\begin{equation}
+    Recall(c) = \frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)}
+\end{equation}
+
+Recall expresses ratio between number of correctly classified positive instances and number of all positive instances. Clearly, this metric does not depend on the rate of imbalance in our data and therefore is suitable choice for evaluation on imbalance datasets.
+
+In many applications of classification on imbalance datasets is put a strong requirement on model to predict minority classes as precisely as possible (capture all positive instances, but also not to cause a lot of mistakes on negative instances), because misdetections could inflict great damage (e.g. malware detection \cite{bakalarka}). In some studies it turns out that combination of precision and recall is appropriate choice to satisfy these requirements and provides reliable evaluation \cite{imbalance_data}.
+
+\subsubsection{F-measure}
+
+F-measure metric combines precision and recall into single value as
+
+\begin{equation}
+    F_\beta(c) = \frac{(1+\beta^2)\cdot Precision(c) \cdot Recall(c)}{\beta^2 \cdot Precision(c) + Recall(c)}\hspace{0.5cm} ,
+\end{equation}
+where $c \in \mathbb{C}$ and $\beta$ is a coefficient which serves to adjust relative importance between precision and recall (often $\beta = 1$). For $\beta = 1$ it expresses harmonic mean of precision and recall. As $\beta \rightarrow 0$ the formula considers only precision and as $\beta \rightarrow \infty$ the formula considers only recall. Generally, $\beta < 1$ favors precision and $\beta > 1$ favors recall. It depends on a specific application to choose $\beta$ appropriately.
+
+\subsubsection{G-measure}
+
+G-measure is computed as
+
+\begin{equation}
+    G(c) = \sqrt{\frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)} \cdot \frac{\text{TN}(c)}{\text{TN}(c) + \text{FP}(c)}} \hspace{0.5cm},
+    \label{g-meas}
+\end{equation}
+where $c \in \mathbb{C}$. The left factor in multiplication under the square root in \eqref{g-meas} is called \textit{Sensitivity} or \textit{true positive rate} (same as recall) and the right factor is called \textit{Specificity} or \textit{true negative rate}.
+
+Optimization of this metric secures good balance between classification performance on both minority and majority classes. In the case of imbalance, even if the classification performance on negative instances is perfect, G-measure would end significantly low if classification of positive instances is poor \cite{imbalance3}. This is valuable property which makes this metric well-applicable to evaluation of the classification model on imbalanced data.
+
+\textbf{Note:} Since we compare different classification models and track their overall performance on various datasets in the experimental part, the main purpose is not to compare metric values for each individual class, but rather to compare summaries of these evaluation outcomes. For this reason we adopt \textbf{macro/weighted average} to represent the individual metrics for different classes as single value.
+
+For arbitrary evaluation metric $f(\cdot)$ is macro/weighted average defined as
+
+\begin{equation}
+    MacroAvg(f) = \frac{\sum_{l=1}^{M}f(c_l)}{M}
+\end{equation}
+\begin{equation}
+    WeightedAvg(f) = \frac{\sum_{l=1}^{M}n_l \cdot f(c_l)}{\sum_{l=1}^{M}n_l} \hspace{0.5cm},
+\end{equation}
+where $c_l, l \in \{1,2,...,M\}$ is $l$-th class, $n_l$ is count of (testing) instances belonging to $c_l$ and $M$ is total number of classes.
+
+It is also worth to mention \textbf{micro average} of precision and recall, which is defined as
+
+\begin{equation}
+    MicroAvg(Precision) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FP}(c_l))}
+\end{equation}
+
+\begin{equation}
+    MicroAvg(Recall) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FN}(c_l))}
+\end{equation}
+
+$MicroAvg(Precision)$ computes basically fraction of the sum of all correctly predicted instances and sum of all correctly and incorrectly predicted instances, which is the sum of all instances. Therefore it expresses same value as accuracy of the model. Furthermore, since $\sum_{l=1}^{M}\text{FN}(c_l) = \sum_{l=1}^{M}\text{FP}(c_l)$, both values are equal. They will be used later in the experimental part of the thesis.
+
+
+\subsubsection{Receiver operator charachteristics (ROC) curves}
+ROC curves are frequently drawn especially in the cases of binary classifiers. Also they could be generalized to the multi-class classification by applying OneVsAll or OneVsOne approach and different averaging methods based on preference (e.g. $MacroAvg$,$MicroAvg$).
+
+ZDE DOPSAT ZBYTEK + Precision - Recall Curves
 
 
 
@@ -359,6 +436,10 @@ Final competitive model is the compound of 'NRT extra layer' and reference model
 \bibitem{imbalance}Chawla, Nitesh. (2005). Data Mining for Imbalanced Datasets: An Overview. 10.1007/0-387-25465-X\_40. 
 
 \bibitem{bakalarka}bakalarka
+
+\bibitem{imbalance_data}HE, H. a E. A. GARCIA. Learning from Imbalanced Data. IEEE Transactions on Knowledge and Data Engineering. 2009, (9), 1264-1284.
+
+\bibitem{imbalance3} Akosa, J.S. (2017). Predictive Accuracy : A Misleading Performance Measure for Highly Imbalanced Data.
 
 \end{thebibliography}
 
