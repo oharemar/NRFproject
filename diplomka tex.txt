@@ -50,6 +50,103 @@ As was mentioned previously, random forest consists of independent classifiers c
 \label{fig:dec_tree}
 \end{figure}
 
+In this work we focus only on binary trees, which means, that every node has always 2 child nodes (following nodes in the hierarchical structure of the tree). The process of applying decision tree to obtain final prediction is basically described in Figure \ref{fig:dec_tree}. Beginning from the root node, the input vector $\boldsymbol{x} \in \mathbb{R}^d$ from $d$-dimensional input space is iteratively tested by the split functions associated with every single node in hierarchical order and based on the result is further sent either to the left or right child (the split functions usually define hyperplanes in the input space). This process is repeated until the vector reaches final node (leaf node). In the leaf node are stored classification predictions, which are eventually extracted.
+
+The work with decision tree could be divided into two major parts:
+
+\begin{enumerate}
+    \item \textbf{Training stage}: In this stage the entire decision tree is built from the scratch on the basis of predefined criterions and properties. To perform this phase, the \textbf{training dataset} has to be adopted and used. It is usually selected as a subset of the complete data that are available. Magnitude of the training dataset depends on the complexity and application of our model (e.g. if the best model is selected and compared with other models, it should be sufficient to use less data or if the model is prepared for the production, it is desirable to use as much data as possible) and on the complexity of the problem. There does not exist any general consensus that dictates how large should training dataset be. It often depends on the personal preferences and experience and of course on the following evaluation results.
+    
+    \item \textbf{Testing/application stage}: After training is the decision tree directly applicable and therefore could be either tested with various evaluation methods or applied in practice. The usage of decision tree itself is very straightforward and was already described. We will focus on description of merging the individual results from the ensemble of decision trees and obtaining final predictions.
+\end{enumerate}
+Now will be provided mathematical details of the both stages.
+
+\subsubsection{Training stage}
+
+Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of vectors in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
+
+Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire training dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
+
+\begin{equation}
+    s(\boldsymbol{x},\boldsymbol{\theta}) = \begin{cases}
+    0,  & \boldsymbol{x} \text{ is sent to the left child}\\
+      1, & \boldsymbol{x} \text{ is sent to the right child}
+    \end{cases}
+\end{equation}
+
+The parameters of the split functions are the input vector $\boldsymbol{x}$ and parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
+
+In the practice, widely used choice of the split function is \cite{rf_main}
+
+\begin{equation}
+    \psi(\boldsymbol{x}, i, \tau) = \begin{cases}
+    0,  & x_i < \tau\\
+      1, & \text{otherwise}
+    \end{cases}
+    \label{split_func}
+\end{equation}
+
+Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)$, where $i \in \{1,...,d\}$ represents one feature from the $d$-dimensional feature space and $\tau \in \mathbb{R}$ is a threshold. Together, equation $x_i = \tau$ embodies hyperplane parallel with one axis and split function divides vectors into two groups based on their relative position with respect to this hyperplane. With regard to the fact, that our proposed transformation of the decision tree to the corresponding neural network is build on usage of this special split function \eqref{split_func}, we will not focus on the other types of split functions in this thesis.
+
+In each iteration, algorithm seeks for the best split, ie. for the parameters of the split function that provides this split. It is achieved by optimizing pre-specified split criterion, which expresses measure of (non)impurity in the corresponding node. By impurity is meant that if node contains instances belonging only to one class, the impurity is 0, whereas it is increased if instances of multiple classes are present in the node.
+
+Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini index} functions, which are adopted in the heuristic algorithms as C4.5 \cite{c45}, CART \cite{cart} and ID3 \cite{id3}. Another possibility is a \textbf{Classification error}. They are defined as (in the same order as were mentioned)
+
+\begin{align}
+    H_E(\mathbb{M}) &= -\sum_{c \in \mathbb{C}}^{}p(c)\log p(c) \\
+    H_G(\mathbb{M}) &= \sum_{c \in \mathbb{C}}^{}p(c)(1-p(c))\\
+    H_{CE}(\mathbb{M}) &= 1 - \max_{c \in \mathbb{C}}[p(c)] \hspace{0.5cm},
+\end{align}
+where the sum iterates over all classes $c \in \mathbb{C}$, $\mathbb{C}$ is a set of all classes, and
+\begin{equation}
+    p(c) = \frac{\sum_{\boldsymbol{x} \in \mathbb{M}}^{} 1|_{\boldsymbol{x} \in c}}{|\mathbb{M}|} \hspace{0.5cm},
+\end{equation}
+which is probability of instance in $\mathbb{M}$ belonging to the class $c$. $|\mathbb{M}|$ represents number of instances in set $\mathbb{M}$ and
+
+\begin{equation}
+    1|_{\boldsymbol{x} \in c} = \begin{cases}
+    1, & \boldsymbol{x} \in c \\
+    0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+These impurity functions are in general exploited in the split criterions, which are then optimized in order to obtain the best possible split. By optimizing these criterions should decrease the impurity function value after each split.
+There are plenty of possibilities to choose split criterion that suits our problem, but as the most popular choice could be considered \textbf{Information gain} criterion, which is defined as
+
+\begin{equation}
+    I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau))
+    \label{inf_gain}
+\end{equation}
+
+$H(\mathbb{M})$ is arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$ represent the subsets of $\mathbb{M}$ proceeding to the left or right child. In parentheses is emphasized, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node are obtained final parameters $i^*, \tau^*$, that are stored and used in the testing stage. Thus parameters of the split function of the $j$-th node are acquired as
+
+\begin{equation}
+    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*) = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
+\end{equation}
+where $\mathbb{M}_j \subset \mathbb{M}$ is the subset of $\mathbb{M}$ in the $j$-th node.
+
+Basic simulation of finding the best split is visualized in the Figure \ref{fig:split_example}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{hor_ver_split.png}
+\caption{In the Figure are illustrated two cases of different splits.}
+\label{fig:split_example}
+\end{figure}
+Values of information gain (IG) for different impurity functions are (Figure \ref{fig:split_example}):
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+       &\textbf{Horizontal split} & \textbf{Vertical split} \\ \hline
+         IG (Entropy)& 0.34 & \textbf{0.69}\\ \hline
+         IG (Gini)& 0.135& \textbf{0.25}\\ \hline
+         IG (Classification Error)&0.20 & \textbf{0.25}\\ \hline
+    \end{tabular}
+    \caption{Values of IG for splits in Figure \ref{fig:split_example}.}
+    \label{tab:ig_vals}
+\end{table}
+With change of the horizontal split to the vertical split occured increase in values of all studied criterions. This suggests that vertical split divides data better than the horizontal split and should be preferred.
 
 
 \subsubsection{Ensemble of decision trees}
@@ -482,6 +579,18 @@ microarray data using random forest. BMC Bioinformatics, 7:1–13, 2006.
 \bibitem{rf_overfit}Ali, Jehad \& Khan, Rehanullah \& Ahmad, Nasir \& Maqsood, Imran. (2012). Random Forests and Decision Trees. International Journal of Computer Science Issues(IJCSI). 9. 
 
 \bibitem{rf_imp}PARR, Terence, Kerem TURGUTLU, Christopher CSISZAR a Jeremy HOWARD. Beware Default Random Forest Importances. Explained.ai [online]. 2018 [cit. 2018-05-15]. Dostupné z: http://explained.ai/rf-importance/index.html
+
+\bibitem{rf_main}A. Criminisi, J. Shotton, and E. Konukoglu, Decision Forests: A Unified Framework for Classification, Regression, Density Estimation, Manifold Learning and Semi-Supervised Learning. Foundations and Trends in Computer Graphics and Computer Vision, Now Publishers Inc., 2012, 81-227.
+\bibitem{c45}C4.5 algorithm and Multivariate Decision Trees
+Thales Sehn Korting
+
+\bibitem{cart}
+Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression
+Tree Wadsworth \& Brooks/Cole Advanced Books \& Software, Pacific Californi
+
+\bibitem{id3}Xiaohu, Wang & Lele, Wang \& Nianfeng, Li. (2012). An Application of Decision Tree Based on ID3. Physics Procedia. 25. 1017-1021. 10.1016/j.phpro.2012.03.193. 
+
+
 
 
 \end{thebibliography}
