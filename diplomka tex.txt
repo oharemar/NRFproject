@@ -90,7 +90,7 @@ Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)$, where $i \in 
 
 In each iteration, algorithm seeks for the best split, ie. for the parameters of the split function that provides this split. It is achieved by optimizing pre-specified split criterion, which expresses measure of (non)impurity in the corresponding node. By impurity is meant that if node contains instances belonging only to one class, the impurity is 0, whereas it is increased if instances of multiple classes are present in the node.
 
-Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini index} functions, which are adopted in the heuristic algorithms as C4.5 \cite{c45}, CART \cite{cart} and ID3 \cite{id3}. Another possibility is a \textbf{Classification error}. They are defined as (in the same order as were mentioned)
+Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini index}, which are adopted in the heuristic algorithms as C4.5 \cite{c45}, CART \cite{cart} and ID3 \cite{id3}. Another possibility is a \textbf{Classification error}. They are defined as (in the same order as were mentioned)
 
 \begin{align}
     H_E(\mathbb{M}) &= -\sum_{c \in \mathbb{C}}^{}p(c)\log p(c) \\
@@ -111,7 +111,7 @@ which is probability of instance in $\mathbb{M}$ belonging to the class $c$. $|\
 \end{equation}
 
 These impurity functions are in general exploited in the split criterions, which are then optimized in order to obtain the best possible split. By optimizing these criterions should decrease the impurity function value after each split.
-There are plenty of possibilities to choose split criterion that suits our problem, but as the most popular choice could be considered \textbf{Information gain} criterion, which is defined as
+There are plenty of possibilities to choose split criterion that suits our problem, but as the most popular choice could be considered \textbf{Information gain} criterion, which is defined as \cite{rf_main}
 
 \begin{equation}
     I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau))
@@ -146,10 +146,66 @@ Values of information gain (IG) for different impurity functions are (Figure \re
     \caption{Values of IG for splits in Figure \ref{fig:split_example}.}
     \label{tab:ig_vals}
 \end{table}
-With change of the horizontal split to the vertical split occured increase in values of all studied criterions. This suggests that vertical split divides data better than the horizontal split and should be preferred.
+With change of the horizontal split to the vertical split occured increase in values of all studied criterions (see Table \ref{tab:ig_vals}). This suggests that vertical split divides data better than the horizontal split and should be preferred.
+
+Apart of the split function and the split criterion, another necessary feature must be added to the decision tree model in advance. We need to define stopping criterion, which interrupt the growth of the tree in the current node when the specified condition is met.
+
+One natural choice of the stopping criterion is to stop splitting when the corresponding node contains instances belonging to the same class. Therefore there does not make any sense to continue in splitting and growth could be ended. Also it is not possible to continue if there ends only one instance in the node. In practice are frequently used many different criterions, which helps to avoid overgrown trees prone to overfitting. If one of them applies, the growth in the current node is interrupted. As example could be mentioned \cite{pruning}:
+\begin{itemize}
+    \item \textit{Low information gain}: Lower threshold for the information gain is set. When a subsequent split produces insufficient information gain below specified threshold, the growth is terminated and node becomes a leaf node.
+    \item \textit{Maximum depth}: When the number of splits in the current tree branch reaches the maximum depth, the current node becomes a leaf node.
+    \item \textit{Maximum instances in the leaf}: This is a threshold for the maximum number of instances in the leaf nodes. When the number of instances in the current node is equal or below this threshold, the node becomes a leaf node.
+\end{itemize}
+
+All of these stopping criterions defined in advance belongs to the \textit{prepruning} methods \cite{pruning}. The fact, that these methods are defined in advance embodies certain drawback. For instance, we do not know in advance, if the predefined maximum depth would produce sufficient requirements. Maybe it is too small and the decision tree will tend to underfitting or is too large and the decision tree will tend to overfitting.
+
+For this reason, there could be adopted the \textit{postpruning methods} for the large-depth trees which encounter this issue and solves efficiently the problem of overfitting. There were not applied in our experiments, so we will provide only short summary of these methods \cite{pruning2}.
+\begin{itemize}
+    \item \textit{Reduced Error Pruning (REP)}: The model is pruned by usage of the independent validation (pruning) dataset different from the training dataset. The subtree starting from the chosen inner node is replaced by the leaf node and the classification error on the validation dataset is measured. If the error is lower than the error in case of the previous non-pruned tree, the tree is pruned. This procedure runs in the bottom-up manner and is ended when no improvement in the classification error is observed.
+    \item \textit{Pessimistic Error Pruning (PEP)}:  Unlike the REP method, PEP uses entire training dataset for the pruning procedure. It is based on the continuity correction of the error rate, since the error rate on the training dataset is significantly biased. Details could be found in \cite{pruning2} alongside the descriptions of other applied methods.
+\end{itemize}
+
+When the growth of the tree is successfully finished, the class distributions of the instances that ended in each leaf node form a probability distribution of classes, which is stored in the leaf node. For probability $p^j(c)$ of class $c \in \mathbb{C}$ in the leaf node $j \in \{1,...,L\}$, where $L$ is a total number of leaf nodes applies
+\begin{equation}
+    p^j(c) = \frac{n^j_c}{N^j} \hspace{0.5cm},
+\end{equation}
+where $n^j_c$ is a total number of instances of class $c$ in the leaf node $j$ and $N^j$ is a total number of instances in the entire leaf node $j$.
+
+\subsubsection{Testing/application stage}
+
+After the training stage, the decision tree is obtained and could be applied in practice. Starting from the root node, the testing instance $x \in \mathbb{X} \subset \mathbb{R}^d$ is traversed down the tree by iterative application of the split functions associated with individual nodes. When the instance reaches the leaf node, the probability distribution of classes in the leaf node is extracted and the values are observed. The class which has the maximum value is outputted as the final prediction. Mathematically, the output of the single decision tree is
+
+\begin{equation}
+    c^* = \text{arg}\max_{c \in \mathbb{C}}p^j(c) \hspace{0.5cm},
+\end{equation}
+where $j$ is the leaf node where $x$ ended.
+
+\subsection{Ensemble of decision trees}
+
+Ensemble of decision trees forms a strong classifier with higher predictive ability than individual decision trees. Idea behind this is to combine several weak classifiers to create one strong classifier. Ensembles generally boost the performance in the comparison with the single classifier (decision tree). For instance, there is a chance of single classifiers to get stuck in the local optima when optimizing different criterions (e.g. minimizing error rate). With more and more data, it could be for many classifiers computationally unreachable to find the best optimal value. In such cases, the employment of ensemble methods is valuable, because training of independent classifiers with different subsets of input data and merging their output could approximate real prediction function far better \cite{ensemble}.
+
+Ensemble methods also significantly benefit from the averaging of results from individual classifiers, especially in the case of insufficient number of training data points. In such case, the learning algorithm could find many applicable parameters (e.g. hyperplanes of the decision tree) that will result in the same accuracy on the training dataset. Combining those models could suppress the possibility of picking a wrong classifier \cite{ensemble}.
+
+Among popular techniques to create an ensemble of decision trees belong:
+\begin{itemize}
+    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to the train the decision tree. Then the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
+    \item \textbf{Boosting} This method is based on idea of iterative boosting of weak classifiers into a strong one. In each iteration, the algorithm aims to boost previous-staged classifier by checking of the misclassified instances and attempting to fix these errors. As popular boosting algorithm could be mentioned AdaBoost algorithm \cite{adaboost2}. These methods often tend to overfitting problem \cite{adaboost}.
+\end{itemize}
+
+In the experimental part of this thesis is used exclusively bagging technique to make an ensemble of decision trees. To obtain random forest from the ensemble obtained by bagging algorithm, the \textit{randomization} of single trees needs to be added into the process. This technique helps to avoid correlation between individual decision trees and secures better indepedence of classifiers. An idea is to suppress the influence of strongly distinguishing features (dimensions), that are natural choice to split by. Occurrence of these features could result in the correlation of the decision trees, because algorithm would prefer those features especially in the early stages of growing phase and therefore indicates detectable similarity of the trees. Randomization attempts to obviate this problem and selects some random subset of the features in each splitting iteration and only those selected features are used for the split.
+
+\subsubsection{Combining predictions of the decision trees}
+
+As was mentioned previously, from every decision tree could be extracted either probability distribution of classes from the leaf node or directly predicted class label. There are naturally numerous possibilities of merging these results. Unless there is not special requirement on the model, practically are used two ways. If the outputs are discrete class labels, than the voting scheme is applied and the class with maximum votes is taken as final prediction. If the outputs are probability distributions, those values are averaged and the class with maximum probability is taken. Mathematically noted, the final prediction in this case is
+
+\begin{equation}
+    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|T|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
+    \label{final_pred}
+\end{equation}
+where $T$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} could be also a weighted average instead, which is applied e.g. if predicting some class is more preferred over predicting others.
 
 
-\subsubsection{Ensemble of decision trees}
+
 \subsection{Neural network (NN)}
 \subsubsection{Perceptron and neuron}
 \subsubsection{Activation functions}
@@ -590,7 +646,20 @@ Tree Wadsworth \& Brooks/Cole Advanced Books \& Software, Pacific Californi
 
 \bibitem{id3}Xiaohu, Wang & Lele, Wang \& Nianfeng, Li. (2012). An Application of Decision Tree Based on ID3. Physics Procedia. 25. 1017-1021. 10.1016/j.phpro.2012.03.193. 
 
+\bibitem{pruning}Zhou, Xinlei \& Yan, Dasen. (2019). Model tree pruning. International Journal of Machine Learning and Cybernetics. 10.1007/s13042-019-00930-9. 
 
+\bibitem{pruning2}Esposito, Floriana \& Malerba, Donato \& Semeraro, Giovanni \& Kay, John. (1997). A Comparative Analysis of Methods for Pruning Decision Trees. Pattern Analysis and Machine Intelligence, IEEE Transactions on. 19. 476 - 491. 10.1109/34.589207. 
+
+\bibitem{ensemble}Ensemble Methods in Machine Learning
+Thomas G Dietterich
+Oregon State University Corvallis Oregon USA
+tgdcsorstedu WWW home page httpwwwcsorstedutgd
+
+\bibitem{variance_rf} http://www.math.mcgill.ca/yyang/resources/doc/randomforest.pdf
+
+\bibitem{adaboost} Coadou, Yann. (2013). Boosted Decision Trees and Applications. EPJ Web of Conferences. 55. 02004-. 10.1051/epjconf/20135502004. 
+
+\bibitem{adaboost2}
 
 
 \end{thebibliography}
