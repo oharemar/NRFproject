@@ -23,193 +23,7 @@
 \section{State-of-the-art classification models}
 \subsection{Logistic regression}
 \subsection{Support vector machines (SVM)}
-\section{Random forest}
 
-Random forest algorithm is a popular machine learning method used primarily on the classification and regression tasks. Its functionality is based on collecting predictions from several independent classifiers (ensemble of decision trees) and merging their outcomes into final prediction. It belongs to the group of supervised learning algorithms. In this thesis is usage of random forests restricted only to the classification tasks, so the theoretical part of this section will be limited only to the random forests used for classification. Main goal is to find a decision function $f: \mathbb{X} \rightarrow \mathbb{R}$, where $X \subset \mathbb{R}^d$ is the input space in the $d$-dimensional real-valued space, which outputs the response (class, label).
-
-Random Forest nowadays is a widespread method exploited frequently in various domains, such as computer vision \cite{computer_vision}, text classification \cite{text_rec}, bioinformatics \cite{bioinf}, network threat detection \cite{random_forest_intrusion} etc. The individual classifiers - decision trees - could be also used as a clustering algorithm [ref Egypt článek].
-Popularity of random forests is gained due to excellent generalization and application to wide-ranged spectrum of classification tasks with registering competitive classification quality in comparison with other state-of-the-art methods, such as logistic regression, support vector machines, neural networks etc. Also the method itself is in its basics quite simple and therefore is fast, easy implementable and could be analyzed and interpreted with instant gain of variable importances \cite{rf_imp}.
-
-Unlike the neural networks, it has far less parameters to tune and is better-applicable to the small-sample sized (high-dimensional) datasets. With the usage of randomization, bagging, bootstrapping and other techniques based on randomness, random forests overcome easily problems of overfitting \cite{rf_overfit}.
-
-\subsection{Decision tree}
-
-As was mentioned previously, random forest consists of independent classifiers called decision trees (Figure \ref{fig:dec_tree}).
-
-\begin{figure}[ht]
-\begin{minipage}[b]{0.5\linewidth}
-\centering
-\includegraphics[width=\textwidth]{dec_tree.png}
-\end{minipage}
-%\hspace{0.5cm}
-\begin{minipage}[b]{0.5\linewidth}
-\centering
-\includegraphics[width=\textwidth]{dec_tree_graph.png}
-\end{minipage}
-\caption{In the left part of the figure is illustrated decision tree with depth = 2. The first circle in red color is called root node. Two beige circles in the intermediate layer are inner nodes and green rectangles are leaf nodes, where probabilities of individual classes are stored . Each input vector $\boldsymbol{x} = (x_1,x_2) \in \mathbb{R}^2$ starts from the root node and traverses down the tree by applying subsequent split criterions in nodes until it reaches the leaf node. In the right figure is visualized segregation of input space by the hyperplanes (defined in root node and inner nodes of the decision tree) parallel to the axes (black lines).}
-\label{fig:dec_tree}
-\end{figure}
-
-In this work we focus only on binary trees, which means, that every node has always 2 child nodes (following nodes in the hierarchical structure of the tree). The process of applying decision tree to obtain final prediction is basically described in Figure \ref{fig:dec_tree}. Beginning from the root node, the input vector $\boldsymbol{x} \in \mathbb{R}^d$ from $d$-dimensional input space is iteratively tested by the split functions associated with every single node in hierarchical order and based on the result is further sent either to the left or right child (the split functions usually define hyperplanes in the input space). This process is repeated until the vector reaches final node (leaf node). In the leaf node are stored classification predictions, which are eventually extracted.
-
-The work with decision tree could be divided into two major parts:
-
-\begin{enumerate}
-    \item \textbf{Training stage}: In this stage the entire decision tree is built from the scratch on the basis of predefined criterions and properties. To perform this phase, the \textbf{training dataset} has to be adopted and used. It is usually selected as a subset of the complete data that are available. Magnitude of the training dataset depends on the complexity and application of our model (e.g. if the best model is selected and compared with other models, it should be sufficient to use less data or if the model is prepared for the production, it is desirable to use as much data as possible) and on the complexity of the problem. There does not exist any general consensus that dictates how large should training dataset be. It often depends on the personal preferences and experience and of course on the following evaluation results.
-    
-    \item \textbf{Testing/application stage}: After training is the decision tree directly applicable and therefore could be either tested with various evaluation methods or applied in practice. The usage of decision tree itself is very straightforward and was already described. We will focus on description of merging the individual results from the ensemble of decision trees and obtaining final predictions.
-\end{enumerate}
-Now will be provided mathematical details of the both stages.
-
-\subsubsection{Training stage}
-
-Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of vectors in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
-
-Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire training dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
-
-\begin{equation}
-    s(\boldsymbol{x},\boldsymbol{\theta}) = \begin{cases}
-    0,  & \boldsymbol{x} \text{ is sent to the left child}\\
-      1, & \boldsymbol{x} \text{ is sent to the right child}
-    \end{cases}
-\end{equation}
-
-The parameters of the split functions are the input vector $\boldsymbol{x}$ and parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
-
-In the practice, widely used choice of the split function is \cite{rf_main}
-
-\begin{equation}
-    \psi(\boldsymbol{x}, i, \tau) = \begin{cases}
-    0,  & x_i < \tau\\
-      1, & \text{otherwise}
-    \end{cases}
-    \label{split_func}
-\end{equation}
-
-Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)$, where $i \in \{1,...,d\}$ represents one feature from the $d$-dimensional feature space and $\tau \in \mathbb{R}$ is a threshold. Together, equation $x_i = \tau$ embodies hyperplane parallel with one axis and split function divides vectors into two groups based on their relative position with respect to this hyperplane. With regard to the fact, that our proposed transformation of the decision tree to the corresponding neural network is build on usage of this special split function \eqref{split_func}, we will not focus on the other types of split functions in this thesis.
-
-In each iteration, algorithm seeks for the best split, ie. for the parameters of the split function that provides this split. It is achieved by optimizing pre-specified split criterion, which expresses measure of (non)impurity in the corresponding node. By impurity is meant that if node contains instances belonging only to one class, the impurity is 0, whereas it is increased if instances of multiple classes are present in the node.
-
-Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini index}, which are adopted in the heuristic algorithms as C4.5 \cite{c45}, CART \cite{cart} and ID3 \cite{id3}. Another possibility is a \textbf{Classification error}. They are defined as (in the same order as were mentioned)
-
-\begin{align}
-    H_E(\mathbb{M}) &= -\sum_{c \in \mathbb{C}}^{}p(c)\log p(c) \\
-    H_G(\mathbb{M}) &= \sum_{c \in \mathbb{C}}^{}p(c)(1-p(c))\\
-    H_{CE}(\mathbb{M}) &= 1 - \max_{c \in \mathbb{C}}[p(c)] \hspace{0.5cm},
-\end{align}
-where the sum iterates over all classes $c \in \mathbb{C}$, $\mathbb{C}$ is a set of all classes, and
-\begin{equation}
-    p(c) = \frac{\sum_{\boldsymbol{x} \in \mathbb{M}}^{} 1|_{\boldsymbol{x} \in c}}{|\mathbb{M}|} \hspace{0.5cm},
-\end{equation}
-which is probability of instance in $\mathbb{M}$ belonging to the class $c$. $|\mathbb{M}|$ represents number of instances in set $\mathbb{M}$ and
-
-\begin{equation}
-    1|_{\boldsymbol{x} \in c} = \begin{cases}
-    1, & \boldsymbol{x} \in c \\
-    0, & \text{otherwise}
-    \end{cases}
-\end{equation}
-
-These impurity functions are in general exploited in the split criterions, which are then optimized in order to obtain the best possible split. By optimizing these criterions should decrease the impurity function value after each split.
-There are plenty of possibilities to choose split criterion that suits our problem, but as the most popular choice could be considered \textbf{Information gain} criterion, which is defined as \cite{rf_main}
-
-\begin{equation}
-    I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau))
-    \label{inf_gain}
-\end{equation}
-
-$H(\mathbb{M})$ is arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$ represent the subsets of $\mathbb{M}$ proceeding to the left or right child. In parentheses is emphasized, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node are obtained final parameters $i^*, \tau^*$, that are stored and used in the testing stage. Thus parameters of the split function of the $j$-th node are acquired as
-
-\begin{equation}
-    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*) = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
-\end{equation}
-where $\mathbb{M}_j \subset \mathbb{M}$ is the subset of $\mathbb{M}$ in the $j$-th node.
-
-Basic simulation of finding the best split is visualized in the Figure \ref{fig:split_example}.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.8\textwidth]{hor_ver_split.png}
-\caption{In the Figure are illustrated two cases of different splits.}
-\label{fig:split_example}
-\end{figure}
-Values of information gain (IG) for different impurity functions are (Figure \ref{fig:split_example}):
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|c|c|c|}
-    \hline
-       &\textbf{Horizontal split} & \textbf{Vertical split} \\ \hline
-         IG (Entropy)& 0.34 & \textbf{0.69}\\ \hline
-         IG (Gini)& 0.135& \textbf{0.25}\\ \hline
-         IG (Classification Error)&0.20 & \textbf{0.25}\\ \hline
-    \end{tabular}
-    \caption{Values of IG for splits in Figure \ref{fig:split_example}.}
-    \label{tab:ig_vals}
-\end{table}
-With change of the horizontal split to the vertical split occured increase in values of all studied criterions (see Table \ref{tab:ig_vals}). This suggests that vertical split divides data better than the horizontal split and should be preferred.
-
-Apart of the split function and the split criterion, another necessary feature must be added to the decision tree model in advance. We need to define stopping criterion, which interrupt the growth of the tree in the current node when the specified condition is met.
-
-One natural choice of the stopping criterion is to stop splitting when the corresponding node contains instances belonging to the same class. Therefore there does not make any sense to continue in splitting and growth could be ended. Also it is not possible to continue if there ends only one instance in the node. In practice are frequently used many different criterions, which helps to avoid overgrown trees prone to overfitting. If one of them applies, the growth in the current node is interrupted. As example could be mentioned \cite{pruning}:
-\begin{itemize}
-    \item \textit{Low information gain}: Lower threshold for the information gain is set. When a subsequent split produces insufficient information gain below specified threshold, the growth is terminated and node becomes a leaf node.
-    \item \textit{Maximum depth}: When the number of splits in the current tree branch reaches the maximum depth, the current node becomes a leaf node.
-    \item \textit{Maximum instances in the leaf}: This is a threshold for the maximum number of instances in the leaf nodes. When the number of instances in the current node is equal or below this threshold, the node becomes a leaf node.
-\end{itemize}
-
-All of these stopping criterions defined in advance belongs to the \textit{prepruning} methods \cite{pruning}. The fact, that these methods are defined in advance embodies certain drawback. For instance, we do not know in advance, if the predefined maximum depth would produce sufficient requirements. Maybe it is too small and the decision tree will tend to underfitting or is too large and the decision tree will tend to overfitting.
-
-For this reason, there could be adopted the \textit{postpruning methods} for the large-depth trees which encounter this issue and solves efficiently the problem of overfitting. There were not applied in our experiments, so we will provide only short summary of these methods \cite{pruning2}.
-\begin{itemize}
-    \item \textit{Reduced Error Pruning (REP)}: The model is pruned by usage of the independent validation (pruning) dataset different from the training dataset. The subtree starting from the chosen inner node is replaced by the leaf node and the classification error on the validation dataset is measured. If the error is lower than the error in case of the previous non-pruned tree, the tree is pruned. This procedure runs in the bottom-up manner and is ended when no improvement in the classification error is observed.
-    \item \textit{Pessimistic Error Pruning (PEP)}:  Unlike the REP method, PEP uses entire training dataset for the pruning procedure. It is based on the continuity correction of the error rate, since the error rate on the training dataset is significantly biased. Details could be found in \cite{pruning2} alongside the descriptions of other applied methods.
-\end{itemize}
-
-When the growth of the tree is successfully finished, the class distributions of the instances that ended in each leaf node form a probability distribution of classes, which is stored in the leaf node. For probability $p^j(c)$ of class $c \in \mathbb{C}$ in the leaf node $j \in \{1,...,L\}$, where $L$ is a total number of leaf nodes applies
-\begin{equation}
-    p^j(c) = \frac{n^j_c}{N^j} \hspace{0.5cm},
-\end{equation}
-where $n^j_c$ is a total number of instances of class $c$ in the leaf node $j$ and $N^j$ is a total number of instances in the entire leaf node $j$.
-
-\subsubsection{Testing/application stage}
-
-After the training stage, the decision tree is obtained and could be applied in practice. Starting from the root node, the testing instance $x \in \mathbb{X} \subset \mathbb{R}^d$ is traversed down the tree by iterative application of the split functions associated with individual nodes. When the instance reaches the leaf node, the probability distribution of classes in the leaf node is extracted and the values are observed. The class which has the maximum value is outputted as the final prediction. Mathematically, the output of the single decision tree is
-
-\begin{equation}
-    c^* = \text{arg}\max_{c \in \mathbb{C}}p^j(c) \hspace{0.5cm},
-\end{equation}
-where $j$ is the leaf node where $x$ ended.
-
-\subsection{Ensemble of decision trees}
-
-Ensemble of decision trees forms a strong classifier with higher predictive ability than individual decision trees. Idea behind this is to combine several weak classifiers to create one strong classifier. Ensembles generally boost the performance in the comparison with the single classifier (decision tree). For instance, there is a chance of single classifiers to get stuck in the local optima when optimizing different criterions (e.g. minimizing error rate). With more and more data, it could be for many classifiers computationally unreachable to find the best optimal value. In such cases, the employment of ensemble methods is valuable, because training of independent classifiers with different subsets of input data and merging their output could approximate real prediction function far better \cite{ensemble}.
-
-Ensemble methods also significantly benefit from the averaging of results from individual classifiers, especially in the case of insufficient number of training data points. In such case, the learning algorithm could find many applicable parameters (e.g. hyperplanes of the decision tree) that will result in the same accuracy on the training dataset. Combining those models could suppress the possibility of picking a wrong classifier \cite{ensemble}.
-
-Among popular techniques to create an ensemble of decision trees belong:
-\begin{itemize}
-    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to the train the decision tree. Then the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
-    \item \textbf{Boosting} This method is based on idea of iterative boosting of weak classifiers into a strong one. In each iteration, the algorithm aims to boost previous-staged classifier by checking of the misclassified instances and attempting to fix these errors. As popular boosting algorithm could be mentioned AdaBoost algorithm \cite{adaboost2}. These methods often tend to overfitting problem \cite{adaboost}.
-\end{itemize}
-
-In the experimental part of this thesis is used exclusively bagging technique to make an ensemble of decision trees. To obtain random forest from the ensemble obtained by bagging algorithm, the \textit{randomization} of single trees needs to be added into the process. This technique helps to avoid correlation between individual decision trees and secures better indepedence of classifiers. An idea is to suppress the influence of strongly distinguishing features (dimensions), that are natural choice to split by. Occurrence of these features could result in the correlation of the decision trees, because algorithm would prefer those features especially in the early stages of growing phase and therefore indicates detectable similarity of the trees. Randomization attempts to obviate this problem and selects some random subset of the features in each splitting iteration and only those selected features are used for the split.
-
-\subsubsection{Combining predictions of the decision trees}
-
-As was mentioned previously, from every decision tree could be extracted either probability distribution of classes from the leaf node or directly predicted class label. There are naturally numerous possibilities of merging these results. Unless there is not special requirement on the model, practically are used two ways. If the outputs are discrete class labels, than the voting scheme is applied and the class with maximum votes is taken as final prediction. If the outputs are probability distributions, those values are averaged and the class with maximum probability is taken. Mathematically noted, the final prediction in this case is
-
-\begin{equation}
-    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|T|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
-    \label{final_pred}
-\end{equation}
-where $T$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} could be also a weighted average instead, which is applied e.g. if predicting some class is more preferred over predicting others.
-
-
-
-\subsection{Neural network (NN)}
-\subsubsection{Perceptron and neuron}
-\subsubsection{Activation functions}
-\subsubsection{Backpropagation algorithm}
 \section{Evaluation}
 
 This section is focused on the summary and description of the evaluation metrics used in the experimental part, alongside the pros and cons of each metric and suitable application. This section includes only metrics that are applied in the testing phase. The correct choice of evaluation is the main and crucial task in the case of searching for optimal classification model. In practice, there exist numerous evaluation methods applied frequently to many classification tasks, each fits better in different cases. Before we choose set of evaluation metrics, we must be aware of the processed data and classification model to set our evaluation correctly. Also the purpose and future application scope of our model is significant. If this foremost analysis of the data and model is neglected or done wrong, we could end up choosing bad-shaped evaluation techniques and therefore misinterpret the performance of our model.
@@ -335,15 +149,225 @@ ROC curves are frequently drawn especially in the cases of binary classifiers. A
 ZDE DOPSAT ZBYTEK + Precision - Recall Curves
 
 
+\chapter{Random forest}
+
+Random forest algorithm is a popular machine learning method used primarily on the classification and regression tasks. Its functionality is based on collecting predictions from several independent classifiers (ensemble of decision trees) and merging their outcomes into final prediction. It belongs to the group of supervised learning algorithms. In this thesis is usage of random forests restricted only to the classification tasks, so the theoretical part of this section will be limited only to the random forests used for classification. Main goal is to find a decision function $f: \mathbb{X} \rightarrow \mathbb{R}$, where $X \subset \mathbb{R}^d$ is the input space in the $d$-dimensional real-valued space, which outputs the response (class, label).
+
+Random Forest nowadays is a widespread method exploited frequently in various domains, such as computer vision \cite{computer_vision}, text classification \cite{text_rec}, bioinformatics \cite{bioinf}, network threat detection \cite{random_forest_intrusion} etc. The individual classifiers - decision trees - could be also used as a clustering algorithm [ref Egypt článek].
+Popularity of random forests is gained due to excellent generalization and application to wide-ranged spectrum of classification tasks with registering competitive classification quality in comparison with other state-of-the-art methods, such as logistic regression, support vector machines, neural networks etc. Also the method itself is in its basics quite simple and therefore is fast, easy implementable and could be analyzed and interpreted with instant gain of variable importances \cite{rf_imp}.
+
+Unlike the neural networks, it has far less parameters to tune and is better-applicable to the small-sample sized (high-dimensional) datasets. With the usage of randomization, bagging, bootstrapping and other techniques based on randomness, random forests overcome easily problems of overfitting \cite{rf_overfit}.
+
+\section{Decision tree}
+
+As was mentioned previously, random forest consists of independent classifiers called decision trees (Figure \ref{fig:dec_tree}).
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=\textwidth]{dec_tree.png}
+\end{minipage}
+%\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\includegraphics[width=\textwidth]{dec_tree_graph.png}
+\end{minipage}
+\caption{In the left part of the figure is illustrated decision tree with depth = 2. The first circle in red color is called root node. Two beige circles in the intermediate layer are inner nodes and green rectangles are leaf nodes, where probabilities of individual classes are stored . Each input vector $\boldsymbol{x} = (x_1,x_2) \in \mathbb{R}^2$ starts from the root node and traverses down the tree by applying subsequent split criterions in nodes until it reaches the leaf node. In the right figure is visualized segregation of input space by the hyperplanes (defined in root node and inner nodes of the decision tree) parallel to the axes (black lines).}
+\label{fig:dec_tree}
+\end{figure}
+
+In this work we focus only on binary trees, which means, that every node has always 2 child nodes (following nodes in the hierarchical structure of the tree). The process of applying decision tree to obtain final prediction is basically described in Figure \ref{fig:dec_tree}. Beginning from the root node, the input vector $\boldsymbol{x} \in \mathbb{R}^d$ from $d$-dimensional input space is iteratively tested by the split functions associated with every single node in hierarchical order and based on the result is further sent either to the left or right child (the split functions usually define hyperplanes in the input space). This process is repeated until the vector reaches final node (leaf node). In the leaf node are stored classification predictions, which are eventually extracted.
+
+The work with decision tree could be divided into two major parts:
+
+\begin{enumerate}
+    \item \textbf{Training stage}: In this stage the entire decision tree is built from the scratch on the basis of predefined criterions and properties. To perform this phase, the \textbf{training dataset} has to be adopted and used. It is usually selected as a subset of the complete data that are available. Magnitude of the training dataset depends on the complexity and application of our model (e.g. if the best model is selected and compared with other models, it should be sufficient to use less data or if the model is prepared for the production, it is desirable to use as much data as possible) and on the complexity of the problem. There does not exist any general consensus that dictates how large should training dataset be. It often depends on the personal preferences and experience and of course on the following evaluation results.
+    
+    \item \textbf{Testing/application stage}: After training is the decision tree directly applicable and therefore could be either tested with various evaluation methods or applied in practice. The usage of decision tree itself is very straightforward and was already described. We will focus on description of merging the individual results from the ensemble of decision trees and obtaining final predictions.
+\end{enumerate}
+Now will be provided mathematical details of the both stages.
+
+\subsection{Training stage}
+
+Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of vectors in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
+
+Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire training dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
+
+\begin{equation}
+    s(\boldsymbol{x},\boldsymbol{\theta}) = \begin{cases}
+    0,  & \boldsymbol{x} \text{ is sent to the left child}\\
+      1, & \boldsymbol{x} \text{ is sent to the right child}
+    \end{cases}
+\end{equation}
+
+The parameters of the split functions are the input vector $\boldsymbol{x}$ and parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
+
+In the practice, widely used choice of the split function is \cite{rf_main}
+
+\begin{equation}
+    \psi(\boldsymbol{x}, i, \tau) = \begin{cases}
+    0,  & x_i < \tau\\
+      1, & \text{otherwise}
+    \end{cases}
+    \label{split_func}
+\end{equation}
+
+Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)$, where $i \in \{1,...,d\}$ represents one feature from the $d$-dimensional feature space and $\tau \in \mathbb{R}$ is a threshold. Together, equation $x_i = \tau$ embodies hyperplane parallel with one axis and split function divides vectors into two groups based on their relative position with respect to this hyperplane. With regard to the fact, that our proposed transformation of the decision tree to the corresponding neural network is build on usage of this special split function \eqref{split_func}, we will not focus on the other types of split functions in this thesis.
+
+In each iteration, algorithm seeks for the best split, ie. for the parameters of the split function that provides this split. It is achieved by optimizing pre-specified split criterion, which expresses measure of (non)impurity in the corresponding node. By impurity is meant that if node contains instances belonging only to one class, the impurity is 0, whereas it is increased if instances of multiple classes are present in the node.
+
+Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini index}, which are adopted in the heuristic algorithms as C4.5 \cite{c45}, CART \cite{cart} and ID3 \cite{id3}. Another possibility is a \textbf{Classification error}. They are defined as (in the same order as were mentioned)
+
+\begin{align}
+    H_E(\mathbb{M}) &= -\sum_{c \in \mathbb{C}}^{}p(c)\log p(c) \\
+    H_G(\mathbb{M}) &= \sum_{c \in \mathbb{C}}^{}p(c)(1-p(c))\\
+    H_{CE}(\mathbb{M}) &= 1 - \max_{c \in \mathbb{C}}[p(c)] \hspace{0.5cm},
+\end{align}
+where the sum iterates over all classes $c \in \mathbb{C}$, $\mathbb{C}$ is a set of all classes, and
+\begin{equation}
+    p(c) = \frac{\sum_{\boldsymbol{x} \in \mathbb{M}}^{} 1|_{\boldsymbol{x} \in c}}{|\mathbb{M}|} \hspace{0.5cm},
+\end{equation}
+which is probability of instance in $\mathbb{M}$ belonging to the class $c$. $|\mathbb{M}|$ represents number of instances in set $\mathbb{M}$ and
+
+\begin{equation}
+    1|_{\boldsymbol{x} \in c} = \begin{cases}
+    1, & \boldsymbol{x} \in c \\
+    0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+These impurity functions are in general exploited in the split criterions, which are then optimized in order to obtain the best possible split. By optimizing these criterions should decrease the impurity function value after each split.
+There are plenty of possibilities to choose split criterion that suits our problem, but as the most popular choice could be considered \textbf{Information gain} criterion, which is defined as \cite{rf_main}
+
+\begin{equation}
+    I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau))
+    \label{inf_gain}
+\end{equation}
+
+$H(\mathbb{M})$ is arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$ represent the subsets of $\mathbb{M}$ proceeding to the left or right child. In parentheses is emphasized, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node are obtained final parameters $i^*, \tau^*$, that are stored and used in the testing stage. Thus parameters of the split function of the $j$-th node are acquired as
+
+\begin{equation}
+    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*) = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
+\end{equation}
+where $\mathbb{M}_j \subset \mathbb{M}$ is the subset of $\mathbb{M}$ in the $j$-th node.
+
+Basic simulation of finding the best split is visualized in the Figure \ref{fig:split_example}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{hor_ver_split.png}
+\caption{In the Figure are illustrated two cases of different splits.}
+\label{fig:split_example}
+\end{figure}
+Values of information gain (IG) for different impurity functions are (Figure \ref{fig:split_example}):
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+       &\textbf{Horizontal split} & \textbf{Vertical split} \\ \hline
+         IG (Entropy)& 0.34 & \textbf{0.69}\\ \hline
+         IG (Gini)& 0.135& \textbf{0.25}\\ \hline
+         IG (Classification Error)&0.20 & \textbf{0.25}\\ \hline
+    \end{tabular}
+    \caption{Values of IG for splits in Figure \ref{fig:split_example}.}
+    \label{tab:ig_vals}
+\end{table}
+With change of the horizontal split to the vertical split occured increase in values of all studied criterions (see Table \ref{tab:ig_vals}). This suggests that vertical split divides data better than the horizontal split and should be preferred.
+
+Apart of the split function and the split criterion, another necessary feature must be added to the decision tree model in advance. We need to define stopping criterion, which interrupt the growth of the tree in the current node when the specified condition is met.
+
+One natural choice of the stopping criterion is to stop splitting when the corresponding node contains instances belonging to the same class. Therefore there does not make any sense to continue in splitting and growth could be ended. Also it is not possible to continue if there ends only one instance in the node. In practice are frequently used many different criterions, which helps to avoid overgrown trees prone to overfitting. If one of them applies, the growth in the current node is interrupted. As example could be mentioned \cite{pruning}:
+\begin{itemize}
+    \item \textit{Low information gain}: Lower threshold for the information gain is set. When a subsequent split produces insufficient information gain below specified threshold, the growth is terminated and node becomes a leaf node.
+    \item \textit{Maximum depth}: When the number of splits in the current tree branch reaches the maximum depth, the current node becomes a leaf node.
+    \item \textit{Maximum instances in the leaf}: This is a threshold for the maximum number of instances in the leaf nodes. When the number of instances in the current node is equal or below this threshold, the node becomes a leaf node.
+\end{itemize}
+
+All of these stopping criterions defined in advance belongs to the \textit{prepruning} methods \cite{pruning}. The fact, that these methods are defined in advance embodies certain drawback. For instance, we do not know in advance, if the predefined maximum depth would produce sufficient requirements. Maybe it is too small and the decision tree will tend to underfitting or is too large and the decision tree will tend to overfitting.
+
+For this reason, there could be adopted the \textit{postpruning methods} for the large-depth trees which encounter this issue and solves efficiently the problem of overfitting. There were not applied in our experiments, so we will provide only short summary of these methods \cite{pruning2}.
+\begin{itemize}
+    \item \textit{Reduced Error Pruning (REP)}: The model is pruned by usage of the independent validation (pruning) dataset different from the training dataset. The subtree starting from the chosen inner node is replaced by the leaf node and the classification error on the validation dataset is measured. If the error is lower than the error in case of the previous non-pruned tree, the tree is pruned. This procedure runs in the bottom-up manner and is ended when no improvement in the classification error is observed.
+    \item \textit{Pessimistic Error Pruning (PEP)}:  Unlike the REP method, PEP uses entire training dataset for the pruning procedure. It is based on the continuity correction of the error rate, since the error rate on the training dataset is significantly biased. Details could be found in \cite{pruning2} alongside the descriptions of other applied methods.
+\end{itemize}
+
+When the growth of the tree is successfully finished, the class distributions of the instances that ended in each leaf node form a probability distribution of classes, which is stored in the leaf node. For probability $p^j(c)$ of class $c \in \mathbb{C}$ in the leaf node $j \in \{1,...,L\}$, where $L$ is a total number of leaf nodes applies
+\begin{equation}
+    p^j(c) = \frac{n^j_c}{N^j} \hspace{0.5cm},
+\end{equation}
+where $n^j_c$ is a total number of instances of class $c$ in the leaf node $j$ and $N^j$ is a total number of instances in the entire leaf node $j$.
+
+\subsection{Testing/application stage}
+
+After the training stage, the decision tree is obtained and could be applied in practice. Starting from the root node, the testing instance $x \in \mathbb{X} \subset \mathbb{R}^d$ is traversed down the tree by iterative application of the split functions associated with individual nodes. When the instance reaches the leaf node, the probability distribution of classes in the leaf node is extracted and the values are observed. The class which has the maximum value is outputted as the final prediction. Mathematically, the output of the single decision tree is
+
+\begin{equation}
+    c^* = \text{arg}\max_{c \in \mathbb{C}}p^j(c) \hspace{0.5cm},
+\end{equation}
+where $j$ is the leaf node where $x$ ended.
+
+\section{Ensemble of decision trees}
+
+Ensemble of decision trees forms a strong classifier with higher predictive ability than individual decision trees. Idea behind this is to combine several weak classifiers to create one strong classifier. Ensembles generally boost the performance in the comparison with the single classifier (decision tree). For instance, there is a chance of single classifiers to get stuck in the local optima when optimizing different criterions (e.g. minimizing error rate). With more and more data, it could be for many classifiers computationally unreachable to find the best optimal value. In such cases, the employment of ensemble methods is valuable, because training of independent classifiers with different subsets of input data and merging their output could approximate real prediction function far better \cite{ensemble}.
+
+Ensemble methods also significantly benefit from the averaging of results from individual classifiers, especially in the case of insufficient number of training data points. In such case, the learning algorithm could find many applicable parameters (e.g. hyperplanes of the decision tree) that will result in the same accuracy on the training dataset. Combining those models could suppress the possibility of picking a wrong classifier \cite{ensemble}.
+
+Among popular techniques to create an ensemble of decision trees belong:
+\begin{itemize}
+    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to the train the decision tree. Then the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
+    \item \textbf{Boosting} This method is based on idea of iterative boosting of weak classifiers into a strong one. In each iteration, the algorithm aims to boost previous-staged classifier by checking of the misclassified instances and attempting to fix these errors. As popular boosting algorithm could be mentioned AdaBoost algorithm \cite{adaboost2}. These methods often tend to overfitting problem \cite{adaboost}.
+\end{itemize}
+
+In the experimental part of this thesis is used exclusively bagging technique to make an ensemble of decision trees. To obtain random forest from the ensemble obtained by bagging algorithm, the \textit{randomization} of single trees needs to be added into the process. This technique helps to avoid correlation between individual decision trees and secures better indepedence of classifiers. An idea is to suppress the influence of strongly distinguishing features (dimensions), that are natural choice to split by. Occurrence of these features could result in the correlation of the decision trees, because algorithm would prefer those features especially in the early stages of growing phase and therefore indicates detectable similarity of the trees. Randomization attempts to obviate this problem and selects some random subset of the features in each splitting iteration and only those selected features are used for the split.
+
+\subsection{Combining predictions of the decision trees}
+
+As was mentioned previously, from every decision tree could be extracted either probability distribution of classes from the leaf node or directly predicted class label. There are naturally numerous possibilities of merging these results. Unless there is not special requirement on the model, practically are used two ways. If the outputs are discrete class labels, than the voting scheme is applied and the class with maximum votes is taken as final prediction. If the outputs are probability distributions, those values are averaged and the class with maximum probability is taken. Mathematically noted, the final prediction in this case is
+
+\begin{equation}
+    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|T|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
+    \label{final_pred}
+\end{equation}
+where $T$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} could be also a weighted average instead, which is applied e.g. if predicting some class is more preferred over predicting others.
+
+
+\chapter{Neural Networks}
+\section{Introduction to Neural Networks (NN)}
+
+For thousands of years, the people have been pursuing the dream to perfectly simulate human or animal brains and adopt their ability to solve problems on the daily basis. For this purpose, the (artificial) neural network was developed and nowadays is frequently used for solving difficult data modelling tasks, statistical analysis and many others. Its functionality is based on the simplified version of real brain information processing and reasoning, where single processing units of brain - neurons - transfer information to other neurons in predefined structure and get activated based on activity status of other adjacent neurons. In the actual brain, the signal from the neuron is transferred to the connected neuron by the synapse. When the neuron accumulates all coming signals from synapses, then it evaluates this coupled signal and if it exceeds the threshold, the neuron sends signal through synapse (connection) to other neuron. This principle is basically what fuels artificial neural networks today.
+
+The beginnings of the artificial neural network dates to early 1950s, almost simultaneously with development and application of programmable electronic units. In 1943, Warren McCulloch and Walter Pitts introduced models inspired by real brain neurons and adopted threshold switches \cite{culloch}. They provided the evidence that even simple model (network) motivated by this approach could compute almost any logic or arithmetic function. In 1957-1958, Frank Rosenblatt and Charles Wightman et al introduced the first successful neurocomputer, Mark I Perceptron, which could identify 20x20 pixel images of simple patterns. In 1959, Frank Rosenblatt covered different version of the perceptron and formulated and proved the convergence theorem of the perceptron (perceptron will be described later). Then Marvin Minsky and Seymour Papert published mathematic paper that studied perceptron in 1969. The conclusion of this paper pointed to the insufficiency of the single perceptron, which was not able to represent classical boolean XOR or sets that are not linearly separable \cite{perceptron}. This led to the approximately 15-year black-out in the field of the neural network research. In 1974 was introduced learning algorithm called backpropagation of error by Paul Werbos \cite{werbos}. Suprisingly, this algorithm was fully acknowledged approximately ten years later. The backpropagation of error as learning procedure was further developed and expanded in 1986 and widely published by the Parallel Distributed Processing Group \cite{backprop-cit}. In that time, the non-separability could be effectively solved by multilayer perceptrons and previous negative conclusions about perceptrons were disproved right away \cite{perceptron-nonsep}. Since then, the development in the field of neural networks and machine learning in general proceeded intensively and actively continues. It is not even possible to mention all milestones in this thesis. Many different neural networks architectures and training algorithms were tested, resulting in complex deep learning structures able to handle massive amount of unlabeled data. They are sucessfully applied in many challenging tasks as bioinformatics, speech recognition, natural language processing etc \cite{nn-application}.  Special NN called Convolutional Neural Networks (CNN) are frequently used especially in the field of image processing.
+
+\section{Building blocks of ANN}
+
+In this section will be described main components of artificial neural network. As we mentioned in the introductory section, architecture of neural network consists of the processing units - neurons, and the connections between neurons. General neuron is associated with the so called \textit{propagation function}, \textit{activation function} and \textit{output function}. These functions process internally the input from other neurons and builds the output of neuron. Propagation function firstly considers all inputs to the neuron and output from the propagation function serves as input for the activation function. The activation function transforms this information into activation value of current neuron and this activation values is then transformed by output function and output is sent to by the connection to the following neuron. Entire process is illustrated in the Figure \ref{fig:single_neuron}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{single_neuron.png}
+\caption{Processing of input and creating output of neuron could be formulated as composition of three functions - propagation function, activation function and output function.}
+\label{fig:single_neuron}
+\end{figure}
+
+As propagation function is almost solely used simple weighted sum of all inputs generally with addition of a constant (called bias). Consider input as vector (if single neuron is connected by the connections from multiple neurons) $\boldsymbol{x} = (x_1,x_2,...,x_k)$, where $k \in \mathbb{N}$ is number of inputs to neuron and $b \in \mathbb{R}$ is a bias and $\boldsymbol{w} = (w_1,...,w_k) \in \mathbb{R}^k$ are connection weights used for weighted sum. Then output $z \in \mathbb{R}$ from propagation function $f: \mathbb{R}^k \rightarrow \mathbb{R}$ is
+
+\begin{equation}
+    z = f(\boldsymbol{x}) = \sum_{i=1}^{k}(w_i \cdot x_i) + b   
+\end{equation}
 
 
 
+The term \textit{weights} is crucial for neural network terminology. Weights are usually associated with the connections and bias term is associated with the neuron. It depends mainly on personal preference how to imagine and comprehend the neural network settings.
 
+As the output function of neuron serves in the most cases simple identity function. This thesis will not focus on details of other possible choices of propagation and output functions, since in the practice are weighted sum for propagation function and identity function for output function common choice and other options are very rarely used.
 
-
-
-
-
+With these presumptions on propagation and output function, the output of neuron is fully controlled by activation function, which takes as input the weighted sum of input from connections (with added bias). This behaviour is depicted for special neuron - perceptron in the Figure [BLA]. Its activation function is so called threshold function $\tau : \mathbb{R} \rightarrow \mathbb{R}$
+\begin{equation}
+    \tau(z) = \begin{cases}
+    1 & z > 0 \\
+    0 & \text{otherwise}
+    \end{cases} \hspace{0.5cm}
+\end{equation}
 
 
 \chapter{Decision-Tree-Inspired NN architecture}
@@ -661,6 +685,21 @@ tgdcsorstedu WWW home page httpwwwcsorstedutgd
 
 \bibitem{adaboost2}
 
+\bibitem{culloch}W.S. McCulloch and W. Pitts. A logical calculus of the ideas immanent
+in nervous activity. Bulletin of Mathematical Biology, 5(4):115–133, 1943.
+
+\bibitem{perceptron}M. Minsky and S. Papert. Perceptrons. MIT Press, Cambridge, Mass,
+1969.
+
+\bibitem{werbos} P. J. Werbos. Beyond Regression: New Tools for Prediction and Analysis
+in the Behavioral Sciences. PhD thesis, Harvard University, 1974.
+
+\bibitem{backprop-cit}D. Rumelhart, G. Hinton, and R. Williams. Learning representations by
+back-propagating errors. Nature, 323:533–536, October 1986
+
+\bibitem{perceptron-nonsep}http://www.dkriesel.com/\_media/science/neuronalenetze-en-zeta2-2col-dkrieselcom.pdf
+
+\bibitem{nn-application}Hordri, Nur \& Yuhaniz, Siti & Shamsuddin, Siti Mariyam. (2016). Deep Learning and Its Applications: A Review. 
 
 \end{thebibliography}
 
