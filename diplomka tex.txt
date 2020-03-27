@@ -356,18 +356,75 @@ As propagation function is almost solely used simple weighted sum of all inputs 
 \end{equation}
 
 
-
 The term \textit{weights} is crucial for neural network terminology. Weights are usually associated with the connections and bias term is associated with the neuron. It depends mainly on personal preference how to imagine and comprehend the neural network settings.
 
 As the output function of neuron serves in the most cases simple identity function. This thesis will not focus on details of other possible choices of propagation and output functions, since in the practice are weighted sum for propagation function and identity function for output function common choice and other options are very rarely used.
 
-With these presumptions on propagation and output function, the output of neuron is fully controlled by activation function, which takes as input the weighted sum of input from connections (with added bias). This behaviour is depicted for special neuron - perceptron in the Figure [BLA]. Its activation function is so called threshold function $\tau : \mathbb{R} \rightarrow \mathbb{R}$
+With these presumptions on propagation and output function, the output of neuron is fully controlled by activation function, which takes as input the weighted sum of input values with added bias. For arbitrary activation function $\phi$ is the procedure visualized in the Figure \ref{fig:perceptron}.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{perceptron.png}
+\caption{Sum of input values $x_1,...,x_k$, where $k \in \mathbb{N}$ weighted by the weights $w_1,...,w_k$ of connections with added bias term $b$ is taken as argument of arbitrary activation function $\phi$. Resulting value of activation function embodies amount of activity produced by neuron. Activity value of neuron is taken as single output of neuron and could be transferred to other connected neurons.}
+\label{fig:perceptron}
+\end{figure}
+
+
+The bias term might be thought as the negative threshold of neuron ($b = - \text{threshold}$). When the weighted sum exceeds the absolute value of the threshold, it gets activated. This discrete behaviour is perfectly simulated by special neuron - perceptron. Its activation function is so called threshold function $\tau : \mathbb{R} \rightarrow \mathbb{R}$ with binary output
 \begin{equation}
     \tau(z) = \begin{cases}
     1 & z > 0 \\
     0 & \text{otherwise}
     \end{cases} \hspace{0.5cm}
 \end{equation}
+
+If the argument of $\tau$ is positive (threshold value for this neuron is 0), the output is 1, otherwise it is 0. Even this simple model is applicable to many different tasks, but reliably solves only problems with linearly-separable data. This is due to the determinative equation $\sum_{i=1}^{k}(w_i \cdot x_i) + b = 0$, which defines a hyperplane in $\mathbb{R}^k$ and divides the space on two half-spaces. This drawback was surpassed by application of multilayer perceptrons, which is term for interconnected layers of multiple perceptrons (neural network with perceptrons).
+
+\section{Architecture of neural network}
+
+Since we defined a general shape of one processing unit of neural network - neuron, we could define more complex architectures of neurons that helps to solve more complex, non-linear problems. In this thesis we mainly focus on the so called \textbf{feedforward} neural networks \cite{feedforward}, which almost exclusively refers to the topology of multiple layers of neurons and weighted connections only between neurons of two consecutive layers (no skipping allowed). Furthermore, the first layer is referred as \textit{input layer}, then follow arbitrary number of \textit{hidden layers} and the last layer is called the \textit{output layer}. General architecture of the feedforward neural network is depicted in the Figure \ref{fig:feedforward}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{feedforward.png}
+\caption{In the Figure is illustrated general architecture of feedforward neural network. Connections are only between neurons of two consecutive layers. Input (each neuron usually receives value of one feature - neuron $j \in \mathbb{N}$ of the input layer accepts value of $j$-th feature $x_j$ of input vector $\boldsymbol{x}$) of the neural network is inserted to the input layer and the output is extracted from the output layer.}
+\label{fig:feedforward}
+\end{figure}
+
+The universal approximation theorem proved by G. Cybenko \cite{cybenko} states that under some presumption on the activation functions of neuron (e.g. with usage of sigmoid function, this will be described later), this neural network structure could approximate any continuous function on compact subsets of $\mathbb{R}^n$. Also later studies approves, that that the multilayered (even with only one hidden layer) feedforward neural networks could be considered as universal approximators.
+
+When speaking about feedforward neural networks, we usually mean full-connected system, which means, that single neuron in layer $l$ is connected to all neurons in layer $l+1$. If it is necessary to turn down the neurons output to 0 (delete the connection), we force the connection weight to 0 and therefore supress the output of the neuron.
+
+There exists another possible architectures of neural networks, which will be not examined in this thesis, but certainly worth mentioning them.
+
+\begin{itemize}
+    \item \textbf{Shortcut connections architecture}:
+    This feedforward setting allowed connections skipping of one or more levels. These skipped connections have to be directed towards the output layer (no backwards skipping). Application of this architecture was successfully exploited for example in residual networks (ResNet) \cite{resnet}.
+    
+    \item \textbf{Direct recurrence networks}: Some neuron in networks could influence themselves. The simple realization is to connect single neuron with itself, which may therefore adaptively strenghten or weaken its activation value.
+    
+    \item \textbf{Indirect recurrence networks} If connections are permitted backwards (to the foregoing layers), we talk about indirect recurrence \cite{perceptron-nonsep}. 
+\end{itemize}
+
+\section{Activation functions}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \chapter{Decision-Tree-Inspired NN architecture}
@@ -699,7 +756,13 @@ back-propagating errors. Nature, 323:533–536, October 1986
 
 \bibitem{perceptron-nonsep}http://www.dkriesel.com/\_media/science/neuronalenetze-en-zeta2-2col-dkrieselcom.pdf
 
-\bibitem{nn-application}Hordri, Nur \& Yuhaniz, Siti & Shamsuddin, Siti Mariyam. (2016). Deep Learning and Its Applications: A Review. 
+\bibitem{nn-application}Hordri, Nur \& Yuhaniz, Siti \& Shamsuddin, Siti Mariyam. (2016). Deep Learning and Its Applications: A Review. 
+
+\bibitem{feedforward} http://static.latexstudio.net/article/2018/0912/neuralnetworksanddeeplearning.pdf
+
+\bibitem{cybenko}Cybenko, G. (1989) "Approximations by superpositions of sigmoidal functions", Mathematics of Control, Signals, and Systems, 2(4), 303–314. doi:10.1007/BF02551274
+
+\bibitem{resnet}https://arxiv.org/pdf/1909.04653.pdf
 
 \end{thebibliography}
 
