@@ -407,10 +407,197 @@ There exists another possible architectures of neural networks, which will be no
     \item \textbf{Indirect recurrence networks} If connections are permitted backwards (to the foregoing layers), we talk about indirect recurrence \cite{perceptron-nonsep}. 
 \end{itemize}
 
+\subsubsection{Insufficiency of perceptron}
+
+When working with neural networks, usual procedure is to adapt all parameters of neurons (weights and biases) to force neural network to behave in the way we require. This procedure is done by employing predefined learning strategy (it will be described later in the thesis), which defines the manner in which neural networks learn on the data and then act independently.
+
+Consider for a moment a feedforward neural network consisting of perceptrons with $\tau$ as activation function and consider arbitrary classification problem (for example classification of digits 0-9). If the neural network encounter training instance, it adapts the weights and biases in the way that the instance is then correctly classified. But even in the case of small change in the weights and biases, the output from $\tau$ function could flip vigorously to ($1 - \text{previous value}$) , so entirely to the other type of activity of neuron. This jump may cause the previous instances to be totally misclassified. So the discontinuity property of threshold function $\tau$ makes it very difficult for neural network to learn correct parameters, especially when solving more complicated, multiclass problems.
+
+To enable better learning ability of neural networks, it is desirable to adopt the property that small change in the weights or biases $\Delta w$ and $\Delta b$ causes only a small change in the output of neuron \cite{feedforward}. This is the property that is not met by $\tau$ function. It is the key to employ other types of activation functions that meet this property in order to establish effective learning procedures.
+
 \section{Activation functions}
 
+In this section is provided summary and descriptions of other applied activation functions.
+
+\subsubsection{Sigmoid function}
+
+One way of solving a discontinuity problem of perceptron is to replace $\tau$ with its smooth approximation - sigmoid function. It is also called logistic function. The shape of this function could be seen in the Figure \ref{fig:sigmoid}. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{sigmoid.png}
+\caption{Sigmoid function approximates threshold function $\tau$.}
+\label{fig:sigmoid}
+\end{figure}
+For real input $z \in \mathbb{R}$ is sigmoid function $\sigma$ defined as
+
+\begin{equation}
+    \sigma(z) = \frac{1}{1 + e^{-z}}
+\end{equation}
+This function is bounded, nonlinear, differentiable and has positive derivatives. It is successfully applied especially in the output layers of deep neural networks (output lies within (0,1) range, so in the case of classification it could be thought as the probability of the instance acquiring particular label) or in the shallow neural networks (with 1 or max. 2 hidden layers) \cite{actfunc}. Despite some of its favourable properties, it suffers from significant drawbacks related to popular training methods. These drawbacks will be mentioned later once the gradient descent and backpropagation algorithm for training will be described.
+
+\subsubsection{Hyperbolic tangent}
+
+Hyperbolic tangent (tanh) is another alternative as activation function. The shape of the tanh is depicted in the Figure \ref{fig:hyperbolic}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{hyperbolic_tangent.png}
+\caption{Hyperbolic tangent function. It has conformable shape as sigmoid function, but its range lies within (-1,1).}
+\label{fig:hyperbolic}
+\end{figure}
+
+For real input $z \in \mathbb{R}$ is defined as
+
+\begin{equation}
+    tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}
+\end{equation}
+
+Hyperbolic tangent has very similar properties as sigmoid function, but inherents some more beneficial properties, e.g. its range lies within (-1,1) and therefore is zero-centered, which produces advantegous behaviour in backpropagation training. Also tanh became preferred choice over sigmoid function in the case of multilayer neural networks due to showing better training performance \cite{tanh_prefer}.
+
+On the other hand, it shares few common drawbacks with the sigmoid function, e.g. vanishing gradient problem, which will be mentioned and described later in the thesis.
+
+\subsubsection{Softmax}
+
+Last of the exponential-based activation functions mentioned in this section is called softmax activation function $\boldsymbol{\theta} : \mathbb{R}^k \rightarrow \mathbb{R}^k$. It is defined for input vector $\boldsymbol{a} \in \mathbb{R}^k$ and $j \in \{1,...,k\}$, where $k \in \mathbb{N}$ as
+
+\begin{equation}
+    [\boldsymbol{\theta}(\boldsymbol{a})]_j = \frac{e^{a_j}}{\sum_{i=1}^{k}e^{a_i}}
+\end{equation}
+
+Softmax activation function is frequently used especially in the output layers of neural networks, because its definition secures that output vector of softmax is interpretable as probability distribution (output components can be added to 1 and range of softmax is (0,1)).
+
+\subsubsection{Rectified Linear Unit (ReLU)}
+
+ReLU activation function was indtroduced in 2010 by Nair and Hinto \cite{relu} and since then belongs to the most popular activation functions worldwide with state-of-the-art results. It is the most widely used activation function in the field of deep learning. ReLU function is visualized in the Figure \ref{fig:relu}
+
+\begin{figure}[ht]
+\begin{minipage}[b]{0.48\linewidth}
+\centering
+\includegraphics[width=\textwidth]{relu.png}
+\end{minipage}
+%\hspace{0.5cm}
+\begin{minipage}[b]{0.48\linewidth}
+\centering
+\includegraphics[width=\textwidth]{leakyrelu.png}
+\end{minipage}
+\caption{In the left part of the Figure is graph of ReLU function. In the right part is graph of Leaky ReLU for $\alpha = 0.05$.}
+\label{fig:relu}
+\end{figure}
 
 
+It is defined for real input $z \in \mathbb{R}$ as
+\begin{equation}
+    \text{ReLU}(z) = \max\{0,z\}
+\end{equation}
+For positive values of x it behaves as simple linear function and for negative values the output value remains 0. Its similarity with simple linear functions makes it easy to optimize learning algorithms and therefore is training of ReLU neurons more effective and quicker (it need not count exponentials and divisions). The generalization ability, speed of convergence and often better performance with comparison to the sigmoid and tanh functions cause that ReLU functions are much more often used mainly in the hidden layers than those competitive exponentially-based activation functions \cite{actfunc}. Also ReLU function lacks vanishing gradient drawback, which will be discussed later.
+
+ReLU function also suffers from drawbacks, such as easy inclination to overfitting in comparison with the sigmoid function and production of the so called "dead" neurons. It is inflicted when argument of ReLU is negative and ReLU outputs 0. With regard to the fact, that slope of ReLU in the negative part is also 0, it is probable that output of this neuron will stuck on 0 a do not return back. This neuron has no further effect in determining the output and is useless. This problematic will be covered after description of gradient-based learning methods.
+
+Problem of dead neurons could be solved by adoption of the Leaky ReLU activation function \cite{leaky}, which softens the strict condition of forcing output to 0 when input is negative and replaces constant 0 value in the negative part of the horizontal axis with the linear function of small slope parameter $\alpha \in \mathbb{R}$. Therefore the gradient will never be 0. It is defined for real input $z \in \mathbb{R}$ as
+\begin{equation}
+    \text{LeakyReLU}(z) = \begin{cases}
+    z & z > 0 \\
+    \alpha z & \text{otherwise}
+    \end{cases}
+\end{equation}
+Values of parameter $\alpha$ should be small, popular choice is $\alpha = 0,01$. Shape of Leaky ReLU could be seen in the right part of the Figure \ref{fig:relu}.
+
+\section{Training methods}
+
+We already sufficiently define neural networks architecture and the way it works by transferring activation values between neurons. What remains is to describe the algorithms which enable our neural network to learn and adapt to new problems.
+
+Let us define some notation in order to describe this issue more clearly. The notation is inspired by \cite{feedforward}. We denote correct (desired) output of neural network as $\boldsymbol{y}(\boldsymbol{x})$ for input vector $\boldsymbol{x}$ and real output (estimation) of the neural network as $\hat{\boldsymbol{y}}(\boldsymbol{x})$. The quality of performance is evaluated by the means of minimizing the so called \textit{loss function} (in the literature could be found also as objective function or cost function). We denote general loss function as $\Lambda$. One typical example of loss function is \textit{Mean Squared Error} (MSE), also known as quadratic cost function,which is defined as
+\begin{equation}
+    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \frac{1}{2n} \sum_{i=1}^{n}||\boldsymbol{y}({\boldsymbol{x}}_i)- \hat{\boldsymbol{y}}({\boldsymbol{x}}_i)||^2 \hspace{0.5cm},
+    \label{mse}
+\end{equation}
+where $\mathbb{W}$ is a set of all weights, $\mathbb{B}$ is a set of all biases and $\mathbb{X} = \{\boldsymbol{x}_1,...,\boldsymbol{x}_n\}$ is a set of all training vectors, where $n \in \mathbb{N}$ is a number of all training vectors. Norm $||\cdot|| = ||\cdot||_2$ is Euclidean norm. It is evident that estimation $\hat{\boldsymbol{y}}({\boldsymbol{x}})$ depend on $\boldsymbol{x}$ as well as on all weights and biases in the neural network. Later we will mention other frequently used loss functions with better application especially to the task of classification.
+
+Now will be described the most popular algorithm used for finding optimal weights and biases, which optimize the general loss function $\Lambda$ - \textit{gradient descent}.
+
+\subsection{Gradient Descent}
+
+Gradient descent algorithm is a popular nonlinear programming technique for a wide range of minimization tasks. It is considered as a benchmark for the minimization of loss functions in the field of neural networks. Let us consider general loss function $\Lambda(\boldsymbol{v})$ depending on vector $\boldsymbol{v}$. Gradient descent constructs the sequence of $\boldsymbol{v}^{(k)}$, that for each $k \in \mathbb{N}$ satisfies the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$ (except when $\boldsymbol{v}^{(k)}$ is optimal). The sequence is constructed as
+\begin{equation}
+    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} + \eta\Delta \boldsymbol{d} ^{(k)} \hspace{0.5cm},
+\end{equation}
+where $\Delta \boldsymbol{d}^{(k)}$ is a real vector called the step or search direction, with same dimension as $\boldsymbol{v}^{(k)}$ and $\eta > 0$ is called a learning rate \cite{grad}. Question is how to choose $\Delta \boldsymbol{d}^{(k)}$ in order to fulfill the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$.
+
+We must choose $\Delta \boldsymbol{d}^{(k)}$ in the way the $\Lambda$ function decreases in that direction. We could apply the calculus and search the direction in the way that the following condition is met:
+\begin{equation}
+    \nabla_{\Delta \boldsymbol{d}^{(k)}} \Lambda(\boldsymbol{v}^{(k)}) = \Delta \boldsymbol{d}^{(k)} \cdot \nabla \Lambda(\boldsymbol{v}^{(k)}) < 0
+    \label{condition_calculus} \hspace{0.5cm},
+\end{equation}
+where $\nabla \Lambda(\boldsymbol{v}^{(k)})$ is gradient of function $\Lambda$ and is defined for vector $\boldsymbol{v} = (v_1,...,v_m)^T$, $m \in \mathbb{N}$ as
+
+\begin{equation}
+    \nabla \Lambda(\boldsymbol{v}) = (\frac{\partial \Lambda}{\partial v_1}(\boldsymbol{v}),...,\frac{\partial \Lambda}{\partial v_m}(\boldsymbol{v}))^T.
+\end{equation}
+Condition \eqref{condition_calculus} expresses derivative of $\Lambda(\boldsymbol{v}^{(k)})$ in the direction of $\Delta \boldsymbol{d}^{(k)}$. If this derivative is negative, we ensures that $\Lambda$ decreases in that direction.
+
+Suppose choosing $\Delta \boldsymbol{d}^{(k)} = - \nabla \Lambda(\boldsymbol{v}^{(k)})$. Then
+\begin{equation}
+    \Delta \boldsymbol{d}^{(k)} \cdot \nabla \Lambda(\boldsymbol{v}^{(k)}) = - ||\nabla \Lambda(\boldsymbol{v}^{(k)})||^2 \leq 0
+    \label{condition_full}
+\end{equation}
+
+Moreover, equality in \eqref{condition_full} is held only if $\nabla \Lambda(\boldsymbol{v}^{(k)}) = \boldsymbol{0}$ and therefore no further update is performed, so the algorithm could be terminated. In the practice, euclidean norm of gradient is compared to the small positive threshold $\epsilon$ and algorithm is terminated when $||\nabla \Lambda(\boldsymbol{v}^{(k)})|| \leq \epsilon$ \cite{grad}.
+
+Final equation for constructing the sequence is therefore
+
+\begin{equation}
+    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} - \eta\nabla \Lambda(\boldsymbol{v}^{(k)})
+\end{equation}
+
+To provide more intuitive perspective, gradient descent algorithm iteratively searches for directions in which the value of loss function is decreasing and stops when it is sufficiently close to optimum (could be local or global minimum). The initial (starting) point of algorithm need to be selected in advance. It is usually picked randomly. The procedure is illustrated in the Figure \ref{fig:grad}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{grad2_desc.png}
+\caption{Gradient descent algorithm. In each iteration it finds the direction in which loss function decreases. In this case, the green point is "rolling down" towards the global minimum $(0,0)^T$.}
+\label{fig:grad}
+\end{figure}
+Of course, gradient descent is not universal method which always find global minimum of the arbitrary function. There are some requirements on loss function to ensure functionality. Especially when the loss function is not "nice" as one in the Figure \ref{fig:grad}, it could stuck in the local minimum instead or even do not converge, which also depends on the initial point of algorithm. Theory behind the convergence to global optimum is properly described almost exclusively for (strictly) convex functions \cite{grad}, which is for example function in the Figure \ref{fig:grad}, $f(x,y) = x^2 + y^2$ or quadratic cost function defined in \eqref{mse}.
+
+Also the learning rate $\eta$ significantly affects convergence. If it is too small, the time until convergence could be very long and if it is too big, it could bounce back and forth around the optimal value and never reach it. Deriving the most suitable learning rate for particular application usually requires a bit of experimenting around. There also exists methods to set learning rate or adjust it during execution. Some of them has been used in the experimental part of this thesis and will be mentioned later.
+
+We should concretize the update rule in the case of modifying weights and biases of neural network by gradient descent. Update rules for arbitrary weight $w$, bias $b$ and $k$-th iteration of gradient descent is
+\begin{align}
+    w^{(k+1)} &= w^{(k)} - \eta \frac{\partial \Lambda}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \\
+    b^{(k+1)} &= b^{(k)} - \eta \frac{\partial \Lambda}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
+\end{align}
+
+\subsubsection{Stochastic Gradient Descent (SGD)}
+
+In order to accelerate learning of neural network, \textit{stochastic gradient descent} algorithm was developed \cite{feedforward}. It is based on estimating the gradient of loss function instead of computing it precisely.
+For instance, we show the algorithm in the case of quadratic cost function in \eqref{mse}. It could be rewritten as
+\begin{align}
+    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) &= \frac{1}{n}\sum_{i=1}^{n}\Lambda_{\boldsymbol{x}_i} = \frac{1}{n}\sum_{i=1}^{n}\frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2}\\ \Lambda_{\boldsymbol{x}_i} &= \frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2}
+\end{align}
+Therefore, gradient of loss function could be written as (we omit the parameters of $\Lambda$ for simplification)
+
+\begin{equation}
+    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i}
+\end{equation}
+Basically, this term is only average of gradients of $\Lambda_{\boldsymbol{x}_i}$ across all training instances. Idea of stochastic gradient descent is to replace averaging across all training instances with averaging only across randomly sample mini-batch \\ $x_{i_1},...,x_{i_m}$ of size $m < n$, $m \in \mathbb{N}$. We obtain estimate
+\begin{equation}
+    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i} \approx \frac{1}{m}\sum_{l=1}^{m} \nabla \Lambda_{\boldsymbol{x}_{i_l}}
+\end{equation}
+
+If the size of mini-batch is large enough, we could expect that this approximation will be roughly equal to the real gradient. This algorithm works for loss functions that could be rewritten in the same manner as quadratic cost function from the example. Of course, there could be some statistical deviations and the estimation is not always precise, but what we need is to move in direction where the loss function is expected to decrease, it need not to be exactly the direction of gradient, so working with estimation is justified. We shall rewrite the update rule in the case of SGD as
+\begin{align}
+    w^{(k+1)} &= w^{(k)} - \frac{\eta}{m}\sum_{l=1}^{m} \frac{\partial \Lambda_{\boldsymbol{x}_{i_l}}}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
+    \label{sgd_weight}\\
+    b^{(k+1)} &= b^{(k)} - \frac{\eta}{m}\sum_{l=1}^{m} \frac{\partial \Lambda_{\boldsymbol{x}_{i_l}}}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
+    \label{sgd_bias}
+\end{align}
+
+The algorithm in practice usually runs in several epochs. Each epoch is characterized by random sampling of mini batches of given size $m$ and then by training with those mini batches. When one epoch is finished, training instances are randomly mixed and mini batches are sampled again and training continues in new epoch with new mini batches.
+
+In \eqref{sgd_weight} and \eqref{sgd_bias} could be omitted $\frac{1}{m}$ factor, which corresponds only to the scaling of learning rate. Factor $\frac{1}{n}$ is sometimes omitted also in definition of MSE in \eqref{mse} \cite{feedforward}.
+
+\section{Backpropagation algorithm}
 
 
 
@@ -763,6 +950,18 @@ back-propagating errors. Nature, 323:533–536, October 1986
 \bibitem{cybenko}Cybenko, G. (1989) "Approximations by superpositions of sigmoidal functions", Mathematics of Control, Signals, and Systems, 2(4), 303–314. doi:10.1007/BF02551274
 
 \bibitem{resnet}https://arxiv.org/pdf/1909.04653.pdf
+
+\bibitem{actfunc}https://arxiv.org/pdf/1811.03378.pdf
+
+\bibitem{tanh_prefer}B. Karlik and A. Vehbi, “Performance Analysis of Various Activation Functions in Generalized MLP Architectures of Neural Networks,”
+International Journal of Artificial Intelligence and Expert Systems (IJAE), vol. 1, no. 4, pp. 111–122, 2011. [Online]. Available:
+http://www.cscjournals.org/library/manuscriptinfo.php
+
+\bibitem{relu}https://www.cs.toronto.edu/~fritz/absps/reluICML.pdf
+
+\bibitem{leaky}https://arxiv.org/pdf/1804.02763.pdf
+
+\bibitem{grad}https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
 
 \end{thebibliography}
 
