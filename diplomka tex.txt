@@ -579,6 +579,7 @@ Therefore, gradient of loss function could be written as (we omit the parameters
 
 \begin{equation}
     \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i}
+    \label{good_shape}
 \end{equation}
 Basically, this term is only average of gradients of $\Lambda_{\boldsymbol{x}_i}$ across all training instances. Idea of stochastic gradient descent is to replace averaging across all training instances with averaging only across randomly sample mini-batch \\ $x_{i_1},...,x_{i_m}$ of size $m < n$, $m \in \mathbb{N}$. We obtain estimate
 \begin{equation}
@@ -599,8 +600,26 @@ In \eqref{sgd_weight} and \eqref{sgd_bias} could be omitted $\frac{1}{m}$ factor
 
 \section{Backpropagation algorithm}
 
+We already presented an idea of training neural network via (stochastic) gradient descent. But we did not provide the way of computing partial derivatives of loss function with respect to weights and biases, which are necessary to execute the training algorithm. This could be of course done by computing the derivatives analytically, which is definitely very uncomfortable and almost insane idea, especially when adopting large neural networks. For this reason, the \textit{backpropagation algorithm} was developed in order to retrieve partial derivatives with respect to all weights and biases involved in the neural network in comfortable and quick way.
 
+The derivation and description of backpropagation algorithm is motivated by papers \cite{backprop} and \cite{feedforward}. We define some helpful notation in advance in order to simplify the derivation. Let us denote output from $l$-th layer of neural network and $j$-th neuron of that layer as $a_j^l$, also entire output vector of $l$-th layer will be denoted as $\boldsymbol{a}^l$. Term $w_{jk}^l$ denotes weight of connection going from neuron $k$ in previous layer $(l-1)$ to neuron $j$ in layer $l$ (it is in reversed order on purpose, it will simplify further notation with respect to the matrix multiplication) and term $\mathbb{W}^l = (w_{jk}^l)_{j,k}$ denotes matrix of weights directed from layer $(l-1)$ to $l$. Bias of node $j$ in layer $l$ is denoted as $b_j^l$ and biases folded into vector of biases of layer $l$ is $\boldsymbol{b}^l$. By applying this notation, we could write comfortably a feedforward dependency for output from layer $l$ as
+\begin{equation}
+    \boldsymbol{a}^l = \sigma(\mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l) \hspace{0.5cm},
+    \label{comfort_write}
+\end{equation}
+where $\sigma(\cdot)$ is arbitrary activation function used in neurons of layer $l$, which is applied in element-wise fashion. We also denote argument of $\sigma(\cdot)$ in \eqref{comfort_write} as
+\begin{equation}
+    \boldsymbol{z}^l = \mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l
+\end{equation}
+The aim of backpropagation algorithm is to compute $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$ (we will omit arguments of the functions for simplification, all of them are evaluated in the values of current weights, biases and training instance) with respect to arbitrary weight $w$ and bias $b$. These partial derivatives expresses, how much is loss function changed when $w$ or $b$ is changed. Of course, the main goal is to find optimal weights and biases, which corresponds to the local (global) minimum of loss function. Intuitively, we could imagine that in each layer of neural network arises some error (from imperfection of current weights and biases), which cause flaws in the output layer. Furthermore, we could say that even individual neurons produce these errors, which consequently leads to corrupted output. But what we can measure is only deviation of current output (extracted from output layer) of neural network from desired value, because we do not know in advance "correct" output (activation values) of other layers. So briefly, what backpropagation really does is that it \textit{backpropagates} error from the output layer to the previous layers and then from these \textit{error} terms computes corresponding partial derivatives $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$. This procedure is illustrated in the Figure [BLA].
 
+We will now define this \textit{error} term heuristically. Output from $j$-th neuron of layer $l$ could be written as $a_j^l = \sigma(z_j^l)$. Let's imagine for a moment, that layer $l$ has corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \sigma(\hat{z}_j^l) =\sigma(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses deviation of argument $z_j^l$ from optimal value. In case that other weights and biases are already optimal, the difference between optimal cost and "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). Deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. Also when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then neuron is very close to optimal state. Therefore, we could define error term as
+\begin{equation}
+    \delta_j^l = \frac{\partial \Lambda}{\partial z_j^l}
+\end{equation}
+This is heuristic derivation and of course, it is not absolutely precise and certainly requires deeper math behind (e.g. we omitted trade-off between $\frac{\partial \Lambda}{\partial z_j^l}$ and $\Delta z_j^l$ in estimating the deviation), but this derivation serves mainly for description of intuitive behaviour of $\delta_j^l$. Also more important is, that $\delta_j^l$ is only provisional term, which will lead us to derivation of values of real interest - $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
+
+The algorithm always backpropagates the error of single training instance $\boldsymbol{x}$ (we can use only one training instance in time), so what it really computes is $\frac{\partial\Lambda_\boldsymbol{x}}{\partial w}$ and $\frac{\partial \Lambda_\boldsymbol{x}}{\partial b}$. Therefore the loss function $\Lambda$ needs to be rewritten in the same manner as in \eqref{good_shape}, which we assume. From now, we will omit the subscript and denote $\Lambda_\boldsymbol{x}$ simply as $\Lambda$. Another assumption on loss function is that it can be expressed as function of output $\boldsymbol{a}^L$ from the output layer, where $L$ denotes the output layer. We need $\Lambda = \Lambda(\boldsymbol{a}^L)$, but it may depend also on other variables. This assumption will be explained later. For instance, both assumptions are fulfilled by quadratic cost function and also by other loss functions presented later in this thesis.
 
 
 
@@ -962,6 +981,8 @@ http://www.cscjournals.org/library/manuscriptinfo.php
 \bibitem{leaky}https://arxiv.org/pdf/1804.02763.pdf
 
 \bibitem{grad}https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
+
+\bibitem{backprop}http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf citováno 30.3.2020
 
 \end{thebibliography}
 
