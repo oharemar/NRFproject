@@ -568,7 +568,7 @@ We should concretize the update rule in the case of modifying weights and biases
     b^{(k+1)} &= b^{(k)} - \eta \frac{\partial \Lambda}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
 \end{align}
 
-\subsubsection{Stochastic Gradient Descent (SGD)}
+\subsection{Stochastic Gradient Descent (SGD)}
 
 In order to accelerate learning of neural network, \textit{stochastic gradient descent} algorithm was developed \cite{feedforward}. It is based on estimating the gradient of loss function instead of computing it precisely.
 For instance, we show the algorithm in the case of quadratic cost function in \eqref{mse}. It could be rewritten as
@@ -622,8 +622,42 @@ This is heuristic derivation and of course, it is not absolutely precise and cer
 The algorithm always backpropagates the error of single training instance $\boldsymbol{x}$ (we can use only one training instance in time), so what it really computes is $\frac{\partial\Lambda_\boldsymbol{x}}{\partial w}$ and $\frac{\partial \Lambda_\boldsymbol{x}}{\partial b}$. Therefore the loss function $\Lambda$ needs to be rewritten in the same manner as in \eqref{good_shape}, which we assume. From now, we will omit the subscript and denote $\Lambda_\boldsymbol{x}$ simply as $\Lambda$. Another assumption on loss function is that it can be expressed as function of output $\boldsymbol{a}^L$ from the output layer, where $L$ denotes the output layer. We need $\Lambda = \Lambda(\boldsymbol{a}^L)$, but it may depend also on other variables. This assumption will be explained later. For instance, both assumptions are fulfilled by quadratic cost function and also by other loss functions presented later in this thesis.
 
 
+Since we defined $\delta_j^l$, we now need to find equations for values of real interest, ig. partial derivatives of loss function with respect to weights and biases. Entire backpropagation algorithm stands on 4 equations, which allow us to compute values of real interest from errors in individual layers of neural network. They can be simply derived by careful application of the chain rule from multivariate calculus.
 
+\begin{enumerate}
+    \item \textbf{Equation to calculate error $\boldsymbol{\delta}^L$ of the output layer L}:
+    \begin{equation}
+        \delta_j^L = \frac{\partial \Lambda}{\partial a_j^L}\sigma'(z_j^L)
+        \label{BP1}
+    \end{equation}
+    As we mentioned before, the backpropagation algorithm runs backwards. First, we need to compute error in the output layer. It is calculated by multiplication of partial derivative of loss function with respect to the output $a_j^L$ of $j$-th neuron of layer $L$ and derivative of activation function $\sigma$ in $z_j^L$. This equation is perfectly intuitively understandable, because the error term is basically expressed as trade-off between "how much is loss function changing with respect to the output from neuron ($\frac{\partial \Lambda}{\partial a_j^L}$)" and "how much is output of the neuron changing with respect to the input value to the activation function ($\sigma'(z_j^L)$)". If any of these values are small, then error of that neuron is also small. Furthermore, both values could be easily retrieved and the shape of derivatives is usually computed analytically (obviously depending on the shape of loss function and activation function).
+    
+    \item \textbf{Equation to backpropagate the error from layer $(l+1)$ to previous layer $l$}
+    \begin{equation}
+        \delta_j^l = [(\mathbb{W}^{(l+1)})^T\boldsymbol{\delta}^{(l+1)}]_j \sigma'(z_j^l)
+        \label{BP2}
+    \end{equation}
+    This equation gives us a way to backpropagate the error backwards. Together with \eqref{BP1}, we can compute $\boldsymbol{\delta}^l$ (vector of errors $\delta_j^l$ of neurons in layer $l$) in arbitrary layer $l$. It is obtained by multiplying transpose of weight matrix $\mathbb{W}^{(l+1)}$ with vector of errors of $(l+1)$ layer $\boldsymbol{\delta}^{(l+1)}$. This could be thought as a "projection" of error to the previous layer. Then the result is multiplied by $\sigma'(z_j^l)$, same as in the case \eqref{BP1}, because the error is influenced by the speed of change of the activation function in $z_j^L$.
+    
+    \item \textbf{Equation to calculate} $\frac{\partial \Lambda}{\partial b_j^l}$
+    \begin{equation}
+        \frac{\partial \Lambda}{\partial b_j^l} = \delta_j^l
+        \label{BP3}
+    \end{equation}
+    This first value of real interest could be determined easily, because equation states that it is equal directly to the error term. And \eqref{BP1} and \eqref{BP2} already give us tools to compute the error in arbitrary layer.
+    
+    \item \textbf{Equation to calculate} $\frac{\partial \Lambda}{\partial w_{jk}^l}$
+    \begin{equation}
+        \frac{\partial \Lambda}{\partial w_{jk}^l} = a_k^{(l-1)}\delta_j^l
+        \label{BP4}
+    \end{equation}
+    This equation computes the partial derivative of the loss function with respect to any weight. It depends on activation (output) from $k$-th neuron of layer $(l-1)$ and error of $j$-the neuron of the consecutive layer $l$.
+\end{enumerate}
+By applying these 4 equations, we could compute all values of interest easily. Also this equations could be rewritten completely into the vector shape and therefore solved more efficiently (e.g. by exploiting different algebraic libraries, such as Numpy \cite{numpy}).
 
+Now we will derive \eqref{BP3} and \eqref{BP4} by gradually applying the chain rule. Derivation of \eqref{BP1} and \eqref{BP2} could be found for example in \cite{feedforward}.
+
+DOPSAT ODVOZENÍ, DODĚLAT OBRÁZKY, DALŠÍ LOSS FUNCTIONS, REGULARIZATION A ADAM A NESTEROV (cca 6-7 dalších stran) - v případě potřeby se dá zkrátit na to nejnutnější (3 strany cca)
 
 
 
@@ -983,6 +1017,8 @@ http://www.cscjournals.org/library/manuscriptinfo.php
 \bibitem{grad}https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
 
 \bibitem{backprop}http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf citováno 30.3.2020
+
+\bibitem{numpy}https://numpy.org/
 
 \end{thebibliography}
 
