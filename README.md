@@ -2,6 +2,8 @@
 
 1) dodělat modely - NRF with extra layer - ReLU do mezivrstvy (1)
                   - v NRF with extra layer doimplementovat adam a nesterov (1)
+                  
+                  -PROTŘÍDIT MODELY, KTERÉ BUDEME POUŽÍVAT A UDĚLAT V TOM POŘÁDEK
 
 2) najít další public datasety - mít alespoň 7 datasetů - vybírat tak, aby se dalo porovnat s jinými studiemi (1)
 3) přichystat skript pro iteraci přes všechny datasety a přes všechny modely, použít i logistickou regresi a klasickou neuronku (1)
