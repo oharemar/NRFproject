@@ -6,6 +6,9 @@
                   -PROTŘÍDIT MODELY, KTERÉ BUDEME POUŽÍVAT A UDĚLAT V TOM POŘÁDEK
 
 2) najít další public datasety - mít alespoň 7 datasetů - vybírat tak, aby se dalo porovnat s jinými studiemi (1)
+
+-najít pro všechny modely ideální parametry na nějaké validační množině, ty pak používat
+
 3) přichystat skript pro iteraci přes všechny datasety a přes všechny modely, použít i logistickou regresi a klasickou neuronku (1)
 4) prozkoumat cross validaci v scikit, případně naimplementovat custom verzi (1-2)
 5) posbírat výsledky na všech metrikách z classification report - spustit skript z bodu 3) a na vyhodnocení použít buď 5 fold crossvalidation nebo spustit 5x experiment pokaždé s jinou trénovací a testovací množinou, výsledky uložit do souboru (2-4)
