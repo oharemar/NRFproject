@@ -7,7 +7,7 @@ import math
 class Network():
 
     def __init__(self , sizes, biases = None, weights = None , gamma=None,gamma_output = 2,
-                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid',gamma_sigmoid = 1):
+                 weight_initilizer = 'new', cost = None, output_func = 'sigmoid',gamma_sigmoid = 1,penultimate_func = 'LeakyReLU', alpha = 0.01):
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.gamma_sigmoid = gamma_sigmoid # koeficient v sigmoidu v předposlední vrstvě
@@ -15,6 +15,8 @@ class Network():
         self.gamma = gamma
         self.cost = cost
         self.output_func = output_func
+        self.alpha = alpha
+        self.penultimate_func = penultimate_func
         if biases is not None:
             self.biases = biases
         else:
@@ -35,7 +37,10 @@ class Network():
                 a = tanh(np.dot(w, a) + b,gamma=self.gamma[number]) # gamma is hyperparameter
             else:
                 if number == 2:
-                    a = sigmoid(np.dot(w, a) + b, self.gamma_sigmoid) # zde je zatím sigmoid, mohli bychom zde poměnit (ReLu)
+                    if self.penultimate_func == 'sigmoid':
+                        a = sigmoid(np.dot(w, a) + b, self.gamma_sigmoid) # zde je zatím sigmoid, mohli bychom zde poměnit (ReLu)
+                    elif self.penultimate_func == 'LeakyReLU':
+                        a = leaky_relu(np.dot(w, a) + b, self.alpha) # zde je zatím sigmoid, mohli bychom zde poměnit (ReLu)
                 elif self.output_func == 'sigmoid':
                     a = sigmoid(np.dot(w, a) + b,self.gamma_output)
                 elif self.output_func == 'softmax':
@@ -139,7 +144,10 @@ class Network():
                 activation = tanh(z,self.gamma[number])
             else:
                 if number == 2:
-                    activation = sigmoid(z, self.gamma_sigmoid)
+                    if self.penultimate_func == 'sigmoid':
+                        activation = sigmoid(z, self.gamma_sigmoid)
+                    elif self.penultimate_func == 'LeakyReLU':
+                        activation = leaky_relu(z,self.alpha)
                 elif self.output_func == 'sigmoid':
                     activation = sigmoid(z,self.gamma_output)
                 elif self.output_func == 'softmax':
@@ -153,7 +161,10 @@ class Network():
         for l in range(2, self.num_layers):
             z = zs[-l]
             if l == 2:
-                sp = sigmoid_prime(z,self.gamma_sigmoid)
+                if self.penultimate_func == 'sigmoid':
+                    sp = sigmoid_prime(z, self.gamma_sigmoid)
+                elif self.penultimate_func == 'LeakyReLU':
+                    sp = derivation_leaky_relu(z, self.alpha)
             else:
                 sp = derivative_tanh(z,self.gamma[self.num_layers - l - 1])
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * sp

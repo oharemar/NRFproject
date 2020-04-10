@@ -169,3 +169,12 @@ class NeuralTreeBasic_boosted_nesterov():
             predictions.append(prediction)
         return np.array(predictions)
 
+    def predict_prob(self, X_test):
+
+        data = list(X_test)
+        data = [d.reshape(-1, 1) for d in data]
+        predictions = np.zeros((X_test.shape[0],self.decision_tree.n_classes_))
+        for d,j in zip(data,range(len(data))):
+            prediction = self.network.feedforward(d).reshape(1,-1)
+            predictions[j,:] = prediction
+        return np.array(predictions)

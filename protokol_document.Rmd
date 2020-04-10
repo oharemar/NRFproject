@@ -1,7 +1,7 @@
 ---
 title: "REAN protokol"
 author: "Martin Oharek"
-date: "12 února 2020"
+date: "12 Ăşnora 2020"
 output: pdf_document
 ---
 
@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Knihovny
-Na začátek načteme doporučené knihovny
+Na zaÄŤĂˇtek naÄŤteme doporuÄŤenĂ© knihovny
 ```{r}
 lbs <- c('car','MASS','tidyverse','ggplot2','ISLR','graphics','effects','leaps','psych',
          'lattice','lmtest','robustbase')
@@ -20,36 +20,36 @@ for(libs in install.lib) install.packages(libs, dependences = TRUE)
 sapply(lbs, require, character = TRUE)
 ```
 
-# Zpracování dat, průzkumová a grafická část
+# ZpracovĂˇnĂ­ dat, prĹŻzkumovĂˇ a grafickĂˇ ÄŤĂˇst
 
-## Otázka č.1: Zjistěte, zdali data neobsahují chybějící hodnoty (NA), pokud ano tak rozhodněte zdali můžete příslušná pozorování z dat odstranit.
+## OtĂˇzka ÄŤ.1: ZjistÄ›te, zdali data neobsahujĂ­ chybÄ›jĂ­cĂ­ hodnoty (NA), pokud ano tak rozhodnÄ›te zdali mĹŻĹľete pĹ™Ă­sluĹˇnĂˇ pozorovĂˇnĂ­ z dat odstranit.
 
-Jako první data načteme z příslušného souboru
+Jako prvnĂ­ data naÄŤteme z pĹ™Ă­sluĹˇnĂ©ho souboru
 
 ```{r}
 my_data <- read.table("auto-mpg-01rean.txt",header = TRUE)
 my_data = as.data.frame(my_data)
 ```
 
-Potom se na data podíváme přes summary funkci
+Potom se na data podĂ­vĂˇme pĹ™es summary funkci
 ```{r}
 summary(my_data)
 ```
 
-Vidíme, že se vyskytuje 6 NaNs v proměnné horsepower a 9 NaNs v proměnné mpg. Odstranění příslušných řádků závisí na plánovaném využití datasetu. Pokud budeme chtít regresovat mpg, pak jistě budeme muset odstranit řádky s NaNy v mpg. Pokud budeme chtít regresovat navíc pomocí horsepower, pak budeme muset odstranit i řádky s NaNy v horsepower. V našem případě je celkově 15 řádků s Nany, což není vzhledem k celkovému počtu 406 mnoho, navíc budeme téměř ve všech pozdějších úlohách pracovat jak s mpg, tak horsepower dohromady, proto pro větší přehlednost budeme uvažovat pouze data bez NaNů již od začátku pro všechny následující úlohy.
+VidĂ­me, Ĺľe se vyskytuje 6 NaNs v promÄ›nnĂ© horsepower a 9 NaNs v promÄ›nnĂ© mpg. OdstranÄ›nĂ­ pĹ™Ă­sluĹˇnĂ˝ch Ĺ™ĂˇdkĹŻ zĂˇvisĂ­ na plĂˇnovanĂ©m vyuĹľitĂ­ datasetu. Pokud budeme chtĂ­t regresovat mpg, pak jistÄ› budeme muset odstranit Ĺ™Ăˇdky s NaNy v mpg. Pokud budeme chtĂ­t regresovat navĂ­c pomocĂ­ horsepower, pak budeme muset odstranit i Ĺ™Ăˇdky s NaNy v horsepower. V naĹˇem pĹ™Ă­padÄ› je celkovÄ› 15 Ĺ™ĂˇdkĹŻ s Nany, coĹľ nenĂ­ vzhledem k celkovĂ©mu poÄŤtu 406 mnoho, navĂ­c budeme tĂ©mÄ›Ĺ™ ve vĹˇech pozdÄ›jĹˇĂ­ch ĂşlohĂˇch pracovat jak s mpg, tak horsepower dohromady, proto pro vÄ›tĹˇĂ­ pĹ™ehlednost budeme uvaĹľovat pouze data bez NaNĹŻ jiĹľ od zaÄŤĂˇtku pro vĹˇechny nĂˇsledujĂ­cĂ­ Ăşlohy.
 
 ```{r}
 data_mpghp = my_data[!is.na(my_data$mpg) & !is.na(my_data$horsepower),]
 
 ```
 
-## Otázka č.2: Které proměnné jsou kvantitativní a které kvalitativní? Jeli možno některé zařadit do obou skupin, pro kterou se rozhodnete? Které proměnné budete brát jako faktorové a proč?
+## OtĂˇzka ÄŤ.2: KterĂ© promÄ›nnĂ© jsou kvantitativnĂ­ a kterĂ© kvalitativnĂ­? Jeli moĹľno nÄ›kterĂ© zaĹ™adit do obou skupin, pro kterou se rozhodnete? KterĂ© promÄ›nnĂ© budete brĂˇt jako faktorovĂ© a proÄŤ?
 
-Za kvalitativní proměnné většinou bereme kategorické proměnné, které nabývají diskrétních hodnot. Kvantitativní jsou naopak spojité, numerické proměnné, které popisují číselnou velikost, množství,..
+Za kvalitativnĂ­ promÄ›nnĂ© vÄ›tĹˇinou bereme kategorickĂ© promÄ›nnĂ©, kterĂ© nabĂ˝vajĂ­ diskrĂ©tnĂ­ch hodnot. KvantitativnĂ­ jsou naopak spojitĂ©, numerickĂ© promÄ›nnĂ©, kterĂ© popisujĂ­ ÄŤĂ­selnou velikost, mnoĹľstvĂ­,..
 
-Zřejmě kvantitativní proměnné v našem případě jsou mpg, displacement, horsepower, weight a acceleration. Faktorové jsou určitě origin a car_name. Do obou skupin lze zařadit cylinders a model_year. Jestli danou proměnnou brát jako faktorovou či nikoliv závisí na zkoumaném problému a plánovaném využití výsledného modelu. Např. pokud budeme chtít používat model i na automobily o jiném počtu válců než máme v datasetu, pak zvolíme cylinders jako numerickou proměnnou. Ale např. model_year bych určitě nebral jako numerickou proměnnou, zde nedává příliš smysl do modelu dosazovat jiné roky, než se kterými se setkáme v datasetu, nebo např. dosazovat neceločíselné hodnoty let. Předpokládat, že spotřeba se bude měnit lineárně i v budoucnu či v minulosti vzhledem k našim datům mi nepřijde správné.
+ZĹ™ejmÄ› kvantitativnĂ­ promÄ›nnĂ© v naĹˇem pĹ™Ă­padÄ› jsou mpg, displacement, horsepower, weight a acceleration. FaktorovĂ© jsou urÄŤitÄ› origin a car_name. Do obou skupin lze zaĹ™adit cylinders a model_year. Jestli danou promÄ›nnou brĂˇt jako faktorovou ÄŤi nikoliv zĂˇvisĂ­ na zkoumanĂ©m problĂ©mu a plĂˇnovanĂ©m vyuĹľitĂ­ vĂ˝slednĂ©ho modelu. NapĹ™. pokud budeme chtĂ­t pouĹľĂ­vat model i na automobily o jinĂ©m poÄŤtu vĂˇlcĹŻ neĹľ mĂˇme v datasetu, pak zvolĂ­me cylinders jako numerickou promÄ›nnou. Ale napĹ™. model_year bych urÄŤitÄ› nebral jako numerickou promÄ›nnou, zde nedĂˇvĂˇ pĹ™Ă­liĹˇ smysl do modelu dosazovat jinĂ© roky, neĹľ se kterĂ˝mi se setkĂˇme v datasetu, nebo napĹ™. dosazovat neceloÄŤĂ­selnĂ© hodnoty let. PĹ™edpoklĂˇdat, Ĺľe spotĹ™eba se bude mÄ›nit lineĂˇrnÄ› i v budoucnu ÄŤi v minulosti vzhledem k naĹˇim datĹŻm mi nepĹ™ijde sprĂˇvnĂ©.
 
-Momentálně zvolím cylinders i model_year jako kategorické proměnné.
+MomentĂˇlnÄ› zvolĂ­m cylinders i model_year jako kategorickĂ© promÄ›nnĂ©.
 
 ```{r}
 data_mpghp$origin = as.factor(data_mpghp$origin)
@@ -59,7 +59,7 @@ data_mpghp$model_year = as.factor(data_mpghp$model_year)
 
 ```
 
-## Otázka č.3: Proměnnou mpg nahraďte proměnnou consumption, kde bude místo počtu ujetých mil na galon paliva uvedena hodnota počet litrů na 100km. Jednotky proměnné displacement převěďte z kubických palců na litry a weight z liber na kilogramy.
+## OtĂˇzka ÄŤ.3: PromÄ›nnou mpg nahraÄŹte promÄ›nnou consumption, kde bude mĂ­sto poÄŤtu ujetĂ˝ch mil na galon paliva uvedena hodnota poÄŤet litrĹŻ na 100km. Jednotky promÄ›nnĂ© displacement pĹ™evÄ›ÄŹte z kubickĂ˝ch palcĹŻ na litry a weight z liber na kilogramy.
 
 ```{r}
 data_mpghp$consumption = (100*3.785411)/(data_mpghp$mpg * 1.609344)
@@ -68,12 +68,12 @@ data_mpghp$weight = data_mpghp$weight*0.45359237
 
 ```
 
-## Otázka č.4: Vykreslete histogramy a odhady hustot consumption, displacement, acceleration, horsepower, weight, model_year. Proměnnou consumption vykreslete pomocí scatterplotu spolu s ostatními proměnnými - závislost odezvy ("consumption") na vysvětlujících proměnných. Proložte body jak lineárním odhadem, tak vyhlazenou křivkou lokální regrese, buď pomocí LOESS (locally estimated scatterplot smoothing) nebo LOWESS (locally weighted scatterplot smoothing)(lines(lowess(X,Y))). Co lze z tohoto obrázku předpokládat o závislosti spotřeby auta na dalších proměnných. 
+## OtĂˇzka ÄŤ.4: Vykreslete histogramy a odhady hustot consumption, displacement, acceleration, horsepower, weight, model_year. PromÄ›nnou consumption vykreslete pomocĂ­ scatterplotu spolu s ostatnĂ­mi promÄ›nnĂ˝mi - zĂˇvislost odezvy ("consumption") na vysvÄ›tlujĂ­cĂ­ch promÄ›nnĂ˝ch. ProloĹľte body jak lineĂˇrnĂ­m odhadem, tak vyhlazenou kĹ™ivkou lokĂˇlnĂ­ regrese, buÄŹ pomocĂ­ LOESS (locally estimated scatterplot smoothing) nebo LOWESS (locally weighted scatterplot smoothing)(lines(lowess(X,Y))). Co lze z tohoto obrĂˇzku pĹ™edpoklĂˇdat o zĂˇvislosti spotĹ™eby auta na dalĹˇĂ­ch promÄ›nnĂ˝ch. 
 
-Jako první vykreslíme histogramy.
+Jako prvnĂ­ vykreslĂ­me histogramy.
 
 ```{r}
-data_mpghp$model_year = as.numeric(as.character(data_mpghp$model_year))# změníme zpět na numerickou kvůli histogramu
+data_mpghp$model_year = as.numeric(as.character(data_mpghp$model_year))# zmÄ›nĂ­me zpÄ›t na numerickou kvĹŻli histogramu
 
 cols = c('consumption', 'displacement', 'acceleration', 'horsepower', 'weight', 'model_year')
 par(mfrow = c(2, 3))
@@ -85,7 +85,7 @@ for (col in cols)
 ```
 
 
-Nyní vykreslíme odhady hustot.
+NynĂ­ vykreslĂ­me odhady hustot.
 
 ```{r}
 
@@ -98,7 +98,7 @@ for (col in cols)
 ```
 
 
-A naposledy scatterploty s křivkou lokální regrese.
+A naposledy scatterploty s kĹ™ivkou lokĂˇlnĂ­ regrese.
 
 ```{r}
 par(mfrow = c(2, 3))
@@ -112,20 +112,20 @@ for (col in cols)
 
 ```
 
-Z obrázku vidíme, že se křivky "přibližně" podobají, z toho lze usoudit, že data jsou vhodná modelovat pomocí lineární regrese. Pokud by se křivky významně lišily, pak by už dopředu mohlo být jasnější, že (jednoduchý) lineární model nebude příliš vhodnou volbou a stálo by za to vybrat jiný (nelineární) model.
+Z obrĂˇzku vidĂ­me, Ĺľe se kĹ™ivky "pĹ™ibliĹľnÄ›" podobajĂ­, z toho lze usoudit, Ĺľe data jsou vhodnĂˇ modelovat pomocĂ­ lineĂˇrnĂ­ regrese. Pokud by se kĹ™ivky vĂ˝znamnÄ› liĹˇily, pak by uĹľ dopĹ™edu mohlo bĂ˝t jasnÄ›jĹˇĂ­, Ĺľe (jednoduchĂ˝) lineĂˇrnĂ­ model nebude pĹ™Ă­liĹˇ vhodnou volbou a stĂˇlo by za to vybrat jinĂ˝ (nelineĂˇrnĂ­) model.
 
-Dále si můžeme všimnout poměrně logických trendů, které nám ověřují, že data jsou smysluplná, např. můžeme vidět, že se zvyšující se váhou či výkonem vozidla se zvyšuje i spotřeba, což souhlasí s jakousi empirickou a fyzikální znalostí problému. Také se s přibývajícími roky většinou spotřeba snižovala. Zde by bylo zajímavé si vykreslit (bude rozebráno v úkolu č.8) závislost výkonu či zrychlení v závislosti na model_year a ověřit, že deficit ve spotřebě negativně neovlivnil tyto proměnné.
+DĂˇle si mĹŻĹľeme vĹˇimnout pomÄ›rnÄ› logickĂ˝ch trendĹŻ, kterĂ© nĂˇm ovÄ›Ĺ™ujĂ­, Ĺľe data jsou smysluplnĂˇ, napĹ™. mĹŻĹľeme vidÄ›t, Ĺľe se zvyĹˇujĂ­cĂ­ se vĂˇhou ÄŤi vĂ˝konem vozidla se zvyĹˇuje i spotĹ™eba, coĹľ souhlasĂ­ s jakousi empirickou a fyzikĂˇlnĂ­ znalostĂ­ problĂ©mu. TakĂ© se s pĹ™ibĂ˝vajĂ­cĂ­mi roky vÄ›tĹˇinou spotĹ™eba sniĹľovala. Zde by bylo zajĂ­mavĂ© si vykreslit (bude rozebrĂˇno v Ăşkolu ÄŤ.8) zĂˇvislost vĂ˝konu ÄŤi zrychlenĂ­ v zĂˇvislosti na model_year a ovÄ›Ĺ™it, Ĺľe deficit ve spotĹ™ebÄ› negativnÄ› neovlivnil tyto promÄ›nnĂ©.
 
-## Otázka č.5: Z proměnné car_name vytvořte proměnnou model podle prvního slova obsaženého v řetězci. Pro proměnné model_year, model, cylinders, origin a jejich vztah k odezvě consumption vykreslete krabicové diagramy (boxploty). Je mezi uvedenými proměnnými některá, pro kterou byste na základě krabicových diagramů navrhli sloučit určité úrovně dohromady? Je z těchto grafů vidět, že některá auta mají jinou, než očekávanou spotřebu?
+## OtĂˇzka ÄŤ.5: Z promÄ›nnĂ© car_name vytvoĹ™te promÄ›nnou model podle prvnĂ­ho slova obsaĹľenĂ©ho v Ĺ™etÄ›zci. Pro promÄ›nnĂ© model_year, model, cylinders, origin a jejich vztah k odezvÄ› consumption vykreslete krabicovĂ© diagramy (boxploty). Je mezi uvedenĂ˝mi promÄ›nnĂ˝mi nÄ›kterĂˇ, pro kterou byste na zĂˇkladÄ› krabicovĂ˝ch diagramĹŻ navrhli slouÄŤit urÄŤitĂ© ĂşrovnÄ› dohromady? Je z tÄ›chto grafĹŻ vidÄ›t, Ĺľe nÄ›kterĂˇ auta majĂ­ jinou, neĹľ oÄŤekĂˇvanou spotĹ™ebu?
 
-Ke splnění úlohy využijeme balíček "stringr", který nám usnadní práci.
+Ke splnÄ›nĂ­ Ăşlohy vyuĹľijeme balĂ­ÄŤek "stringr", kterĂ˝ nĂˇm usnadnĂ­ prĂˇci.
 ```{r}
 library('stringr')
 data_mpghp$producer = word(data_mpghp$car_name,1)
-data_mpghp$model_year = factor(data_mpghp$model_year) # model_year převedeme zpět na faktor
+data_mpghp$model_year = factor(data_mpghp$model_year) # model_year pĹ™evedeme zpÄ›t na faktor
 ```
 
-Na vykreslení boxplotu využijeme ggplot
+Na vykreslenĂ­ boxplotu vyuĹľijeme ggplot
 
 ```{r}
 library(gplots)
@@ -152,12 +152,12 @@ plot(p4)
 
 ```
 
-Dle podobnosti středních hodnot a mediánů by se da sloučit model_year na méně faktorů. Daly by se sloučit roky 70-73, 74-79, 80-82. Ostatní proměnné bych neslučoval, jelikož rozdíly středních hodnot a mediánů pro jednotlivé faktory jsou příliš velké.
+Dle podobnosti stĹ™ednĂ­ch hodnot a mediĂˇnĹŻ by se da slouÄŤit model_year na mĂ©nÄ› faktorĹŻ. Daly by se slouÄŤit roky 70-73, 74-79, 80-82. OstatnĂ­ promÄ›nnĂ© bych nesluÄŤoval, jelikoĹľ rozdĂ­ly stĹ™ednĂ­ch hodnot a mediĂˇnĹŻ pro jednotlivĂ© faktory jsou pĹ™Ă­liĹˇ velkĂ©.
 
-Jde vidět, že auta se 3 válci mají nižší spotřebu než auta se 4 a 5 válci, což trochu porušuje trend, který vidíme u 4 az 8 válcových aut, kde zpravidla čím větší počet válců, tím nižší spotřeba. Avšak to nemusí být nutně chyba, jelikož spotřebu ovlivňují i další nezávislé proměnné.
+Jde vidÄ›t, Ĺľe auta se 3 vĂˇlci majĂ­vyšší spotĹ™ebu neĹľ auta se 4 a 5 vĂˇlci, coĹľ trochu poruĹˇuje trend, kterĂ˝ vidĂ­me u 4 az 8 vĂˇlcovĂ˝ch aut, kde zpravidla ÄŤĂ­m nižší poÄŤet vĂˇlcĹŻ, tĂ­m nižší spotĹ™eba. AvĹˇak to nemusĂ­ bĂ˝t nutnÄ› chyba, jelikoĹľ spotĹ™ebu ovlivĹujĂ­ i dalĹˇĂ­ nezĂˇvislĂ© promÄ›nnĂ©.
 
 
-## Otázka č.6: Pro kombinaci faktorizovaných proměnných cylinders a origin vykreslete spotřebu aut, aby bylo na obrázku vidět, jestli se liší spotřeba u aut pocházejících z různých kontinentů v závislosti na počtu válců a naopak.
+## OtĂˇzka ÄŤ.6: Pro kombinaci faktorizovanĂ˝ch promÄ›nnĂ˝ch cylinders a origin vykreslete spotĹ™ebu aut, aby bylo na obrĂˇzku vidÄ›t, jestli se liĹˇĂ­ spotĹ™eba u aut pochĂˇzejĂ­cĂ­ch z rĹŻznĂ˝ch kontinentĹŻ v zĂˇvislosti na poÄŤtu vĂˇlcĹŻ a naopak.
 
 
 ```{r}
@@ -168,7 +168,7 @@ print(p)
 ```
 
 
-## Otázka č.7: Pro auta výrobce Chrysler vykreslete závislost spotřeby na váze automobilu, kde jednotlivé události označíte barvou podle počtu válců a velikosti bodů v grafu bude odpovídat objemu motoru. 
+## OtĂˇzka ÄŤ.7: Pro auta vĂ˝robce Chrysler vykreslete zĂˇvislost spotĹ™eby na vĂˇze automobilu, kde jednotlivĂ© udĂˇlosti oznaÄŤĂ­te barvou podle poÄŤtu vĂˇlcĹŻ a velikosti bodĹŻ v grafu bude odpovĂ­dat objemu motoru. 
 
 ```{r}
 data_chrysler = data_mpghp[data_mpghp[,'producer']=='chrysler',]
@@ -177,9 +177,9 @@ p <- ggplot(data_chrysler,aes(x=weight,y=consumption))+
 print(p)
 ```
 
-## Otázka č.8: Navrhněte další zobrazení datového souboru. Proveďte ho a popište jeho účel.
+## OtĂˇzka ÄŤ.8: NavrhnÄ›te dalĹˇĂ­ zobrazenĂ­ datovĂ©ho souboru. ProveÄŹte ho a popiĹˇte jeho ĂşÄŤel.
 
-Už bylo zmíněno v otázce č.4, že z grafů bylo vidět snižování spotřeby v průběhu let. Bylo by proto zajímavé vykreslit jiné proměnné, např. výkon, váhu či zrychlení a podívat se, jak se tyto veličiny měnily s přibývajícím časem. Podíváme se tak na to, jestli snižování spotřeby v důsledky lidského rozvoje nemělo negativní vliv na ostatní klíčové parametry vozidla (jinak by takový vývoj byl poněkud kontraproduktivní, pokud samozřejmě nebylo cílem pouze snížit spotřebu i přes fakt, že získáme pomalejší, méně schopné vozidlo). Tyto veličiny bychom měli vykreslovat pro jednotlivé producery zvlášť. Zkusíme např. auta značky chrysler.
+UĹľ bylo zmĂ­nÄ›no v otĂˇzce ÄŤ.4, Ĺľe z grafĹŻ bylo vidÄ›t sniĹľovĂˇnĂ­ spotĹ™eby v prĹŻbÄ›hu let. Bylo by proto zajĂ­mavĂ© vykreslit jinĂ© promÄ›nnĂ©, napĹ™. vĂ˝kon, vĂˇhu ÄŤi zrychlenĂ­ a podĂ­vat se, jak se tyto veliÄŤiny mÄ›nily s pĹ™ibĂ˝vajĂ­cĂ­m ÄŤasem. PodĂ­vĂˇme se tak na to, jestli sniĹľovĂˇnĂ­ spotĹ™eby v dĹŻsledky lidskĂ©ho rozvoje nemÄ›lo negativnĂ­ vliv na ostatnĂ­ klĂ­ÄŤovĂ© parametry vozidla (jinak by takovĂ˝ vĂ˝voj byl ponÄ›kud kontraproduktivnĂ­, pokud samozĹ™ejmÄ› nebylo cĂ­lem pouze snĂ­Ĺľit spotĹ™ebu i pĹ™es fakt, Ĺľe zĂ­skĂˇme pomalejĹˇĂ­, mĂ©nÄ› schopnĂ© vozidlo). Tyto veliÄŤiny bychom mÄ›li vykreslovat pro jednotlivĂ© producery zvlĂˇĹˇĹĄ. ZkusĂ­me napĹ™. auta znaÄŤky chrysler.
 
 ```{r}
 p1 <- ggplot(data_chrysler,aes(x=model_year,y=acceleration))+
@@ -200,32 +200,30 @@ print(p3)
 
 ```
 
-Vidíme, že spotřeba aut se v průběhu let u této značky snižovala a s ní většinou i výkon. Naopak zrychlení se zvyšovalo. Tohle souvisí s tím, že byla tendence značky snižovat hmotnost a tím pádem i se snížením výkonu motoru zvětšit zrychlení auta.
+VidĂ­me, Ĺľe spotĹ™eba aut se v prĹŻbÄ›hu let u tĂ©to znaÄŤky sniĹľovala a s nĂ­ vÄ›tĹˇinou i vĂ˝kon. Naopak zrychlenĂ­ se zvyĹˇovalo. Tohle souvisĂ­ s tĂ­m, Ĺľe byla tendence znaÄŤky sniĹľovat hmotnost a tĂ­m pĂˇdem i se snĂ­ĹľenĂ­m vĂ˝konu motoru zvÄ›tĹˇit zrychlenĂ­ auta.
 
-## Otázka č.9: Sestavte jednoduchý regresní model, kde vysvětlovaná proměnná bude spotřeba automobilu. Na jeho základech zjistěte, zdali spotřeba automobilu závisí na hmotnosti automobilu. Pokud ano, o kolik se změní spotřeba automobilu pokud se hmotnost zvýší o 1000kg?
+## OtĂˇzka ÄŤ.9: Sestavte jednoduchĂ˝ regresnĂ­ model, kde vysvÄ›tlovanĂˇ promÄ›nnĂˇ bude spotĹ™eba automobilu. Na jeho zĂˇkladech zjistÄ›te, zdali spotĹ™eba automobilu zĂˇvisĂ­ na hmotnosti automobilu. Pokud ano, o kolik se zmÄ›nĂ­ spotĹ™eba automobilu pokud se hmotnost zvĂ˝ĹˇĂ­ o 1000kg?
 
-Připravíme si jednoduché modely s interceptem i bez interceptu. Model bez interceptu má v tomto případě určitě smysl uvažovat (nejspíš i lepší smysl než model s interceptem), protože intuice a zkušenost říká, že auto vážící 0kg by mělo spotřebovat 0l paliva. Co se týká závislosti spotřeby na hmotnosti, je z předchozích scatterplotů zřejmé, že spotřeba na hmotnosti závisí. Ověříme si to i z hodnot t-statistik koeficientů z obou modelů.
+PĹ™ipravĂ­me si jednoduchý model s interceptem. Model bez interceptu by v tomot případě nejspíše měl nějaký intuitivní smysl (auto vážící 0kg spotřebuje 0l paliva), nicméně v praxi nikdy nenarazíme na auto vážící 0kg Budeme tudíž uvažovat pouze model s interceptem. Co se tĂ˝kĂˇ zĂˇvislosti spotĹ™eby na hmotnosti, je z pĹ™edchozĂ­ch scatterplotĹŻ zĹ™ejmĂ©, Ĺľe spotĹ™eba na hmotnosti zĂˇvisĂ­. OvÄ›Ĺ™Ă­me si to i z hodnot t-statistik koeficientĹŻ z obou modelĹŻ.
 
 ```{r}
 lm_intercept = lm(consumption ~ weight, data_mpghp)
-lm_nointercept = lm (consumption ~ weight - 1, data_mpghp)
 
 ```
 
-Podíváme se na summary funkce obou modelů
+PodĂ­vĂˇme se na summary funkce
 
 ```{r}
 summary(lm_intercept)
-summary(lm_nointercept)
 ```
 
-Hodnoty t-statistik jsou extrémně malé, což jakousi závislost spotřeby na váze potvrzuje. Abychom to mohli říct s větší jistotou, je potřeba první model validovat.
-Při změně váhy o 1000kg se v modelu s interceptem změní spotřeba (po zaokrouhlení) o 8,9. V modelu bez interceptu o 8,4. 
+Hodnota t-statistiky je extrĂ©mnÄ› malá, coĹľ jakousi zĂˇvislost spotĹ™eby na vĂˇze potvrzuje. Abychom to mohli Ĺ™Ă­ct s vÄ›tĹˇĂ­ jistotou, je potĹ™eba prvnĂ­ model validovat.
+PĹ™i zmÄ›nÄ› vĂˇhy o 1000kg se v modelu s interceptem zmÄ›nĂ­ spotĹ™eba (po zaokrouhlenĂ­) o 8,9. 
 
-## Otázka č.10: Dá se předešlý jednoduchý regresní model zlepšit pomocí logaritmické transformace odezvy? Jak se poté změní (navýší/poklesne) spotřeba automobilu při změně hmotnosti o 1000kg? Zdůvodněte, proč případné transformace je přínosná, nebo naopak nepřínosná.
+## OtĂˇzka ÄŤ.10: DĂˇ se pĹ™edeĹˇlĂ˝ jednoduchĂ˝ regresnĂ­ model zlepĹˇit pomocĂ­ logaritmickĂ© transformace odezvy? Jak se potĂ© zmÄ›nĂ­ (navĂ˝ĹˇĂ­/poklesne) spotĹ™eba automobilu pĹ™i zmÄ›nÄ› hmotnosti o 1000kg? ZdĹŻvodnÄ›te, proÄŤ pĹ™Ă­padnĂ© transformace je pĹ™Ă­nosnĂˇ, nebo naopak nepĹ™Ă­nosnĂˇ.
 
 
-Jako první se vykreslíme scatterplot bez i s log transformovanou spotřebou a podíváme se, jestli dostaneme "hezčí" graf.
+Jako prvnĂ­ se vykreslĂ­me scatterplot bez i s log transformovanou spotĹ™ebou a podĂ­vĂˇme se, jestli dostaneme "hezÄŤĂ­" graf.
 
 ```{r}
 par(mfrow = c(1,2))
@@ -234,51 +232,50 @@ plot(data_mpghp$weight,log(data_mpghp$consumption),xlab = 'weight',ylab='log(con
 
 ```
 
-Z grafů není patrné, že by log transformace měla vést k vyšší přesnosti modelu. Nastavíme lineární model. Zvolíme model s interceptem, zde není na místě používat argument (0,0), protože po získání hodnoty z modelu musíme provést zpětnou transformaci a exp(0) = 1.
+Z grafĹŻ nenĂ­ patrnĂ©, Ĺľe by log transformace mÄ›la vĂ©st k vyĹˇĹˇĂ­ pĹ™esnosti modelu. NastavĂ­me lineĂˇrnĂ­ model.
 
 
 ```{r}
 lm_logcons = lm(log(consumption)~weight,data_mpghp)
 ```
 
-podíváme se na výstup ze summary funkce pro tento model
+podĂ­vĂˇme se na vĂ˝stup ze summary funkce pro tento model
 ```{r}
 summary(lm_logcons)
 ```
 
-Z výstupu vidíme, že z hodnot R^2 statistiky můžeme usoudit, že model fituje transformovaná data přibližně stejně kvalitně jako model bez interceptu původní data. V čem tahle transformace ale mohla pomoci je zajištění validace OLS požadavků, k čemuž se často takové transformace v praxi využívají. Tímto se budeme zabývat v pozdějších otázkách. Nevýhoda této transformace je zhoršení interpretovatelnosti parametrů modelu vzhledem k původním hodnotám, jelikož se jedná o nelineární transformaci. Navíc v tomto případě nejde říct přesně, jaká bude změna spotřeby při změně váhy o 1000kg, protože ta se mění nekonstantně a závisí na počáteční hmotnosti, od které změnu měříme. Můžeme uvést např. změnu spotřeby při změne váhy z 1000kg na 2000kg, tj.
+V ÄŤem tahle transformace mohla pomoci je zajiĹˇtÄ›nĂ­ validace OLS poĹľadavkĹŻ, k ÄŤemuĹľ se ÄŤasto takovĂ© transformace v praxi vyuĹľĂ­vajĂ­. TĂ­mto se budeme zabĂ˝vat v pozdÄ›jĹˇĂ­ch otĂˇzkĂˇch. Interpretovatelnost se příliš nezhorší. Jen se v tomto případě už nemůžeme bavit o aditivním rozdílu, ale o multiplikativním rozdílu. v případě log transformace dostáváme pro podíl původních netransformovaných spotřeb při rozdílu hmotnosti o 1000kg vztah y1/y2 = e^(1000*alfa) , kde alfa je koeficient u hmotnosti.
+Tedy při změně váhy se spotřeba zvýší
 ```{r}
-c <- exp(predict(lm_logcons,data.frame(weight = 2000))) - exp(predict(lm_logcons,data.frame(weight = 1000)))
-print(c)
+exp(lm_logcons$coefficients['weight']*1000)
 ```
+přibližně 2,15 krát proti původní hodnotě.
 
-Z vykreslených grafů se zdá, že by mohla navíc k log transformaci pomoci ještě nějaká mocninná transformace, tím bychom mohli graf lépe "vyrovnat", pro zajímavost zkusíme druhou mocninnu.
+Z vykreslenĂ˝ch grafĹŻ se zdĂˇ, Ĺľe by mohla navĂ­c k log transformaci pomoci jeĹˇtÄ› nÄ›jakĂˇ mocninnĂˇ transformace, tĂ­m bychom mohli graf lĂ©pe "vyrovnat", pro zajĂ­mavost zkusĂ­me druhou mocninnu.
 ```{r}
 lm_logcons_squared = lm((log(consumption))^2~weight,data_mpghp)
 ```
 
-Podíváme se na summary funkci.
+PodĂ­vĂˇme se na summary funkci.
 
 ```{r}
 summary(lm_logcons_squared)
 ```
-
-Proti modelu s log transformací vyšla vyšší R^2 statistika, což je pozitivní. Validace modelu nechám na později. Ještě si křivky vykreslíme spolu se scatterplotem.
+Validace modelu nechĂˇm na pozdÄ›ji. JeĹˇtÄ› si kĹ™ivky vykreslĂ­me spolu se scatterplotem.
 
 ```{r}
 p <- ggplot(data_mpghp, aes(x=weight, y=consumption)) + geom_point() +
   geom_line(aes(x = weight, y = lm_intercept$fitted.values, col="red"),size=0.8)+
-    geom_line(aes(x = weight, y = lm_nointercept$fitted.values, col="blue"),size=0.8)+
   geom_line(aes(x = weight, y = exp(sqrt(lm_logcons_squared$fitted.values)),col="green") ,size = 0.8)+
   geom_line(aes(x = weight, y = exp(lm_logcons$fitted.values),col="yellow"),size = 0.8)+
-   scale_color_discrete(name = 'models',labels = c('lm_nointercept','lm_log_squared','lm_intercept','lm_log'))
+   scale_color_discrete(name = 'models',labels = c('lm_log_squared','lm_intercept','lm_log'))
 plot(p)
 ```
 
 
-## Otázka č.11: Vyzkoušejte transformovat nezávislou proměnnou hmotnost. Vyzkoušejte např. po částech konstantní transformaci a polynomiální transformace (kvadratickou a kubickou).
+## OtĂˇzka ÄŤ.11: VyzkouĹˇejte transformovat nezĂˇvislou promÄ›nnou hmotnost. VyzkouĹˇejte napĹ™. po ÄŤĂˇstech konstantnĂ­ transformaci a polynomiĂˇlnĂ­ transformace (kvadratickou a kubickou).
 
-Jako první provedeme po částech konstantní transformaci hmotnosti, intervaly zvolíme po 100kg a v každém intervalu bude hodnota zvolena jako střední hodnota původních hmotností spadajících do tohoto intervalu.
+Jako prvnĂ­ provedeme po ÄŤĂˇstech konstantnĂ­ transformaci hmotnosti, intervaly zvolĂ­me po 100kg a v kaĹľdĂ©m intervalu bude hodnota zvolena jako stĹ™ednĂ­ hodnota pĹŻvodnĂ­ch hmotnostĂ­ spadajĂ­cĂ­ch do tohoto intervalu.
 
 ```{r}
 breaks = seq(from = min(data_mpghp$weight), to = max(data_mpghp$weight)+100, by = 100)
@@ -291,15 +288,15 @@ for (i in levels(factor(data_mpghp$constant_weight2)))
 }
 ```
 
-Ve sloupci constant_weight jsou nyní hodnoty po částech konstantní transformace.
+Ve sloupci constant_weight jsou nynĂ­ hodnoty po ÄŤĂˇstech konstantnĂ­ transformace.
 
-Vytvoříme příslušné modely.
+VytvoĹ™Ă­me pĹ™Ă­sluĹˇnĂ© modely.
 ```{r}
 lm_const = lm(consumption ~ constant_weight,data_mpghp)
 lm_quadratic = lm(consumption ~ I(weight^2),data_mpghp)
 lm_cubic = lm(consumption ~ I(weight^3),data_mpghp)
 ```
-Modely si vypíšeme pomocí summary funkce.
+Modely si vypĂ­Ĺˇeme pomocĂ­ summary funkce.
 ```{r}
 summary(lm_const)
 summary(lm_quadratic)
@@ -307,7 +304,7 @@ summary(lm_cubic)
 ```
 
 
-Nyní si vykreslíme scatterploty s proložením příslušnou křivkou.
+NynĂ­ si vykreslĂ­me scatterploty s proloĹľenĂ­m pĹ™Ă­sluĹˇnou kĹ™ivkou.
 
 ```{r}
 p_const <- ggplot(data_mpghp, aes(x=constant_weight, y=consumption)) + geom_point()+
@@ -327,73 +324,71 @@ plot(figure)
 ```
 
 
-## Otázka č.12: Pro vámi vybraný finální model ověřte předpoklady pro použití OLS, diskutujte výstup a model validujte pomocí příslušných testů na rezidua a pomocí příslušných obrázků (QQplot, residua vs fitted, residua vs regressors atd.)
+## OtĂˇzka ÄŤ.12: Pro vĂˇmi vybranĂ˝ finĂˇlnĂ­ model ovÄ›Ĺ™te pĹ™edpoklady pro pouĹľitĂ­ OLS, diskutujte vĂ˝stup a model validujte pomocĂ­ pĹ™Ă­sluĹˇnĂ˝ch testĹŻ na rezidua a pomocĂ­ pĹ™Ă­sluĹˇnĂ˝ch obrĂˇzkĹŻ (QQplot, residua vs fitted, residua vs regressors atd.)
 
-Potřebujeme ověřit:
-1. nezávilost a homoskedasticitu reziduí se střední hodnotou 0, což můžeme ověřit např. z residuals vs fitted plotu (nebo scale-location plot), homoskedasticitu můžeme ještě ověřit např. pomocí breusch-paganova testu (bptest)
-2. normalitu reziduí pomocí QQ plotu a např. sapirova testu
+PotĹ™ebujeme ovÄ›Ĺ™it:
+1. nezĂˇvilost a homoskedasticitu reziduĂ­, coĹľ mĹŻĹľeme ovÄ›Ĺ™it napĹ™. z residuals vs fitted plotu (nebo scale-location plot), homoskedasticitu mĹŻĹľeme jeĹˇtÄ› ovÄ›Ĺ™it napĹ™. pomocĂ­ breusch-paganova testu (bptest)
+2. normalitu reziduĂ­ pomocĂ­ QQ plotu a napĹ™. sapirova testu
 
-Jako první ověříme klasický model bez transformace s i bez interceptu. Začneme normalitou. Vykreslíme QQplot.
+Jako prvnĂ­ ovÄ›Ĺ™Ă­me klasickĂ˝ model bez transformace. ZaÄŤneme normalitou. VykreslĂ­me QQplot.
 ```{r}
 par(mfrow = c(1,2))
 plot(lm_intercept,which=2)
-plot(lm_nointercept,which=2)
 ```
-Ty chvosty nevypadají příliš dobře, podíváme se na výsledek shapirova testu, uvedeme i model bez interceptu.
+Ty chvosty nevypadajĂ­ pĹ™Ă­liĹˇ dobĹ™e, podĂ­vĂˇme se na vĂ˝sledek shapirova testu, uvedeme i model bez interceptu.
 ```{r}
 shapiro.test(residuals(lm_intercept))
-shapiro.test(residuals(lm_nointercept))
 
 ```
 
-Obě p-hodnoty jsou kriticky nízké, tedy test na normalitu neprošel. Zkusíme model s log transformovanou spotřebou.
+ObÄ› p-hodnoty jsou kriticky nĂ­zkĂ©, tedy test na normalitu neproĹˇel. ZkusĂ­me model s log transformovanou spotĹ™ebou.
 
-Začneme normalitou.
+ZaÄŤneme normalitou.
 ```{r}
 plot(lm_logcons,which=2)
 ```
-To už vypadá o něco lépe.
+To uĹľ vypadĂˇ o nÄ›co lĂ©pe.
 ```{r}
 shapiro.test(residuals(lm_logcons))
 ```
 
-Shapirův test normalitu reziduí nezamítá. Podíváme se na homoskedasticitu reziduí.
+ShapirĹŻv test normalitu reziduĂ­ nezamĂ­tĂˇ. PodĂ­vĂˇme se na homoskedasticitu reziduĂ­.
 ```{r}
 plot(lm_logcons,which=1)
 ```
-Residuals vs fitted plot vypadá hezky. Podíváme se na bptest.
+Residuals vs fitted plot vypadĂˇ hezky. PodĂ­vĂˇme se na bptest.
 ```{r}
 bptest(lm_logcons)
   
 ```
 
-Zde vyšla p-hodnota nad 0.05, tedy homoskedasticitu nezamítáme. Tento model na OLS požadavky tedy prošel.
+Zde vyĹˇla p-hodnota nad 0.05, tedy homoskedasticitu nezamĂ­tĂˇme. Tento model na OLS poĹľadavky tedy proĹˇel.
 
-Zkusím ještě model lm_logcons_squared.
+ZkusĂ­m jeĹˇtÄ› model lm_logcons_squared.
 ```{r}
 plot(lm_logcons_squared,which=2)
 ```
 ```{r}
 shapiro.test(residuals(lm_logcons_squared))
 ```
-Zde vyšla p-hodnota dokonce o něco vyšší než u lm_logcons.
+Zde vyĹˇla p-hodnota dokonce o nÄ›co vyĹˇĹˇĂ­ neĹľ u lm_logcons.
 ```{r}
 plot(lm_logcons_squared,which=1)
 ```
-A residuals vs fitted plot vypadá taky o něco lépe než v předchozím případě.
+A residuals vs fitted plot vypadĂˇ taky o nÄ›co lĂ©pe neĹľ v pĹ™edchozĂ­m pĹ™Ă­padÄ›.
 ```{r}
 bptest(lm_logcons_squared)
   
 ```
-Homoskedasticita je zde daleko lepší než v předchozím případě, což nám hezky potvrzuje i bptest.
+Homoskedasticita je zde daleko lepĹˇĂ­ neĹľ v pĹ™edchozĂ­m pĹ™Ă­padÄ›, coĹľ nĂˇm hezky potvrzuje i bptest.
 
-Při porovnání modelů log_cons a log_cons_squared se jeví jako lepší druhá varianta i vzhledem k R^2 statistice.
+PĹ™i porovnĂˇnĂ­ modelĹŻ log_cons a log_cons_squared se jevĂ­ jako lepĹˇĂ­ druhĂˇ varianta i vzhledem k R^2 statistice.
 
 
 
-## Otázka č.13: Vykreslete scatterplot skutečných spotřeb aut a hmotností a na základě vybraného modelu. Proložte skrze data odhadnutou regresní přímku a vykreslete 95% konfidenční intervaly, jak pro predikované hodnoty, tak pro regresní přímku (tzv. Confidence a Prediction band). Porovnejte s výsledkem z funkce plot(allEfects(model)).
+## OtĂˇzka ÄŤ.13: Vykreslete scatterplot skuteÄŤnĂ˝ch spotĹ™eb aut a hmotnostĂ­ a na zĂˇkladÄ› vybranĂ©ho modelu. ProloĹľte skrze data odhadnutou regresnĂ­ pĹ™Ă­mku a vykreslete 95% konfidenÄŤnĂ­ intervaly, jak pro predikovanĂ© hodnoty, tak pro regresnĂ­ pĹ™Ă­mku (tzv. Confidence a Prediction band). Porovnejte s vĂ˝sledkem z funkce plot(allEfects(model)).
 
-Vybral jsem model lm_logcons_squared. První vykreslíme obrázky pro transformovanou spotřebu.
+Vybral jsem model lm_logcons_squared. PrvnĂ­ vykreslĂ­me obrĂˇzky pro transformovanou spotĹ™ebu.
 
 ```{r}
 
@@ -404,7 +399,7 @@ data <- cbind(data_mpghp, pred_transf)
 conf_transf = data.frame(conf_transf)
 conf_transf$weight = data_mpghp$weight
 
-# vykreslíme
+# vykreslĂ­me
 p1 <- ggplot(data, aes(x=weight, y=(log(consumption))^2)) + geom_point()+
   geom_line(aes(y = lwr ,colour = 'red'),size=0.8) +
   geom_line(aes(y = upr ,colour = 'red'),size=0.8) +
@@ -416,7 +411,7 @@ plot(p1)
 ```
 
 
-Nyní vykreslíme netransformovanou spotřebu a proložíme křivkou. Nejsem si jistý, jestli je interpretačně korektní transformovat confident a prediction bandy stejně jako hodnoty, raději to dělat nebudu.
+NynĂ­ vykreslĂ­me netransformovanou spotĹ™ebu a proloĹľĂ­me kĹ™ivkou.
 
 
 ```{r}
@@ -430,7 +425,7 @@ plot(p)
 ```
 
 
-Nyní zkusíme vykreslit výstup z allEffects.
+NynĂ­ zkusĂ­me vykreslit vĂ˝stup z allEffects.
 
 ```{r}
 
@@ -440,12 +435,12 @@ plot(allEffects(lm_logcons_squared))
 ```
 
 
-Plot vypadá stejně jako náš. Confident band souhlasí.
+Plot vypadĂˇ stejnÄ› jako nĂˇĹˇ. Confident band souhlasĂ­.
 
 
-## Otázka č.14: Přidejte k vysvětlujícím proměnným i proměnnou origin, navrhněte aditivní lineární model, a ve scatterplotu vykreslete 3 skupiny různými barvami a data proložte odpovídajícími regresními přímkami.
+## OtĂˇzka ÄŤ.14: PĹ™idejte k vysvÄ›tlujĂ­cĂ­m promÄ›nnĂ˝m i promÄ›nnou origin, navrhnÄ›te aditivnĂ­ lineĂˇrnĂ­ model, a ve scatterplotu vykreslete 3 skupiny rĹŻznĂ˝mi barvami a data proloĹľte odpovĂ­dajĂ­cĂ­mi regresnĂ­mi pĹ™Ă­mkami.
 
-Vyrobíme aditivní model.
+VyrobĂ­me aditivnĂ­ model.
 ```{r}
 
 lm_weight_origin<-lm(consumption~weight+origin,data_mpghp)
@@ -454,7 +449,7 @@ summary(lm_weight_origin)
 ```
 
 
-Data rozdělíme podle origin a vykreslíme i s regresními přímkami.
+Data rozdÄ›lĂ­me podle origin a vykreslĂ­me i s regresnĂ­mi pĹ™Ă­mkami.
 ```{r}
 data_split_origin  <- split(data_mpghp, data_mpghp$origin)
 data_split_origin[['1']]$Fit <- predict(lm_weight_origin, data_split_origin[['1']])
@@ -470,16 +465,16 @@ plot(p)
 
 ```
 
-Vidíme, že regresní přímky z aditivního modelu pro jednotlivé země jsou velmi podobné. Jde vidět, že origin v tomto modelu příliš spotřebu neovlivňuje.
+VidĂ­me, Ĺľe regresnĂ­ pĹ™Ă­mky z aditivnĂ­ho modelu pro jednotlivĂ© zemÄ› jsou velmi podobnĂ©. Jde vidÄ›t, Ĺľe origin v tomto modelu pĹ™Ă­liĹˇ spotĹ™ebu neovlivĹuje.
 
-## Otázka č.15: Porovnejte pomocí vhodného statistického testu shodnost středních hodnot spotřeby cen u automobilů pocházejících z různých kontinentů a podle počtu válců (faktorizovaná proměnná). Zdůvodněte zdali tyto statistické testy jsou vypovídající a zdali lze z nich určit důležitost daných proměnných pro predikci ceny automobilu.
+## OtĂˇzka ÄŤ.15: Porovnejte pomocĂ­ vhodnĂ©ho statistickĂ©ho testu shodnost stĹ™ednĂ­ch hodnot spotĹ™eby cen u automobilĹŻ pochĂˇzejĂ­cĂ­ch z rĹŻznĂ˝ch kontinentĹŻ a podle poÄŤtu vĂˇlcĹŻ (faktorizovanĂˇ promÄ›nnĂˇ). ZdĹŻvodnÄ›te zdali tyto statistickĂ© testy jsou vypovĂ­dajĂ­cĂ­ a zdali lze z nich urÄŤit dĹŻleĹľitost danĂ˝ch promÄ›nnĂ˝ch pro predikci ceny automobilu.
 
-Jako statistický test použijeme rozšíření t-testu, tzv. one-way anova test.
-Je alternativou t-testu, pokud máme více než 2 faktory. Tento test předpokládá normalitu dat v každém faktoru a stejné rozptyly napříc faktory (mělo by se ověřit).
-Pokud bychom nesplnili tyto požadavky, lze použít jako alternativu Kruskalův test.
+Jako statistickĂ˝ test pouĹľijeme rozĹˇĂ­Ĺ™enĂ­ t-testu, tzv. one-way anova test.
+Je alternativou t-testu, pokud mĂˇme vĂ­ce neĹľ 2 faktory. Tento test pĹ™edpoklĂˇdĂˇ normalitu dat v kaĹľdĂ©m faktoru a stejnĂ© rozptyly napĹ™Ă­c faktory (mÄ›lo by se ovÄ›Ĺ™it).
+Pokud bychom nesplnili tyto poĹľadavky, lze pouĹľĂ­t jako alternativu KruskalĹŻv test.
 
 
-Vykreslíme obrázky zvlášť pro origin a pro cylinders.
+VykreslĂ­me obrĂˇzky zvlĂˇĹˇĹĄ pro origin a pro cylinders.
 ```{r}
 library("ggpubr")
 p1 <- ggline(data_mpghp, x = 'origin', y = 'consumption', 
@@ -496,7 +491,7 @@ plot(figure)
 
 ```
 
-Z obrázku vidíme, že střední hodnoty nabývají na první pohled různých hodnot mezi faktory. Podíváme se na výsledky testů.
+Z obrĂˇzku vidĂ­me, Ĺľe stĹ™ednĂ­ hodnoty nabĂ˝vajĂ­ na prvnĂ­ pohled rĹŻznĂ˝ch hodnot mezi faktory. PodĂ­vĂˇme se na vĂ˝sledky testĹŻ.
 ```{r}
 summary(aov(consumption~origin,data_mpghp))
 kruskal.test(consumption~origin,data_mpghp)
@@ -507,12 +502,12 @@ kruskal.test(consumption~cylinders,data_mpghp)
 ```
 
 
-V obou případech vidíme velmi nízkou p-hodnotu, která znamená, že zamítáme nulovou hypotézu, tedy rovnost středních hodnot. Kruskalův test to pro origin i cylinders potvrzuje.
+V obou pĹ™Ă­padech vidĂ­me velmi nĂ­zkou p-hodnotu, kterĂˇ znamenĂˇ, Ĺľe zamĂ­tĂˇme nulovou hypotĂ©zu, tedy rovnost stĹ™ednĂ­ch hodnot. KruskalĹŻv test to pro origin i cylinders potvrzuje.
 
-Pokud by nastala situace, že by se střední hodnoty consumption rovnali pro nějakou faktorovou proměnnou pro každý faktor, pak si myslím, že daná faktorová proměnná nebude mít
-příliš velký vliv na vysvětlovanou proměnnou (zanedbatelný či žádný vliv), kvůli rovnostem středních hodnot se jednotlivé hodnoty v různých faktorech budou 'dost podobat' a tím pádem v podstatě různé faktory nebudou mít vliv na změnu spotřeby.
+Pokud by nastala situace, Ĺľe by se stĹ™ednĂ­ hodnoty consumption rovnali pro nÄ›jakou faktorovou promÄ›nnou pro kaĹľdĂ˝ faktor, pak si myslĂ­m, Ĺľe danĂˇ faktorovĂˇ promÄ›nnĂˇ nebude mĂ­t
+pĹ™Ă­liĹˇ velkĂ˝ vliv na vysvÄ›tlovanou promÄ›nnou (zanedbatelnĂ˝ ÄŤi ĹľĂˇdnĂ˝ vliv), kvĹŻli rovnostem stĹ™ednĂ­ch hodnot se jednotlivĂ© hodnoty v rĹŻznĂ˝ch faktorech budou 'dost podobat' a tĂ­m pĂˇdem v podstatÄ› rĹŻznĂ© faktory nebudou mĂ­t vliv na zmÄ›nu spotĹ™eby.
 
-Můžeme tuto myšlenku demonstrovat na příkladu. Uměle vytvoříme 3-faktorovou proměnnou, kde se v každém faktoru bude rovnat střední hodnota vysvětlované veličiny (generovaná z normálního rozdělení). Následně uděláme stejný experiment, jen s tím rozdílem, že se střední hodnoty rovnat nebudou.
+MĹŻĹľeme tuto myĹˇlenku demonstrovat na pĹ™Ă­kladu. UmÄ›le vytvoĹ™Ă­me 3-faktorovou promÄ›nnou, kde se v kaĹľdĂ©m faktoru bude rovnat stĹ™ednĂ­ hodnota vysvÄ›tlovanĂ© veliÄŤiny (generovanĂˇ z normĂˇlnĂ­ho rozdÄ›lenĂ­). NĂˇslednÄ› udÄ›lĂˇme stejnĂ˝ experiment, jen s tĂ­m rozdĂ­lem, Ĺľe se stĹ™ednĂ­ hodnoty rovnat nebudou.
 
 ```{r}
 x <- seq(-20, 20, by = .1)
@@ -538,9 +533,9 @@ summary(lm)
 
 ```
 
-Ze summary funkce vidíme, že žádná z faktorů neovlivňuje vysvětlovanou veličinu a tudíž je zbytečné regresovat podle této proměnné (obrovské p-hodnoty koeficientů).
+Ze summary funkce vidĂ­me, Ĺľe ĹľĂˇdnĂˇ z faktorĹŻ neovlivĹuje vysvÄ›tlovanou veliÄŤinu a tudĂ­Ĺľ je zbyteÄŤnĂ© regresovat podle tĂ©to promÄ›nnĂ© (obrovskĂ© p-hodnoty koeficientĹŻ).
 
-Nyní uvedeme případ, kdy se střední hodnoty rovnat nebudou.
+NynĂ­ uvedeme pĹ™Ă­pad, kdy se stĹ™ednĂ­ hodnoty rovnat nebudou.
 
 ```{r}
 x <- seq(-20, 20, by = .1)
@@ -566,11 +561,11 @@ summary(lm)
 
 ```
 
-V tomto případě už je závislost zřejmá (p-hodnoty jsou extrémně nízké).
+V tomto pĹ™Ă­padÄ› uĹľ je zĂˇvislost zĹ™ejmĂˇ (p-hodnoty jsou extrĂ©mnÄ› nĂ­zkĂ©).
 
-## Otázka č.16: Zkonstruujte lineární model popisující spotřebu automobilu s využitím všech dostupných proměnných, kde bude přítomna interakce nejvýše dvou proměnných. Na základě kritérií jako jsou AIC, BIC, R^2, F, atd. vyberte nejvhodnější model. Ten validujte a okomentujte jeho výběr.
+## OtĂˇzka ÄŤ.16: Zkonstruujte lineĂˇrnĂ­ model popisujĂ­cĂ­ spotĹ™ebu automobilu s vyuĹľitĂ­m vĹˇech dostupnĂ˝ch promÄ›nnĂ˝ch, kde bude pĹ™Ă­tomna interakce nejvĂ˝Ĺˇe dvou promÄ›nnĂ˝ch. Na zĂˇkladÄ› kritĂ©riĂ­ jako jsou AIC, BIC, R^2, F, atd. vyberte nejvhodnÄ›jĹˇĂ­ model. Ten validujte a okomentujte jeho vĂ˝bÄ›r.
 
-V modelu nebudeme uvažovat všechny pomocné proměnné, co jsme si v průběhu zpracování protokolu vytvořili. Dále nebudeme uvažovat car_name, jelikož bychom dostali extrémní počet faktorů a také proměnnou producer kvůli vysokému počtu faktorů a také zřejmé kolinearitě s origin (mohli bychom sloučit producery z jedné země do jednoho, viz obrázek).
+V modelu nebudeme uvaĹľovat vĹˇechny pomocnĂ© promÄ›nnĂ©, co jsme si v prĹŻbÄ›hu zpracovĂˇnĂ­ protokolu vytvoĹ™ili. DĂˇle nebudeme uvaĹľovat car_name, jelikoĹľ bychom dostali extrĂ©mnĂ­ poÄŤet faktorĹŻ a takĂ© promÄ›nnou producer kvĹŻli vysokĂ©mu poÄŤtu faktorĹŻ a takĂ© zĹ™ejmĂ© kolinearitÄ› s origin (mohli bychom slouÄŤit producery z jednĂ© zemÄ› do jednoho, viz obrĂˇzek).
 
 ```{r}
 p <- ggplot(data_mpghp, aes(x=producer, y=consumption, color = origin))+geom_point()+theme(axis.text.x = element_text(angle = 75))
@@ -578,9 +573,9 @@ plot(p)
 
 ```
 
-Proměnnou cylinders v případě vícerozměrné regrese budeme uvažovat jako numerickou proměnnou, jednak kvůli snížení počtu faktorů v modelu (origin dohromady s model_year už dají 14 faktorů) a také kvůli přesnější detekci multikolinearity mezi numerickými proměnnými.
+PromÄ›nnou cylinders v pĹ™Ă­padÄ› vĂ­cerozmÄ›rnĂ© regrese budeme uvaĹľovat jako numerickou promÄ›nnou, jednak kvĹŻli snĂ­ĹľenĂ­ poÄŤtu faktorĹŻ v modelu (origin dohromady s model_year uĹľ dajĂ­ 14 faktorĹŻ) a takĂ© kvĹŻli pĹ™esnÄ›jĹˇĂ­ detekci multikolinearity mezi numerickĂ˝mi promÄ›nnĂ˝mi.
 
-Nachystáme tedy maximálně veliký model s interakcemi.
+NachystĂˇme tedy maximĂˇlnÄ› velikĂ˝ model s interakcemi.
 
 ```{r}
 data_mpghp$cylinders = as.numeric(as.character(data_mpghp$cylinders))
@@ -589,10 +584,10 @@ summary(lm_all)
 
 ```
 
-Kolinearita v modelu je zřejmá. Vzhledem k následujícím otázkám její řešení odložíme na později a teď ji vynecháme.
-Použijeme AIC i BIC hodnoty k určení nejvhodnějšího modelu z lm_all. Pak výsledné modely z obou metod porovnáme pomocí anova() a vybereme ten vhodnější.
+Kolinearita v modelu je zĹ™ejmĂˇ. Vzhledem k nĂˇsledujĂ­cĂ­m otĂˇzkĂˇm jejĂ­ Ĺ™eĹˇenĂ­ odloĹľĂ­me na pozdÄ›ji a teÄŹ ji vynechĂˇme.
+PouĹľijeme AIC i BIC hodnoty k urÄŤenĂ­ nejvhodnÄ›jĹˇĂ­ho modelu z lm_all. Pak vĂ˝slednĂ© modely z obou metod porovnĂˇme pomocĂ­ anova() a vybereme ten vhodnÄ›jĹˇĂ­.
 
-Vypisovat celou proceduru by zabralo mnoho stran, tak zde vypisování outputu z funkce vynechám a uvedeme jen porovnání a summary výsledného modelu.
+Vypisovat celou proceduru by zabralo mnoho stran, tak zde vypisovĂˇnĂ­ outputu z funkce vynechĂˇm a uvedeme jen porovnĂˇnĂ­ a summary vĂ˝slednĂ©ho modelu.
 
 ```{r}
 lm_temp_aic <- stepAIC(lm_all,direction='backward', trace=FALSE) # AIC
@@ -600,33 +595,33 @@ lm_temp_bic <- stepAIC(lm_all,direction='backward', k=log(nrow(data_mpghp)), tra
 
 ```
 
-Porovnáme oba modely pomocí anova()
+PorovnĂˇme oba modely pomocĂ­ anova()
 
 ```{r}
 anova(lm_temp_bic,lm_temp_aic)
 
 ```
 
-Z nízké hodnoty vychází, že anova() preferuje model získaný metodou AIC. Budeme tedy pokračovat s lm_temp_aic. Detaily modelu vypíšeme pomocí summary funkce.
+Z nĂ­zkĂ© hodnoty vychĂˇzĂ­, Ĺľe anova() preferuje model zĂ­skanĂ˝ metodou AIC. Budeme tedy pokraÄŤovat s lm_temp_aic. Detaily modelu vypĂ­Ĺˇeme pomocĂ­ summary funkce.
 ```{r}
 summary(lm_temp_aic)
 ```
 
-Pokusíme se nyní validovat OLS předpoklady. Začneme normalitou.
+PokusĂ­me se nynĂ­ validovat OLS pĹ™edpoklady. ZaÄŤneme normalitou.
 ```{r}
 plot(lm_temp_aic,which=2)
 
 ```
-QQ plot nevypadá příliš dobře, je tam příliš velké odchýlení chvostů. Podíváme se na shapirův test.
+QQ plot nevypadĂˇ pĹ™Ă­liĹˇ dobĹ™e, je tam pĹ™Ă­liĹˇ velkĂ© odchĂ˝lenĂ­ chvostĹŻ. PodĂ­vĂˇme se na shapirĹŻv test.
 ```{r}
 shapiro.test(residuals(lm_temp_aic))
 ```
 
-p-hodnota je příliš nízká, shapirův test normalitu zamítá. OLS poždavaky tento model nesplňuje. V dalších otázkách budeme zkoušet různé transformace z důvodu zlepšení normality. Problémy s normalitou mohou být také způsobeny multikolinearitou v modelu, kterou budeme také teprve zkoumat.
+p-hodnota je pĹ™Ă­liĹˇ nĂ­zkĂˇ, shapirĹŻv test normalitu zamĂ­tĂˇ. OLS poĹľdavaky tento model nesplĹuje. V dalĹˇĂ­ch otĂˇzkĂˇch budeme zkouĹˇet rĹŻznĂ© transformace z dĹŻvodu zlepĹˇenĂ­ normality. ProblĂ©my s normalitou mohou bĂ˝t takĂ© zpĹŻsobeny multikolinearitou v modelu, kterou budeme takĂ© teprve zkoumat.
 
-## Otázka č.17: Pro vybraný model z předchozí otázky vyzkoušejte jak logaritmickou transformaci odezvy, tak Box-Coxovu transformaci pro zlepšení normality reziduí. Vykreslete optimální log-věrohodnostní profil u Box-Coxovy transformace a porovnejte navrženou mocninou transformaci s logaritmickou. Pro který model se rozhodnete a proč?
+## OtĂˇzka ÄŤ.17: Pro vybranĂ˝ model z pĹ™edchozĂ­ otĂˇzky vyzkouĹˇejte jak logaritmickou transformaci odezvy, tak Box-Coxovu transformaci pro zlepĹˇenĂ­ normality reziduĂ­. Vykreslete optimĂˇlnĂ­ log-vÄ›rohodnostnĂ­ profil u Box-Coxovy transformace a porovnejte navrĹľenou mocninou transformaci s logaritmickou. Pro kterĂ˝ model se rozhodnete a proÄŤ?
 
-Jako první provedeme logaritmickou transformaci.
+Jako prvnĂ­ provedeme logaritmickou transformaci.
 
 ```{r}
 form = 'log(consumption) ~ cylinders + displacement + horsepower + weight + 
@@ -641,7 +636,7 @@ summary(lm_final_log)
 
 ```
 
-Zkusíme tento model validovat.
+ZkusĂ­me tento model validovat.
 
 ```{r}
 par(mfrow = c(1,2))
@@ -650,15 +645,15 @@ plot(lm_final_log,which=2)
 
 
 ```
-QQ plot i residuals vs fitted vypadají velmi hezky. Podíváme se, co říká Shapirův test.
+QQ plot i residuals vs fitted vypadajĂ­ velmi hezky. PodĂ­vĂˇme se, co Ĺ™Ă­kĂˇ ShapirĹŻv test.
 
 ```{r}
 shapiro.test(residuals(lm_final_log))
 ```
 
-Ten normalitu nezamítá, takže zde logaritmická transformace pomohla k lepšími splnění OLS požadavků.
+Ten normalitu nezamĂ­tĂˇ, takĹľe zde logaritmickĂˇ transformace pomohla k lepĹˇĂ­mi splnÄ›nĂ­ OLS poĹľadavkĹŻ.
 
-Zkusíme Box-Coxovu transformaci.
+ZkusĂ­me Box-Coxovu transformaci.
 ```{r}
 library(MASS)
 bc <- boxcox(lm_temp_aic)
@@ -667,7 +662,7 @@ lambda <- bc$x[which.max(bc$y)]
 ```
 
 
-Nastavíme příslušný model.
+NastavĂ­me pĹ™Ă­sluĹˇnĂ˝ model.
 
 ```{r}
 form_lambda = '(consumption^lambda - 1)/lambda ~ cylinders + displacement + horsepower + weight + 
@@ -693,28 +688,25 @@ plot(lm_final_bc,which=1)
 
 ```
 
-Oba ploty vypadají hezky, podíváme se ještě na normalitu pomocí Shapirova testu.
+Oba ploty vypadajĂ­ hezky, podĂ­vĂˇme se jeĹˇtÄ› na normalitu pomocĂ­ Shapirova testu.
 
 ```{r}
 shapiro.test(residuals(lm_final_bc))
 
 ```
-Normalita krásně prochází.
-Zdá se, že model s box-cox transformací je co se týče R^2 statistiky a splnění OLS požadavků
-na tom velmi podobně jako model s log transformací nakonec bych se asi rozhodl pro box-cox model, který vykazuje o chloupek lepší R^2 statistiku a vyšší hodnotu p-statistiky Shapirova testu určující normalitu reziduí.
+Normalita krĂˇsnÄ› prochĂˇzĂ­.
+Vzhledemk téměř nulové hodnotě lambda bych se nakonec rozhodl pro model s log-transformovanou spotřebou. OLS požadavky prochází u obou modelů a box-coxovým modelem bychom si téměř znemožnily interpretabilitu. Navíc pro lambda blízké k 0 se tato transformace blíží k logaritmické.
 
 
 
-## Otázka č.18: Pro model s log-transformovanou spotřebou v bodě 16 vypočtěte procentuální navýšení/pokles spotřeby automobilu při změně váhy o 1000kg. Porovnejte, jak se změnil vliv spotřeby na váze s porovnáním s modelem z bodu 8.
+## OtĂˇzka ÄŤ.18: Pro model s log-transformovanou spotĹ™ebou v bodÄ› 16 vypoÄŤtÄ›te procentuĂˇlnĂ­ navĂ˝ĹˇenĂ­/pokles spotĹ™eby automobilu pĹ™i zmÄ›nÄ› vĂˇhy o 1000kg. Porovnejte, jak se zmÄ›nil vliv spotĹ™eby na vĂˇze s porovnĂˇnĂ­m s modelem z bodu 8.
 
-Použili jsme log transformaci a v takovém případě změna spotřeby v závislosti na váze
-bude záviset na počáteční váze, od které změnu počítáme (změna je nelineární), nelze tedy určit obecně, jaká bude procentuální změna.
+Opět se zde bude jednat o procentuální/multiplikativní vztah mezi jednotlivými odezvami. Jelikož ještě model nemáme ošetřený vzhledem ke kolinearitě, tuto otázku zodpovím až u finálního modelu.
 
-Model z otázky 16 obsahuje kromě samotné weight i interakce s weight, takže pak není zřejmé, jaký přesně má vliv určitá změna váhy na spotřebu, každopádně pokud bychom zanedbali interakce s weight , pak má weight opačný vliv než v modelu z otázky 9, tj. při zvyšování váhy spotřeba klesá - bez interakcí a ostatních nezávislých proměnných by ale takový model pak nedával s takovou závislostí příliš smysl.
 
-## Otázka č.19: Spočtěte korelace mezi všemi dostupnými proměnnými, kde to dává smysl a u korelovaných proměnných se pokuste zdůvodnit důvod této korelace. Zkoumejte případnou multikolinearitu ve vašem finálním modelu z bodu 16 a pomocí podmíněné matice regresorů, VIF a dalších nástrojů validujte váš výběr.
+## OtĂˇzka ÄŤ.19: SpoÄŤtÄ›te korelace mezi vĹˇemi dostupnĂ˝mi promÄ›nnĂ˝mi, kde to dĂˇvĂˇ smysl a u korelovanĂ˝ch promÄ›nnĂ˝ch se pokuste zdĹŻvodnit dĹŻvod tĂ©to korelace. Zkoumejte pĹ™Ă­padnou multikolinearitu ve vaĹˇem finĂˇlnĂ­m modelu z bodu 16 a pomocĂ­ podmĂ­nÄ›nĂ© matice regresorĹŻ, VIF a dalĹˇĂ­ch nĂˇstrojĹŻ validujte vĂˇĹˇ vĂ˝bÄ›r.
 
-Na začátek zkoumání kolinearity vyzkoušíme vyzkoušíme kompletní aditivní model bez pomocných proměnných, car_name a producer a necháme si vypsat VIF hodnoty kvůli detekci kolinearity.
+Na zaÄŤĂˇtek zkoumĂˇnĂ­ kolinearity vyzkouĹˇĂ­me vyzkouĹˇĂ­me kompletnĂ­ aditivnĂ­ model bez pomocnĂ˝ch promÄ›nnĂ˝ch, car_name a producer a nechĂˇme si vypsat VIF hodnoty kvĹŻli detekci kolinearity.
 
 ```{r}
 lmm <- lm(consumption ~ (.)-car_name-producer-constant_weight-constant_weight2-mpg,data_mpghp)
@@ -726,18 +718,18 @@ kappa(lmm)
 vif(lmm)
 ```
 
-Vidíme, že vyšší hodnoty VIF jsou u numerických proměnných cylinders,displacement,horsepowera weight, které by mohly být mezi sebou korelované To jde ostatně vidět i ze scatterplotů v první části protokolu. Podíváme se na výstup z ggpairs pro tyto proměnné.
+VidĂ­me, Ĺľe vyĹˇĹˇĂ­ hodnoty VIF jsou u numerickĂ˝ch promÄ›nnĂ˝ch cylinders,displacement,horsepowera weight, kterĂ© by mohly bĂ˝t mezi sebou korelovanĂ© To jde ostatnÄ› vidÄ›t i ze scatterplotĹŻ v prvnĂ­ ÄŤĂˇsti protokolu. PodĂ­vĂˇme se na vĂ˝stup z ggpairs pro tyto promÄ›nnĂ©.
 
 ```{r}
 library(GGally)
 ggpairs(data_mpghp[c("cylinders","displacement","horsepower","weight")])
 ```
 
-Mezi těmito proměnnými je zřejmá kolinearita.
-Z grafů jde vidět, že pokud jedna z proměnných "roste", pak "roste" i druhá, což v podstatě
-sedí i s fyzikálním cítěním úlohy, kde se zdá, že se zvyšující se váhou vozidla musí růst i spotřeba. Totéž, pokud zvyšujeme počet válců, zdvihový objem čí výkon, pak se také zvyšuje spotřeba.
+Mezi tÄ›mito promÄ›nnĂ˝mi je zĹ™ejmĂˇ kolinearita.
+Z grafĹŻ jde vidÄ›t, Ĺľe pokud jedna z promÄ›nnĂ˝ch "roste", pak "roste" i druhĂˇ, coĹľ v podstatÄ›
+sedĂ­ i s fyzikĂˇlnĂ­m cĂ­tÄ›nĂ­m Ăşlohy, kde se zdĂˇ, Ĺľe se zvyĹˇujĂ­cĂ­ se vĂˇhou vozidla musĂ­ rĹŻst i spotĹ™eba. TotĂ©Ĺľ, pokud zvyĹˇujeme poÄŤet vĂˇlcĹŻ, zdvihovĂ˝ objem ÄŤĂ­ vĂ˝kon, pak se takĂ© zvyĹˇuje spotĹ™eba.
 
-Z těchto proměnných bude tedy stačit uvažovat pouze jednu. Která to bude zjistíme postupným "vyhazováním" proměnných s nejvyšší VIF hodnotou. Tímto způsobem nakonec zůstane weight.
+Z tÄ›chto promÄ›nnĂ˝ch bude tedy staÄŤit uvaĹľovat pouze jednu. KterĂˇ to bude zjistĂ­me postupnĂ˝m "vyhazovĂˇnĂ­m" promÄ›nnĂ˝ch s nejvyĹˇĹˇĂ­ VIF hodnotou. TĂ­mto zpĹŻsobem nakonec zĹŻstane weight.
 
 
 ```{r}
@@ -745,9 +737,9 @@ lmm1 <- lm(consumption ~ (.)-car_name-producer-displacement-horsepower-cylinders
 kappa(lmm1)
 vif(lmm1)
 ```
-Podařilo se nám snížit číslo podmíněnosti kappa a také vidíme, že VIF hodnoty u zbývajících proměnných jsou dostatečně nízké, takže se nám kolinearitu podařilo tímto způsobem významně snížit.
+PodaĹ™ilo se nĂˇm snĂ­Ĺľit ÄŤĂ­slo podmĂ­nÄ›nosti kappa a takĂ© vidĂ­me, Ĺľe VIF hodnoty u zbĂ˝vajĂ­cĂ­ch promÄ›nnĂ˝ch jsou dostateÄŤnÄ› nĂ­zkĂ©, takĹľe se nĂˇm kolinearitu podaĹ™ilo tĂ­mto zpĹŻsobem vĂ˝znamnÄ› snĂ­Ĺľit.
 
-Nyní se zaměříme na multikolinearitu v našem fináním modelu z otázky 16. Vypíšeme si číslo podmíněnosti matice regresorů kappa a VIF hodnoty v modelu.
+NynĂ­ se zamÄ›Ĺ™Ă­me na multikolinearitu v naĹˇem finĂˇnĂ­m modelu z otĂˇzky 16. VypĂ­Ĺˇeme si ÄŤĂ­slo podmĂ­nÄ›nosti matice regresorĹŻ kappa a VIF hodnoty v modelu.
 
 
 ```{r}
@@ -755,8 +747,8 @@ kappa(lm_final_log)
 vif(lm_final_log)
 ```
 
-Všechny hodnoty jsou velmi vysoké, multikolinearita v modelu je jasná a musíme ji co nejvíce snížit. Půjdeme na to tímto způsobem: iterativně budeme odebírat proměnné s nejvyšší VIF hodnotou. Někdy se stalo, že se VIF hodnoty pro více proměnných lišily např. na 3 desetinném míste -> zkusil jsem více možností zahazování a výsledné modely porovnal pomocí anova()
-threshold VIF hodnoty pro odebrání proměnné jsem nastavil na 3, ale v pozdějších fázích vyhazování se občas stalo, že jedna VIF hodnota byla nápadně vysoká proti ostatním a blízko 3 (2,8...), tak to jsem také zahodil. Celý postup byl velmi zdlouhavý. Uvedu finální model, který z této procedury vyšel nejlépe.
+VĹˇechny hodnoty jsou velmi vysokĂ©, multikolinearita v modelu je jasnĂˇ a musĂ­me ji co nejvĂ­ce snĂ­Ĺľit. PĹŻjdeme na to tĂ­mto zpĹŻsobem: iterativnÄ› budeme odebĂ­rat promÄ›nnĂ© s nejvyĹˇĹˇĂ­ VIF hodnotou. NÄ›kdy se stalo, Ĺľe se VIF hodnoty pro vĂ­ce promÄ›nnĂ˝ch liĹˇily napĹ™. na 3 desetinnĂ©m mĂ­ste -> zkusil jsem vĂ­ce moĹľnostĂ­ zahazovĂˇnĂ­ a vĂ˝slednĂ© modely porovnal pomocĂ­ anova()
+threshold VIF hodnoty pro odebrĂˇnĂ­ promÄ›nnĂ© jsem nastavil na 3, ale v pozdÄ›jĹˇĂ­ch fĂˇzĂ­ch vyhazovĂˇnĂ­ se obÄŤas stalo, Ĺľe jedna VIF hodnota byla nĂˇpadnÄ› vysokĂˇ proti ostatnĂ­m a blĂ­zko 3 (2,8...), tak to jsem takĂ© zahodil. CelĂ˝ postup byl velmi zdlouhavĂ˝. Uvedu finĂˇlnĂ­ model, kterĂ˝ z tĂ©to procedury vyĹˇel nejlĂ©pe.
 
 ```{r}
 form = "log(consumption) ~ cylinders+ origin + acceleration+
@@ -767,13 +759,13 @@ kappa(lm_final)
 
 ```
 
-Vidíme, že kolinearitu v modelu se nám podařilo velmi výrazně snížit. Podíváme se na model pomocí summary funkce.
+VidĂ­me, Ĺľe kolinearitu v modelu se nĂˇm podaĹ™ilo velmi vĂ˝raznÄ› snĂ­Ĺľit. PodĂ­vĂˇme se na model pomocĂ­ summary funkce.
 
 ```{r}
 summary(lm_final)
 ```
 
-Zkusíme tento model ještě validovat. Podíváme se na diagnostické ploty.
+ZkusĂ­me tento model jeĹˇtÄ› validovat. PodĂ­vĂˇme se na diagnostickĂ© ploty.
 
 ```{r}
 par(mfrow=c(2,2))
@@ -784,24 +776,24 @@ plot(lm_final,which=3)
 
 ```
 
-Ploty vypadají hezky, i když homoskedasticita reziduí v residuals vs fitted plotu je mírně podezřelá.
+Ploty vypadajĂ­ hezky, i kdyĹľ homoskedasticita reziduĂ­ v residuals vs fitted plotu je mĂ­rnÄ› podezĹ™elĂˇ.
 
 ```{r}
 shapiro.test(residuals(lm_final))
 ```
 
-Shapirův test nezamítá normalitu.
+ShapirĹŻv test nezamĂ­tĂˇ normalitu.
 ```{r}
 bptest(lm_final)
 ```
-Bptest těsně zamítá homoskedasticitu.
+Bptest tÄ›snÄ› zamĂ­tĂˇ homoskedasticitu.
 
-## Otázka č.20: Vykreslete tzv. partial regression plot a tzv. partial residual plot pro finální model. Okomentujte, co nám zmíněné grafy říkají o výsledném modelu.
+## OtĂˇzka ÄŤ.20: Vykreslete tzv. partial regression plot a tzv. partial residual plot pro finĂˇlnĂ­ model. Okomentujte, co nĂˇm zmĂ­nÄ›nĂ© grafy Ĺ™Ă­kajĂ­ o vĂ˝slednĂ©m modelu.
 
-Tyto grafy znázorňují vliv jedné nezávislé proměnné na response variable při uvážení vlivu ostatních proměnných v modelu. Partial regression plot se hodí na detekci influenčních bodů,
-navíc sklon regresní přímky v těchto plotech je stejný jako sklon dané proměnné v původním vícerozměrném lineárním modelu. Naproti tomu partial residual plot je vhodný k detekci nelinearity mezi danou proměnnou, může nám odhalit vhodné transformace nezávislých proměnných k zajištění či zlepšení linearity.
+Tyto grafy znĂˇzorĹujĂ­ vliv jednĂ© nezĂˇvislĂ© promÄ›nnĂ© na response variable pĹ™i uvĂˇĹľenĂ­ vlivu ostatnĂ­ch promÄ›nnĂ˝ch v modelu. Partial regression plot se hodĂ­ na detekci influenÄŤnĂ­ch bodĹŻ,
+navĂ­c sklon regresnĂ­ pĹ™Ă­mky v tÄ›chto plotech je stejnĂ˝ jako sklon danĂ© promÄ›nnĂ© v pĹŻvodnĂ­m vĂ­cerozmÄ›rnĂ©m lineĂˇrnĂ­m modelu. Naproti tomu partial residual plot je vhodnĂ˝ k detekci nelinearity mezi danou promÄ›nnou, mĹŻĹľe nĂˇm odhalit vhodnĂ© transformace nezĂˇvislĂ˝ch promÄ›nnĂ˝ch k zajiĹˇtÄ›nĂ­ ÄŤi zlepĹˇenĂ­ linearity.
 
-Jako první vykreslíme partial regression ploty.
+Jako prvnĂ­ vykreslĂ­me partial regression ploty.
 
 ```{r}
 library(car)
@@ -809,9 +801,9 @@ avPlots(lm_final)
 
 ```
 
-Vidíme, že několik bodů bylo znázorněno jako podezřelé influenční body, budeme se jimi zabývat v dalších otázkách.
+VidĂ­me, Ĺľe nÄ›kolik bodĹŻ bylo znĂˇzornÄ›no jako podezĹ™elĂ© influenÄŤnĂ­ body, budeme se jimi zabĂ˝vat v dalĹˇĂ­ch otĂˇzkĂˇch.
 
-Residual plot pomocí podobného balíčku vykreslit nemůžeme (nechce vykreslit pro model s interakcemi). Vykreslíme si interakce a faktorové proměnné alespoň pomocí balíčku effects, i když to není přesně to, co hledáme.
+Residual plot pomocĂ­ podobnĂ©ho balĂ­ÄŤku vykreslit nemĹŻĹľeme (nechce vykreslit pro model s interakcemi). VykreslĂ­me si interakce a faktorovĂ© promÄ›nnĂ© alespoĹ pomocĂ­ balĂ­ÄŤku effects, i kdyĹľ to nenĂ­ pĹ™esnÄ› to, co hledĂˇme.
 
 ```{r}
 library(effects)
@@ -820,9 +812,9 @@ plot(Effect(c("acceleration","weight"), lm_final, partial.residuals = TRUE), nro
 plot(Effect(c("origin"), lm_final, partial.residuals = TRUE), nrow = 1)
 
 ```
-Vidíme, že origin by se teoreticky jako proměnná dala vynechat, jelikož střední hodnoty log(consumption) se pro jednotlivé faktory téměr rovnají a jednotlivé klastry pro každý faktor mají i přibližně stejný rozptyl. Zkusil jsem udělat tuto úpravu a origin z finálního modelu odstranit. Tahle úprava ale vedla k porušení podmínky normality reziduí, proto jsem se tím dál nezabýval.
+VidĂ­me, Ĺľe origin by se teoreticky jako promÄ›nnĂˇ dala vynechat, jelikoĹľ stĹ™ednĂ­ hodnoty log(consumption) se pro jednotlivĂ© faktory tĂ©mÄ›r rovnajĂ­ a jednotlivĂ© klastry pro kaĹľdĂ˝ faktor majĂ­ i pĹ™ibliĹľnÄ› stejnĂ˝ rozptyl. Zkusil jsem udÄ›lat tuto Ăşpravu a origin z finĂˇlnĂ­ho modelu odstranit. Tahle Ăşprava ale vedla k poruĹˇenĂ­ podmĂ­nky normality reziduĂ­, proto jsem se tĂ­m dĂˇl nezabĂ˝val.
 
-Pro acceleration a cylinders vykreslíme partial residual ploty ručně.
+Pro acceleration a cylinders vykreslĂ­me partial residual ploty ruÄŤnÄ›.
 
 
 ```{r}
@@ -830,7 +822,7 @@ coef_acceleration <- lm_final$coefficients['acceleration']
 Y = residuals(lm_final) + coef_acceleration*data_mpghp[,'acceleration']
 X = data_mpghp[,'acceleration']
 plot(X,Y,main = 'Partial residual plot acceleration')
-gamLine(x=X,y=Y) # smooth křivka
+gamLine(x=X,y=Y) # smooth kĹ™ivka
 abline(lm(Y~X),col='red',lwd=2)
 
 ```
@@ -847,66 +839,67 @@ abline(lm(Y~X),col='red',lwd=2)
 ```
 
 
-Pro acceleration i cylinders vypadá linearita dobře. Z toho plyne, že není potřeba aplikovat nějaké transformace vysvětlujících proměnných.
+Pro acceleration i cylinders vypadĂˇ linearita dobĹ™e. Z toho plyne, Ĺľe nenĂ­ potĹ™eba aplikovat nÄ›jakĂ© transformace vysvÄ›tlujĂ­cĂ­ch promÄ›nnĂ˝ch.
 
-## Otázka č.21: Prezentujte váš výsledný model pro predikci consumption, diskutujte výsledné parametry R^2 a sigma tohoto modelu. Pokud jste model nevalidovali v předchozích krocích, tak ho validujte (jak graficky, tak pomocí příslušných testů hypotéz).
+## OtĂˇzka ÄŤ.21: Prezentujte vĂˇĹˇ vĂ˝slednĂ˝ model pro predikci consumption, diskutujte vĂ˝slednĂ© parametry R^2 a sigma tohoto modelu. Pokud jste model nevalidovali v pĹ™edchozĂ­ch krocĂ­ch, tak ho validujte (jak graficky, tak pomocĂ­ pĹ™Ă­sluĹˇnĂ˝ch testĹŻ hypotĂ©z).
 
-Výsledný model pro predikci je
+VĂ˝slednĂ˝ model pro predikci je
 ```{r}
 summary(lm_final)
 
 ```
+Pokud se vrátím k otázce č.18, tak v modelu se vyskytuje weight pouze ve formě interakce s acceleration. Zde není zřejmé, jak se změní acceleration:weight při změně váhy o 1000kg, takže v případě tohoto modelu nelze přesně odpovědět, závisí to na hodnotě acceleration.
 
-Model byl v předchozích krocích validován, normalita reziduí je v pořádku, homoskedasticita vypadá z diagnostických grafů dobře, i když residual vs fitted plot obsahuje minimální náznak nějakého "pevného" vzoru, což by mohlo indikovat lehkou heteroskedasticitu. 
-Hodnota R^2 statistiky je 0.8899 (adjusted R^2 je 0.8846), což je považováno za velmi dobrou hodnotu. Hodnota sigma modelu je přibližně 0.114637.
+
+Model byl v pĹ™edchozĂ­ch krocĂ­ch validovĂˇn, normalita reziduĂ­ je v poĹ™Ăˇdku, homoskedasticita vypadĂˇ z diagnostickĂ˝ch grafĹŻ dobĹ™e, i kdyĹľ residual vs fitted plot obsahuje minimĂˇlnĂ­ nĂˇznak nÄ›jakĂ©ho "pevnĂ©ho" vzoru, coĹľ by mohlo indikovat lehkou heteroskedasticitu. 
+Hodnota R^2 statistiky je 0.8899 (adjusted R^2 je 0.8846), coĹľ je povaĹľovĂˇno za velmi dobrou hodnotu. Hodnota sigma modelu je pĹ™ibliĹľnÄ› 0.114637.
 ```{r}
 sigma(lm_final)
 ```
-Model odhaduje nelineárně transformovanou veličinu log(consumption), což výrazně stěžuje interpretabilitu "kvality" regrese v případě netransformované veličiny consumption. To je bohužel nevýhoda tohoto modelu.
 
-## Otázka č.22: Obsahuje Váš model z bodu 19 nějaká vlivná pozorování? Pokuste se detekovat odlehlé a pákové body pomocí různých diagnostických nástrojů tzv. leave-one-out deletion regression.
+## OtĂˇzka ÄŤ.22: Obsahuje VĂˇĹˇ model z bodu 19 nÄ›jakĂˇ vlivnĂˇ pozorovĂˇnĂ­? Pokuste se detekovat odlehlĂ© a pĂˇkovĂ© body pomocĂ­ rĹŻznĂ˝ch diagnostickĂ˝ch nĂˇstrojĹŻ tzv. leave-one-out deletion regression.
 
-Podiváme se na cook distance a residuals vs leverage
+PodivĂˇme se na cook distance a residuals vs leverage
 ```{r}
 par(mfrow=c(1,2))
 plot(lm_final, which = 4)
 plot(lm_final, which = 5)
 ```
 
-Vlivná pozorování jsou v plotech vyznačena 124,174 a 342.
+VlivnĂˇ pozorovĂˇnĂ­ jsou v plotech vyznaÄŤena 124,174 a 342.
 
-Vypíšeme influence.measures (leave one out regression) a podíváme se na podezřelé influenční body a jejich vliv na různé uvažované metriky (dffit,..).
+VypĂ­Ĺˇeme influence.measures (leave one out regression) a podĂ­vĂˇme se na podezĹ™elĂ© influenÄŤnĂ­ body a jejich vliv na rĹŻznĂ© uvaĹľovanĂ© metriky (dffit,..).
 
 ```{r}
 summary(influence.measures(lm_final))
 
 ```
 
-Z tabulky můžeme vypozorovat, že všechny podezřelé body ovlivňují především covariance ratio
-a hlavní podezřelé body z regression vs leverage plotu také kvalitu fitu (dffits kritérium)
+Z tabulky mĹŻĹľeme vypozorovat, Ĺľe vĹˇechny podezĹ™elĂ© body ovlivĹujĂ­ pĹ™edevĹˇĂ­m covariance ratio
+a hlavnĂ­ podezĹ™elĂ© body z regression vs leverage plotu takĂ© kvalitu fitu (dffits kritĂ©rium)
 
-Vzhledem k tabulce se jako nejvíce podezřelé body jeví 124,174,342 , které mají také největší cook distance. Tato 3 pozorování jsou adepty na odstranění.
+Vzhledem k tabulce se jako nejvĂ­ce podezĹ™elĂ© body jevĂ­ 124,174,342 , kterĂ© majĂ­ takĂ© nejvÄ›tĹˇĂ­ cook distance. Tato 3 pozorovĂˇnĂ­ jsou adepty na odstranÄ›nĂ­.
 
-## Otázka č.23: Pokud jste odhalili nějaká vlivná pozorování, jak byste s nimi naložili a proč?
+## OtĂˇzka ÄŤ.23: Pokud jste odhalili nÄ›jakĂˇ vlivnĂˇ pozorovĂˇnĂ­, jak byste s nimi naloĹľili a proÄŤ?
 
-Našli jsme několik influenčních bodů vzhledem k leave one out regression. Po prozkoumání a srovnání podezřelých hodnot s ostatními (např. s podobnou vahou, výkonem,...) jsem se nakonec rozhodl data z finálního modelu neodstraňovat ani nemodifikovat, protože se nezdá, že by tato pozorování byla ovlivněna nějakou systematickou chybou či by se až příliš nepravděpodobně odchylovala od ostatních záznamů.
+NaĹˇli jsme nÄ›kolik influenÄŤnĂ­ch bodĹŻ vzhledem k leave one out regression. Po prozkoumĂˇnĂ­ a srovnĂˇnĂ­ podezĹ™elĂ˝ch hodnot s ostatnĂ­mi (napĹ™. s podobnou vahou, vĂ˝konem,...) jsem se nakonec rozhodl data z finĂˇlnĂ­ho modelu neodstraĹovat ani nemodifikovat, protoĹľe se nezdĂˇ, Ĺľe by tato pozorovĂˇnĂ­ byla ovlivnÄ›na nÄ›jakou systematickou chybou ÄŤi by se aĹľ pĹ™Ă­liĹˇ nepravdÄ›podobnÄ› odchylovala od ostatnĂ­ch zĂˇznamĹŻ.
 
-## Otázka č.24: Porovnejte regresní koeficienty, které jste obdrželi z výsledného klasického lineárního modelu (s a bez odhledlých pozorování) s robustními modely. Vyzkoušejte MM odhad (pro dva druhy funkce psi) a LTS odhad při použití (90% a 50% pozorování).
+## OtĂˇzka ÄŤ.24: Porovnejte regresnĂ­ koeficienty, kterĂ© jste obdrĹľeli z vĂ˝slednĂ©ho klasickĂ©ho lineĂˇrnĂ­ho modelu (s a bez odhledlĂ˝ch pozorovĂˇnĂ­) s robustnĂ­mi modely. VyzkouĹˇejte MM odhad (pro dva druhy funkce psi) a LTS odhad pĹ™i pouĹľitĂ­ (90% a 50% pozorovĂˇnĂ­).
 
 
-První nastavíme nový dataset bez hlavních influenčních bodů (124,174,342).
+PrvnĂ­ nastavĂ­me novĂ˝ dataset bez hlavnĂ­ch influenÄŤnĂ­ch bodĹŻ (124,174,342).
 
 ```{r}
 data_noinfluential = data_mpghp[!(rownames(data_mpghp) %in% c("124","174","342")),]
 ```
 
-Finální klasický model jsme již v druhé části protokolu vybrali model s logaritmicky škálovanou spotřebou umocněnou na druhou.
+FinĂˇlnĂ­ klasickĂ˝ model jsme jiĹľ v druhĂ© ÄŤĂˇsti protokolu vybrali model s logaritmicky ĹˇkĂˇlovanou spotĹ™ebou umocnÄ›nou na druhou.
 
 ```{r}
 lm_logsquared_noinf = lm(log(consumption)^2 ~ weight,data_noinfluential)
 ```
 
-Nachystáme robustní modely. V MM modelech použijeme jako psi ggw a bisquare.
+NachystĂˇme robustnĂ­ modely. V MM modelech pouĹľijeme jako psi ggw a bisquare.
 
 ```{r}
 library(robustbase)
@@ -918,13 +911,13 @@ MM_ggw   <- rlm(log(consumption)^2 ~ weight, method="MM",psi = psi.ggw, data= da
 ```
 
 
-A LTS s 50% a 90% pozorování.
+A LTS s 50% a 90% pozorovĂˇnĂ­.
 ```{r}
 LTS_50  <- ltsReg(log(consumption)^2 ~ weight, alpha=0.5, data = data_mpghp)
 LTS_90  <- ltsReg(log(consumption)^2 ~ weight, alpha=0.9, data = data_mpghp)
 ```
 
-Nyní vykreslíme scatter plot a regresní přímky všech modelů.
+NynĂ­ vykreslĂ­me scatter plot a regresnĂ­ pĹ™Ă­mky vĹˇech modelĹŻ.
 
 ```{r}
 p <- ggplot(data, aes(x=weight, y=log(consumption)^2)) + geom_point()+
@@ -939,11 +932,11 @@ plot(p)
 ```
 
 
-Regresní přímky jsou v podstatě identické. Pokud by existovaly opravdu silné influenční body, které by odchylovaly přímku z klasického modelu, pak by se klasický model a robustní modely více lišily.
+RegresnĂ­ pĹ™Ă­mky jsou v podstatÄ› identickĂ©. Pokud by existovaly opravdu silnĂ© influenÄŤnĂ­ body, kterĂ© by odchylovaly pĹ™Ă­mku z klasickĂ©ho modelu, pak by se klasickĂ˝ model a robustnĂ­ modely vĂ­ce liĹˇily.
 
-## Otázka č.25: Diskutujte, jak by šlo případně zlepšit predikci, jaké transformace jednotlivých proměnných by mohli pomoci. Převedli byste některé další spojité proměnné na diskrétní (na faktory)? Jaké další kroky byste při analýze navrhli?
+## OtĂˇzka ÄŤ.25: Diskutujte, jak by Ĺˇlo pĹ™Ă­padnÄ› zlepĹˇit predikci, jakĂ© transformace jednotlivĂ˝ch promÄ›nnĂ˝ch by mohli pomoci. PĹ™evedli byste nÄ›kterĂ© dalĹˇĂ­ spojitĂ© promÄ›nnĂ© na diskrĂ©tnĂ­ (na faktory)? JakĂ© dalĹˇĂ­ kroky byste pĹ™i analĂ˝ze navrhli?
 
-Pokud se podíváme na signifikanci jednotlivých proměnných, vidíme, že horsepower:model_year79 až horsepower:model_year 82 jsou méně signifikantní než ostatní, navíc jsme v předchozích otázkách zjistili (z grafů), že by se proměnná model_year dala sloučit na méně faktorů. V tomto případě by možná mohlo pomoci nechat všechny faktory až na 80-82, které bychom sloučily dohromady. Rok 79 bych tam již nepřidával, hodnoty consumption pro tento faktor (a tedy střední hodnota) se od 80-82 značně liší, viz obrázek.
+Pokud se podĂ­vĂˇme na signifikanci jednotlivĂ˝ch promÄ›nnĂ˝ch, vidĂ­me, Ĺľe horsepower:model_year79 aĹľ horsepower:model_year 82 jsou mĂ©nÄ› signifikantnĂ­ neĹľ ostatnĂ­, navĂ­c jsme v pĹ™edchozĂ­ch otĂˇzkĂˇch zjistili (z grafĹŻ), Ĺľe by se promÄ›nnĂˇ model_year dala slouÄŤit na mĂ©nÄ› faktorĹŻ. V tomto pĹ™Ă­padÄ› by moĹľnĂˇ mohlo pomoci nechat vĹˇechny faktory aĹľ na 80-82, kterĂ© bychom slouÄŤily dohromady. Rok 79 bych tam jiĹľ nepĹ™idĂˇval, hodnoty consumption pro tento faktor (a tedy stĹ™ednĂ­ hodnota) se od 80-82 znaÄŤnÄ› liĹˇĂ­, viz obrĂˇzek.
 
 ```{r}
 
@@ -954,15 +947,15 @@ plot(p1)
 
 ```
 
-Co se týče transformací nezávislých proměnných, tak z partial residual plotu jsme nezaznamenali nějaké podezřelé nelineární chování, tím pádem bych transformace nevyužíval.
-Pokud se podíváme ještě jednou na kolinearitu v modelu
+Co se tĂ˝ÄŤe transformacĂ­ nezĂˇvislĂ˝ch promÄ›nnĂ˝ch, tak z partial residual plotu jsme nezaznamenali nÄ›jakĂ© podezĹ™elĂ© nelineĂˇrnĂ­ chovĂˇnĂ­, tĂ­m pĂˇdem bych transformace nevyuĹľĂ­val.
+Pokud se podĂ­vĂˇme jeĹˇtÄ› jednou na kolinearitu v modelu
 ```{r}
 
 vif(lm_final)
 
 ```
 
-Vidíme, že acceleration by mohlo být korelované s acceleration:weight. Zkusíme proto acceleration odstranit (má vyšší VIF než acceleration:weight).
+VidĂ­me, Ĺľe acceleration by mohlo bĂ˝t korelovanĂ© s acceleration:weight. ZkusĂ­me proto acceleration odstranit (mĂˇ vyĹˇĹˇĂ­ VIF neĹľ acceleration:weight).
 
 ```{r}
 
@@ -970,7 +963,7 @@ lm_no_acceleration = lm(log(consumption)~cylinders + origin+horsepower:model_yea
 summary(lm_no_acceleration)
 
 ```
-Dostali jsme model, kde je o něco nižší kolinearita než v původním modelu a všechny použité nezávislé proměnné jsou značně signifikantní. Porovnáme pomocí anova() tento model s původním.
+Dostali jsme model, kde je o nÄ›co niĹľĹˇĂ­ kolinearita neĹľ v pĹŻvodnĂ­m modelu a vĹˇechny pouĹľitĂ© nezĂˇvislĂ© promÄ›nnĂ© jsou znaÄŤnÄ› signifikantnĂ­. PorovnĂˇme pomocĂ­ anova() tento model s pĹŻvodnĂ­m.
 
 ```{r}
 
@@ -978,26 +971,26 @@ anova(lm_no_acceleration,lm_final)
 
 ```
 
-Vidíme, že anova preferuje více původní model.
+VidĂ­me, Ĺľe anova preferuje vĂ­ce pĹŻvodnĂ­ model.
 ```{r}
 
 shapiro.test(residuals(lm_no_acceleration))
 
 ```
-Navíc vidíme, že Shapirův test zamítá normalitu, tudíž tento model nesplňuje OLS předpoklady.
+NavĂ­c vidĂ­me, Ĺľe ShapirĹŻv test zamĂ­tĂˇ normalitu, tudĂ­Ĺľ tento model nesplĹuje OLS pĹ™edpoklady.
 
-## Otázka č.26: Představte si, že máte flotilu aut složenou z dostupných dat. Bez ohledu na nosnost auta (předpokládejme, že to zvládnou všechny) potřebujete převést pro známého z Brna hl. nádraží do Prahy do Trojanovy 13, 800kg nákladu. Jaké auto si vyberete a proč? O kolik se vám cesta prodraží a tudíž by vám měl kamarád zaplatit (neuvažujte amortizaci auta a vezměte cenu 30kč za palivo).
+## OtĂˇzka ÄŤ.26: PĹ™edstavte si, Ĺľe mĂˇte flotilu aut sloĹľenou z dostupnĂ˝ch dat. Bez ohledu na nosnost auta (pĹ™edpoklĂˇdejme, Ĺľe to zvlĂˇdnou vĹˇechny) potĹ™ebujete pĹ™evĂ©st pro znĂˇmĂ©ho z Brna hl. nĂˇdraĹľĂ­ do Prahy do Trojanovy 13, 800kg nĂˇkladu. JakĂ© auto si vyberete a proÄŤ? O kolik se vĂˇm cesta prodraĹľĂ­ a tudĂ­Ĺľ by vĂˇm mÄ›l kamarĂˇd zaplatit (neuvaĹľujte amortizaci auta a vezmÄ›te cenu 30kÄŤ za palivo).
 
-Je zřejmé, že nemůžeme jen tak předpokládat pro libovolné auto, že pokud na něj naložíme nějakou zátěž, tak se jeho spotřeba bude chovat lineárně podle námi nalezeného modelu. Musíme na to jít jinak.
+Je zĹ™ejmĂ©, Ĺľe nemĹŻĹľeme jen tak pĹ™edpoklĂˇdat pro libovolnĂ© auto, Ĺľe pokud na nÄ›j naloĹľĂ­me nÄ›jakou zĂˇtÄ›Ĺľ, tak se jeho spotĹ™eba bude chovat lineĂˇrnÄ› podle nĂˇmi nalezenĂ©ho modelu. MusĂ­me na to jĂ­t jinak.
 
-Můj postup by byl takovýto:
+MĹŻj postup by byl takovĂ˝to:
 
-1. vyrobíme jednoduchý klasický model (lm(consumption ~ weight - 1)- použijeme model bez interceptu, protože auto vážící 0kg logicky nespotřebuje nic, tedy 0l paliva), který nám dá lineární odhad závislosti spotřeby na váze
-2. vytvoříme podobné skupiny aut vzhledem k několika nezávislým proměnným určujícím spotřebu (např. pomocí K-Means algoritmu, určitě by to šlo udělat i důkladněji a jinak)
-, za tyto proměnné zvolíme cylinders,horsepower,acceleration,displacement (zajímají mě především klastry na základě technických parametrů aut, proto origin ani model_year uvažovat nebudeme)
-3. jako poslední krok se podíváme na rezidua u jednotlivých skupin a zjistíme, jak moc přesně tyto skupiny opisují regresní přímku danou modelem a vezmeme tu skupinu, která bude mít nejmenší rezidua (suma reziduí^2 normovaná počtem členů ve skupině) a vizuálně bude opisovat nejlépe regresní přímku. U takových skupin lze očekávat velmi podobné hodnoty v ostatních proměnných (cylinders,horsepower,acceleration,displacement) a tedy můžeme předpokládat, že u aut s takovými technickými parametry se závislost spotřeby na váze automobilu chová "přibližně" lineárně - hrubě si to představuji tak, že zafixujeme ostatní proměnné kromě weight a sleduju změnu spotřeby jen na základě přidávání váhy. Nakonec vybereme jedno auto z této skupiny dle uvážení. Měli bychom vybrat nejlepšího reprezentanta dané skupiny (vektor nejblíže ke středu klastru), pokud bude takových aut více, pak vezmeme to nejlehčí, protože pak máme větší jistotu, že přidáním největší váhy se spotřeba změní lineárně (pokud v této skupině máme nejlehčí auto vážící 1000kg a nejtěžší 1500kg, pak u 1000kg auta naložením 500kg ještě stále můžu předpokládat lineární závislost spotřeby).
+1. vyrobĂ­me jednoduchĂ˝ klasickĂ˝ model (lm(consumption ~ weight - 1)- pouĹľijeme model bez interceptu
+2. vytvoĹ™Ă­me podobnĂ© skupiny aut vzhledem k nÄ›kolika nezĂˇvislĂ˝m promÄ›nnĂ˝m urÄŤujĂ­cĂ­m spotĹ™ebu (napĹ™. pomocĂ­ K-Means algoritmu, urÄŤitÄ› by to Ĺˇlo udÄ›lat i dĹŻkladnÄ›ji a jinak)
+, za tyto promÄ›nnĂ© zvolĂ­me cylinders,horsepower,acceleration,displacement (zajĂ­majĂ­ mÄ› pĹ™edevĹˇĂ­m klastry na zĂˇkladÄ› technickĂ˝ch parametrĹŻ aut, proto origin ani model_year uvaĹľovat nebudeme)
+3. jako poslednĂ­ krok se podĂ­vĂˇme na rezidua u jednotlivĂ˝ch skupin a zjistĂ­me, jak moc pĹ™esnÄ› tyto skupiny opisujĂ­ regresnĂ­ pĹ™Ă­mku danou modelem a vezmeme tu skupinu, kterĂˇ bude mĂ­t nejmenĹˇĂ­ rezidua (suma reziduĂ­^2 normovanĂˇ poÄŤtem ÄŤlenĹŻ ve skupinÄ›) a vizuĂˇlnÄ› bude opisovat nejlĂ©pe regresnĂ­ pĹ™Ă­mku. U takovĂ˝ch skupin lze oÄŤekĂˇvat velmi podobnĂ© hodnoty v ostatnĂ­ch promÄ›nnĂ˝ch (cylinders,horsepower,acceleration,displacement) a tedy mĹŻĹľeme pĹ™edpoklĂˇdat, Ĺľe u aut s takovĂ˝mi technickĂ˝mi parametry se zĂˇvislost spotĹ™eby na vĂˇze automobilu chovĂˇ "pĹ™ibliĹľnÄ›" lineĂˇrnÄ› - hrubÄ› si to pĹ™edstavuji tak, Ĺľe zafixujeme ostatnĂ­ promÄ›nnĂ© kromÄ› weight a sleduju zmÄ›nu spotĹ™eby jen na zĂˇkladÄ› pĹ™idĂˇvĂˇnĂ­ vĂˇhy. Nakonec vybereme jedno auto z tĂ©to skupiny dle uvĂˇĹľenĂ­. MÄ›li bychom vybrat nejlepĹˇĂ­ho reprezentanta danĂ© skupiny (vektor nejblĂ­Ĺľe ke stĹ™edu klastru), pokud bude takovĂ˝ch aut vĂ­ce, pak vezmeme to nejlehÄŤĂ­, protoĹľe pak mĂˇme vÄ›tĹˇĂ­ jistotu, Ĺľe pĹ™idĂˇnĂ­m nejvÄ›tĹˇĂ­ vĂˇhy se spotĹ™eba zmÄ›nĂ­ lineĂˇrnÄ› (pokud v tĂ©to skupinÄ› mĂˇme nejlehÄŤĂ­ auto vĂˇĹľĂ­cĂ­ 1000kg a nejtÄ›ĹľĹˇĂ­ 1500kg, pak u 1000kg auta naloĹľenĂ­m 500kg jeĹˇtÄ› stĂˇle mĹŻĹľu pĹ™edpoklĂˇdat lineĂˇrnĂ­ zĂˇvislost spotĹ™eby).
 
-Rozdělíme do 20 klastrů pomocí KMeans a nastavíme model
+RozdÄ›lĂ­me do 20 klastrĹŻ pomocĂ­ KMeans a nastavĂ­me model
 
 ```{r}
 data_temp = data_mpghp[,c('cylinders','displacement','horsepower','acceleration')]
@@ -1008,7 +1001,7 @@ data_mpghp$clusters = clusters$cluster
 lm_classic <- lm(consumption ~ weight - 1, data_mpghp)
 ```
 
-Jako první si vykreslíme regresní přímky a scatterploty všech 20 skupin, vizuálně jsem zúžil výběr na 3 adepty, které dobře opisují regresní přímku a ve kterých se vyskytují auta s dostatečným váhovým rozdílem (potřebujeme linearitu při naložení 800kg, takže pokud jsou auta ve skupině s přibližně stejnou hmotností, moc nám to nepomůže), grafy zde znázorním
+Jako prvnĂ­ si vykreslĂ­me regresnĂ­ pĹ™Ă­mky a scatterploty vĹˇech 20 skupin, vizuĂˇlnÄ› jsem zĂşĹľil vĂ˝bÄ›r na 3 adepty, kterĂ© dobĹ™e opisujĂ­ regresnĂ­ pĹ™Ă­mku a ve kterĂ˝ch se vyskytujĂ­ auta s dostateÄŤnĂ˝m vĂˇhovĂ˝m rozdĂ­lem (potĹ™ebujeme linearitu pĹ™i naloĹľenĂ­ 800kg, takĹľe pokud jsou auta ve skupinÄ› s pĹ™ibliĹľnÄ› stejnou hmotnostĂ­, moc nĂˇm to nepomĹŻĹľe), grafy zde znĂˇzornĂ­m
 
 adepti: cluster 2,4,11
 
@@ -1032,7 +1025,7 @@ plot(figure)
 
 
 
-Nyní spočítáme a porovnáme sumu normovaných reziduí^2 pro tyto skupiny.
+NynĂ­ spoÄŤĂ­tĂˇme a porovnĂˇme sumu normovanĂ˝ch reziduĂ­^2 pro tyto skupiny.
 
 
 ```{r}
@@ -1052,7 +1045,7 @@ sum_res_11
 
 ```
 
-Nejlépe vychází klastr číslo 11. Jako nejlepšího reprezentanta této skupiny vezmeme bod nejblíže středu klastru, tj. bod nejblíže k (vzhledem k euklidovské metrice)
+NejlĂ©pe vychĂˇzĂ­ klastr ÄŤĂ­slo 11. Jako nejlepĹˇĂ­ho reprezentanta tĂ©to skupiny vezmeme bod nejblĂ­Ĺľe stĹ™edu klastru, tj. bod nejblĂ­Ĺľe k (vzhledem k euklidovskĂ© metrice)
 
 ```{r}
 
@@ -1060,16 +1053,16 @@ center = clusters$centers[11,]
 center
 ```
 
-Nejbližší bod z této skupiny je Toyota Cressida z roku 81 vážící přibližně 1315kg. Volil bych tedy toto auto. Jako alternativu by ještě mohl být druhý nejbližší bod, kterým je auto Oldsmobile Omega Brougham z roku 79, které váží o něco méně, a to přibližně 1225kg.
+NejbliĹľĹˇĂ­ bod z tĂ©to skupiny je Toyota Cressida z roku 81 vĂˇĹľĂ­cĂ­ pĹ™ibliĹľnÄ› 1315kg. Volil bych tedy toto auto. Jako alternativu by jeĹˇtÄ› mohl bĂ˝t druhĂ˝ nejbliĹľĹˇĂ­ bod, kterĂ˝m je auto Oldsmobile Omega Brougham z roku 79, kterĂ© vĂˇĹľĂ­ o nÄ›co mĂ©nÄ›, a to pĹ™ibliĹľnÄ› 1225kg.
 
-Vzhledem k předchozí úvaze by se u těchto aut s velmi podobnými technickými parametry měla spotřeba na zvyšující se (pouze) hmotnosti měnit přibližně lineárně.
+Vzhledem k pĹ™edchozĂ­ Ăşvaze by se u tÄ›chto aut s velmi podobnĂ˝mi technickĂ˝mi parametry mÄ›la spotĹ™eba na zvyĹˇujĂ­cĂ­ se (pouze) hmotnosti mÄ›nit pĹ™ibliĹľnÄ› lineĂˇrnÄ›.
 
-Kamarád by tedy za převoz 800kg nákladu zaplatil 
-(koeficient weight v lin. modelu)* (800kg) *(vzdálenost Brno hl.n. - Praha Trojanova 13 v jednotkách 100km)*30 =
+KamarĂˇd by tedy za pĹ™evoz 800kg nĂˇkladu zaplatil 
+(koeficient weight v lin. modelu)* (800kg) *(vzdĂˇlenost Brno hl.n. - Praha Trojanova 13 v jednotkĂˇch 100km)*30 =
 ```{r}
 0.0083554*800*2.05*30
 ```
-Tedy přibližně 411 Kč.
+Tedy pĹ™ibliĹľnÄ› 411 KÄŤ.
 
 
 

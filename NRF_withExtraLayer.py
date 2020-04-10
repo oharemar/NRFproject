@@ -7,9 +7,12 @@ import copy
 class NeuralTree_extraLayer():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1, cost = 'CrossEntropy'):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1, cost = 'CrossEntropy',
+                 penultimate_func = 'LeakyReLU', alpha = 0.01):
 
         self.decision_tree = decision_tree
+        self.penultimate_func = penultimate_func
+        self.alpha = alpha
         self.gamma_output = gamma_output
         self.gamma = gamma
         self.gamma_sigmoid = gamma_sigmoid
@@ -154,7 +157,8 @@ class NeuralTree_extraLayer():
                                         len(self.inner_nodes),
                                         len(self.leaves),
                                         self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=self.gamma,
-                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func,gamma_sigmoid=self.gamma_sigmoid)
+                               gamma_output=self.gamma_output,cost=cost,output_func=self.output_func,gamma_sigmoid=self.gamma_sigmoid,penultimate_func=self.penultimate_func,
+                               alpha=self.alpha)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
@@ -193,4 +197,14 @@ class NeuralTree_extraLayer():
         for d in data:
             prediction = np.argmax(self.network.feedforward(d))
             predictions.append(prediction)
+        return np.array(predictions)
+
+    def predict_prob(self, X_test):
+
+        data = list(X_test)
+        data = [d.reshape(-1, 1) for d in data]
+        predictions = np.zeros((X_test.shape[0],self.decision_tree.n_classes_))
+        for d,j in zip(data,range(len(data))):
+            prediction = self.network.feedforward(d).reshape(1,-1)
+            predictions[j,:] = prediction
         return np.array(predictions)

@@ -1,4 +1,4 @@
-from ANN_withExtraLayer_analyticWeights_twoetas import Network
+from ANN_forNRF_withExtraLayerCombined_boosted import Network
 from CostFunctions import *
 import numpy as np
 import copy
@@ -7,12 +7,12 @@ import copy
 class NeuralTree_extraLayer_analyticWeights():
 
     def __init__(self, decision_tree = None, X_train = None, y_train = None,
-                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1,learning_rate1 = 0.1,learning_rate2 = 0.1,
-                 cost = 'CrossEntropy'):
+                 output_func = 'sigmoid',gamma_output = 1, gamma = [15,15], gamma_sigmoid = 1,
+                 cost = 'CrossEntropy',penultimate_func = 'LeakyReLU', alpha = 0.01):
 
         self.decision_tree = decision_tree
-        self.learning_rate1 = learning_rate1
-        self.learning_rate2 = learning_rate2
+        self.alpha = alpha
+        self.penultimate_func = penultimate_func
         self.gamma_output = gamma_output
         self.gamma = gamma
         self.gamma_sigmoid = gamma_sigmoid
@@ -148,7 +148,10 @@ class NeuralTree_extraLayer_analyticWeights():
 
         for label in range(self.decision_tree.n_classes_):
             probs = leaves_probs[label, :].reshape(-1, 1)
-            probs = sigmoid_inverse(probs, self.gamma_sigmoid) # assumed that penultimate layer is sigmoid layer
+            if self.penultimate_func == 'sigmoid':
+                probs = sigmoid_inverse(probs, self.gamma_sigmoid) # assumed that penultimate layer is sigmoid layer
+            if self.penultimate_func == 'LeakyReLU':
+                probs = leaky_relu_inverse(probs, self.alpha)
             weight = np.dot(inverse_A, probs)
             weights[label, :] = weight.reshape(1, -1)
 
@@ -170,12 +173,12 @@ class NeuralTree_extraLayer_analyticWeights():
                                         len(self.leaves),
                                         self.decision_tree.n_classes_,self.decision_tree.n_classes_],biases=self.biases,weights=self.weights,gamma=self.gamma,
                                gamma_output=self.gamma_output,cost=cost,output_func=self.output_func,gamma_sigmoid=self.gamma_sigmoid,
-                               learn_rate1=self.learning_rate1,learn_rate2=self.learning_rate2)
+                               penultimate_func=self.penultimate_func,alpha = self.alpha)
 
     """now will come methods for training, prediction etc., but it could be easily obtained from already existing methods of Network()"""
 
 
-    def train_NRF(self, epochs, mini_batch_size, lmbda = 0.0,
+    def train_NRF(self, epochs, mini_batch_size, eta,lmbda = 0.0,
             evaluation_data=None, monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False, monitor_training_cost=False,
             monitor_training_accuracy=False):
@@ -193,7 +196,7 @@ class NeuralTree_extraLayer_analyticWeights():
         for j in range(len(train_data)):
             train_data_aligned.append((train_data[j][0].reshape(-1, 1), train_data[j][1]))
 
-        evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,
+        evaluation_cost, evaluation_accuracy, training_cost, training_accuracy = self.network.SGD(training_data=train_data_aligned,epochs=epochs,mini_batch_size=mini_batch_size,eta = eta,
                             num_classes=num_classes, lmbda=lmbda,
                             evaluation_data=evaluation_data, monitor_evaluation_cost= monitor_evaluation_cost,
                             monitor_evaluation_accuracy=monitor_evaluation_accuracy, monitor_training_cost=monitor_training_cost,
@@ -209,4 +212,14 @@ class NeuralTree_extraLayer_analyticWeights():
         for d in data:
             prediction = np.argmax(self.network.feedforward(d))
             predictions.append(prediction)
+        return np.array(predictions)
+
+    def predict_prob(self, X_test):
+
+        data = list(X_test)
+        data = [d.reshape(-1, 1) for d in data]
+        predictions = np.zeros((X_test.shape[0],self.decision_tree.n_classes_))
+        for d,j in zip(data,range(len(data))):
+            prediction = self.network.feedforward(d).reshape(1,-1)
+            predictions[j,:] = prediction
         return np.array(predictions)

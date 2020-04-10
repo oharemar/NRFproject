@@ -1,5 +1,26 @@
 import numpy as np
 
+
+def relu(z):
+    return np.maximum(0,z)
+
+def derivation_relu(z):
+    return derivation_leaky_relu(z,0)
+
+def leaky_relu(z,alpha = 0.01):
+    return np.maximum(alpha*z,z)
+
+def derivation_leaky_relu(z,alpha = 0.01):
+    dx = np.ones_like(z)
+    dx[z < 0] = alpha
+    return dx
+
+def leaky_relu_inverse(z,alpha = 0.01):
+    dx = np.zeros_like(z)
+    dx[z < 0] = z[z<0]*(1/alpha)
+    dx[z>0] = z[z>0]
+    return dx
+
 def sigmoid(z,gamma): # sigmoid function, gamma is hyperparameter
     return 1.0/(1.0+ np.exp(-gamma*z))
 def sigmoid_prime (z,gamma): # derivation of sigmoid function
@@ -31,7 +52,7 @@ def softmax(z,gamma = 1):
     sum = np.sum(np.exp(gamma*z))
     return np.exp(gamma*z)/sum
 
-def softmax_inverse(z,gamma=1):
+def softmax_inverse_bad(z,gamma=1):
     x = z.reshape(1,-1).tolist()[0]
     res = np.zeros((len(x),1),dtype=np.float64).reshape(-1,1)
     for val,index in zip(x,range(len(x))):
@@ -45,6 +66,15 @@ def softmax_inverse(z,gamma=1):
             excluded_sum = sum([np.exp(gamma*x[ind]) for ind in range(len(x)) if ind != index])
             arg = excluded_sum * (val/(1-val))
             res[index, 0] = (1/gamma)*np.log(arg)
+    return res
+
+def softmax_inverse(z,gamma=1):
+    #x = z.reshape(1,-1).tolist()[0]
+    #res = np.zeros((len(x),1),dtype=np.float64).reshape(-1,1)
+    x = np.zeros_like(z, dtype= np.float64)
+    x[z==0] = 0.001
+    x[z > 0] = z[z > 0]
+    res =(1/gamma)*np.log(x) # udělal se zde trik, inverze funguje jenom tím směrem, kterým potřebujeme, jinak funkce není invertibilní obecně, nemá zpětnou inverzi
     return res
 
 
