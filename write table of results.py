@@ -31,13 +31,13 @@ for dataset in datasets:
         std1 = {}
         avg2 = {}
         std2 = {}
-        with open('RESULTS_PUBLIC_DATASETS/{}/{}_mean.txt'.format(model,dataset), 'r') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax/{}/{}_mean.txt'.format(model,dataset), 'r') as file:
             avg1 = eval(file.read())
-        with open('RESULTS_PUBLIC_DATASETS/{}/{}_std.txt'.format(model,dataset), 'r') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax/{}/{}_std.txt'.format(model,dataset), 'r') as file:
             std1 = eval(file.read())
-        with open('RESULTS_PUBLIC_DATASETS_averaging/{}/{}_mean.txt'.format(model,dataset), 'r') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax_ave/{}/{}_mean.txt'.format(model,dataset), 'r') as file:
             avg2 = eval(file.read())
-        with open('RESULTS_PUBLIC_DATASETS_averaging/{}/{}_std.txt'.format(model,dataset), 'r') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax_ave/{}/{}_std.txt'.format(model,dataset), 'r') as file:
             std2 = eval(file.read())
         # vytáhneme jednotlivé hodnoty, porovnáme, vybereme maximum a zapíšeme do příslušných tabulek
         val1 = None

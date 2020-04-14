@@ -22,11 +22,11 @@ from statistics import stdev
 import json
 from NeuralRandomForest import NeuralRandomForest
 
-datasets = ['USPS','OBSnetwork'] # pak přidáme USPS a drive diagnosis
+datasets = ['USPS','OBSnetwork','cars','bank_marketing','diabetes','messidor','wine','vehicle_silhouette'] # pak přidáme USPS a drive diagnosis
 
 
 # do modelů pak přidat logistic regression, RF a neuronku z kerasu
-model_names = ['NN','logistic regression','random forest', 'random forest 30 estimators', 'random forest 50 estimators']
+model_names = ['random forest 30 estimators','random forest','random forest 50 estimators']
 
 learn_rates = [0.0065,0.0035,0.0035,0.012,0.002,0.002,0.15,0.01,0.02,0.15,0.005,0.01]
 
@@ -67,10 +67,17 @@ for dataset in datasets:
             if model == 'random forest 50 estimators':
                 mod = RandomForestClassifier(n_estimators=50, criterion='entropy', max_depth=6, max_features='auto')
                 mod.fit(X_train, y_train)
+            elif model == 'random forest 30 estimators':
+                mod = RandomForestClassifier(n_estimators=30, criterion='entropy', max_depth=6, max_features='auto')
+                mod.fit(X_train, y_train)
+            elif model == 'random forest':
+                mod = RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=6, max_features='auto')
+                mod.fit(X_train, y_train)
+
             elif model == 'NN':
                 mod = Sequential()
-                mod.add(Dense(units=40, activation='relu', input_shape=(X_train.shape[1],)))
-                mod.add(Dense(units=20, activation='relu'))
+                mod.add(Dense(units=60, activation='relu', input_shape=(X_train.shape[1],))) # 60 units zkusit
+                mod.add(Dense(units=60, activation='relu'))                                     # 60 units zkusit
                 mod.add(Dense(units=max(y_train) + 1,
                                 activation='softmax'))  # přičítáme 1, protože předpokládáme, že první classa je 0
                 sgd = keras.optimizers.Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999, amsgrad=False)
@@ -112,9 +119,9 @@ for dataset in datasets:
         final_results_vals['macro avg']['f1-score'] = mean([res['macro avg']['f1-score'] for res in results_all])
         final_results_stds['macro avg']['f1-score'] = stdev([res['macro avg']['f1-score'] for res in results_all])
 
-        with open('RESULTS_PUBLIC_DATASETS/{}/{}_mean.txt'.format(model,dataset), 'w') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax/{}/{}_mean.txt'.format(model,dataset), 'w') as file:
             file.write(json.dumps(final_results_vals))
-        with open('RESULTS_PUBLIC_DATASETS/{}/{}_std.txt'.format(model, dataset), 'w') as file:
+        with open('RESULTS_PUBLIC_DATASETS_betterSoftmax/{}/{}_std.txt'.format(model, dataset), 'w') as file:
             file.write(json.dumps(final_results_stds))
 
 

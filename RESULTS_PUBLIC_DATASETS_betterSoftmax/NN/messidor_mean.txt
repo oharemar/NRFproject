@@ -1,1 +1,1 @@
-{"accuracy": 0.7063278750235272, "macro avg": {"precision": 0.7067930442072567, "recall": 0.7072263640669749, "f1-score": 0.70476058477851, "support": 230.2}, "weighted avg": {"precision": 0.71131561649409, "recall": 0.7063278750235272, "f1-score": 0.7065815844774624, "support": 230.2}}
+{"accuracy": 0.7132994541690194, "macro avg": {"precision": 0.7163529578222252, "recall": 0.7150173405190708, "f1-score": 0.7113448590742865, "support": 230.2}, "weighted avg": {"precision": 0.7211304273231249, "recall": 0.7132994541690194, "f1-score": 0.7128888844054094, "support": 230.2}}

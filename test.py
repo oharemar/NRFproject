@@ -42,12 +42,7 @@ plt.ylabel('y')
 plt.show()
 
 '''
-import math
 
-with open('RESULTS_PUBLIC_DATASETS_betterSoftmax_ave/NRF_analyticWeights/OBSnetwork_mean.txt', 'w') as file:
-    pass
-
-#z = leaky_relu(x)
 #print(leaky_relu_inverse(z))
 
 

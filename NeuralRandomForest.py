@@ -2,6 +2,10 @@ from statistics import mode
 import numpy as np
 import random
 from helpful_functions import *
+import concurrent
+
+def get_NRT(estimator,epochs,mini_batch,eta,lmbda):
+    pass
 
 class NeuralRandomForest():
 

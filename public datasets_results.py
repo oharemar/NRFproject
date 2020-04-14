@@ -17,12 +17,12 @@ from statistics import stdev
 import json
 from NeuralRandomForest import NeuralRandomForest
 
-datasets = ['OBSnetwork','cars','vehicle_silhouette','valley','diabetes','wine','wine_no_scale','bank_marketing'] # pak přidáme USPS
+datasets = ['OBSnetwork'] # pak přidáme USPS
 
 
-model_names = ['NRF_analyticWeights','NRF_analyticWeights_adam','NRF_analyticWeights_nesterov']
+model_names = ['NRF_analyticWeights_adam']
 
-learn_rates = [0.0065,0.0035,0.0035]
+learn_rates = [0.0035]
 
 for dataset in datasets:
     print(dataset)
@@ -32,7 +32,7 @@ for dataset in datasets:
 
         # prepare RF
 
-        rf = RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=6, max_features='auto')
+        #rf = RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=6, max_features='auto')
 
         kf = KFold(n_splits=5)
 
@@ -45,6 +45,7 @@ for dataset in datasets:
         results_all_avg = []
 
         for train_index, test_index in kf.split(df):
+            rf = RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=6, max_features='auto')
             X_train, X_test = df[train_index], df[test_index]
             y_train, y_test = y[train_index], y[test_index]
             #y_train_keras = np.zeros((X_train.shape[0], int(max(y_train) + 1)))
