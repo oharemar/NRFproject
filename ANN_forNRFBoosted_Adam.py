@@ -117,7 +117,7 @@ class Network():
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
         nabla_b = [(1/(len(mini_batch)))*nb for nb in nabla_b]
-        nabla_w = [(1/(len(mini_batch)))*nw for nw in nabla_w]
+        nabla_w = [(1/(len(mini_batch)))*nw + (lmbda/n)*w for nw,w in zip(nabla_w,self.weights)] # added L2 regularization
 
         self.t = self.t + 1
         self.m_weights = [(self.momentum1*m + (1-self.momentum1)*w) for m,w in zip(self.m_weights,nabla_w)]
@@ -128,7 +128,7 @@ class Network():
         weights_update = [(1/(1-self.momentum1**self.t))*m/(((1/(1-self.momentum2**self.t))*n)**0.5 + self.epsilon) for m,n in zip(self.m_weights,self.n_weights)]
         biases_update = [(1/(1-self.momentum1**self.t))*m/(((1/(1-self.momentum2**self.t))*n)**0.5 + self.epsilon) for m,n in zip(self.m_biases,self.n_biases)]
 
-        self.weights = [(1-eta*(lmbda/n))*w - eta*v for w, v in zip(self.weights,weights_update)] # added regularization term to the cost function
+        self.weights = [w - eta*v for w, v in zip(self.weights,weights_update)] # added regularization term to the cost function
         self.biases = [b - eta*vb for b, vb in zip(self.biases, biases_update)]
 
     def cost_derivative(self, output_activations, y):

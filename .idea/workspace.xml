@@ -37,7 +37,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test_roc_pr">
+  <component name="RunManager" selected="Python.test">
     <configuration name="parameters_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="DIPLOMKA" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -145,10 +145,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.test_roc_pr" />
         <item itemvalue="Python.test_params" />
         <item itemvalue="Python.parameters_test" />
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.public datasets_results" />
       </list>
     </recent_temporary>

@@ -24,7 +24,7 @@ import time
 if __name__ == '__main__':
 
 
-    df, y = load_datasets('diabetes') # messidor je binární
+    df, y = load_datasets('messidor') # messidor je binární
 
     n_classes = 2
     X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=0.2)  # split to train and test dataset
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     auc_rf = metrics.auc(recall_rf,precision_rf)
     auc_nrf = metrics.auc(recall_nrf,precision_nrf)
     auc_lr = metrics.auc(recall_lr,precision_lr)
-
+    '''
     plt.figure()
     lw = 2
     plt.plot(recall_lr, precision_lr, color='darkorange',
@@ -87,6 +87,8 @@ if __name__ == '__main__':
              lw=lw, label='ROC curve LR (area = %0.2f)' % roc_auc_lr)
     plt.plot(fpr_nrf, tpr_nrf, color='red',
              lw=lw, label='ROC curve NRF (area = %0.2f)' % roc_auc_nrf)
+    plt.plot(fpr, tpr, color='blue',
+             lw=lw, label='ROC curve NRF (area = %0.2f)' % roc_auc_rf)
     plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -95,4 +97,4 @@ if __name__ == '__main__':
     plt.title('Receiver operating characteristic')
     plt.legend(loc="lower right")
     plt.show()
-    '''
+

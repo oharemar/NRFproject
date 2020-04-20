@@ -46,6 +46,8 @@ class NeuralRandomForest():
             from NRF_withExtraLayer_analyticWeights_adam import NeuralTree_extraLayer_analyticWeights
         elif self.NRF_type == 'NRF_extraLayer_analyticWeights_nesterov':
             from NRF_withExtraLayer_analyticWeights_nesterov import NeuralTree_extraLayer_analyticWeights
+        elif self.NRF_type == 'NRF_extraLayer_analyticWeights_ultra_adam':
+            from NRF_withExtraLayer_analyticWeights_ultra_adam import NeuralTree_extraLayer_analyticWeights
 
         if self.NRF_type == 'NRF_analyticWeights':
             nrf = NeuralTree_analyticWeights(decision_tree=estimator, X_train=self.training_data,
@@ -95,6 +97,10 @@ class NeuralRandomForest():
              output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func,penultimate_func=penultimate_func)
             nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
         elif self.NRF_type == 'NRF_extraLayer_analyticWeights_nesterov':
+            nrf = NeuralTree_extraLayer_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
+             output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func,penultimate_func=penultimate_func)
+            nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)
+        elif self.NRF_type == 'NRF_extraLayer_analyticWeights_ultra_adam':
             nrf = NeuralTree_extraLayer_analyticWeights(decision_tree = estimator, X_train = self.training_data, y_train = self.training_labels,
              output_func = self.output_func,gamma_output = self.gamma_output, gamma = self.gamma, cost=self.cost_func,penultimate_func=penultimate_func)
             nrf.train_NRF(epochs,mini_batch,eta,lmbda,monitor_training_accuracy=False,monitor_training_cost=False)

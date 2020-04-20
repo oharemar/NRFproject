@@ -43,8 +43,20 @@ plt.show()
 
 '''
 
-#print(leaky_relu_inverse(z))
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
 
+df,y = load_datasets('vehicle_silhouette')
+
+X_train,X_test,y_train,y_test = train_test_split(df,y,test_size=0.2)
+
+dt = DecisionTreeClassifier(max_depth=12,max_features=1.0)
+dt.fit(X_train,y_train)
+preds = dt.predict(X_test)
+print(classification_report(y_test,preds))
 
 '''
 y = df.loc[:, 48]
