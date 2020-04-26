@@ -157,7 +157,7 @@ if __name__ == '__main__':
     plt.title('NRF')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrf_mean[j, k], accuracy_nrf_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrf_mean[j, k], accuracy_nrf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_depth_maxFeatures_acc.png')
 
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     plt.title('NRF')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrf_mean[j, k], f1_nrf_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrf_mean[j, k], f1_nrf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_depth_maxFeatures_f1.png')
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     plt.title('NRF_DW')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfdw_mean[j, k], accuracy_nrfdw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfdw_mean[j, k], accuracy_nrfdw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_DW_depth_maxFeatures_acc.png')
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
     plt.title('NRF_DW')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfdw_mean[j, k], f1_nrfdw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfdw_mean[j, k], f1_nrfdw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_DW_depth_maxFeatures_f1.png')
 
@@ -220,7 +220,7 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfeldw_mean[j, k], accuracy_nrfeldw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfeldw_mean[j, k], accuracy_nrfeldw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_EL_DW_depth_maxFeatures_acc.png')
 
@@ -236,7 +236,7 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfeldw_mean[j, k], f1_nrfeldw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfeldw_mean[j, k], f1_nrfeldw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_EL_DW_depth_maxFeatures_f1.png')
 
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     for k in range(len(depth)):
         for j in range(len(max_features)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfeldw_ultra_mean[j, k], accuracy_nrfeldw_ultra_std[j, k]),
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfeldw_ultra_mean[j, k], accuracy_nrfeldw_ultra_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_EL_DW_identity_depth_maxFeatures_acc.png')
 
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW_identity')
     for k in range(len(depth)):
         for j in range(len(max_features)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfeldw_ultra_mean[j, k], f1_nrfeldw_ultra_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfeldw_ultra_mean[j, k], f1_nrfeldw_ultra_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('NRF_EL_DW_identity_depth_maxFeatures_f1.png')
 
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     for k in range(len(depth)):
         for j in range(len(max_features)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_rf_mean[j, k],
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_rf_mean[j, k],
                                                             accuracy_rf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('RF_depth_maxFeatures_acc.png')
@@ -302,7 +302,7 @@ if __name__ == '__main__':
     for k in range(len(depth)):
         for j in range(len(max_features)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_rf_mean[j, k], f1_rf_std[j, k]),
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_rf_mean[j, k], f1_rf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
     fig.savefig('RF_depth_maxFeatures_f1.png')
 

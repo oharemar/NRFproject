@@ -156,9 +156,9 @@ if __name__ == '__main__':
     plt.title('NRF')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrf_mean[j, k], accuracy_nrf_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrf_mean[j, k], accuracy_nrf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_epochs_estimators_acc_messidor.png')
+    fig.savefig('NRF_epochs_estimators_acc.png')
 
 
     fig = plt.figure()
@@ -173,9 +173,9 @@ if __name__ == '__main__':
     plt.title('NRF')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrf_mean[j, k], f1_nrf_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrf_mean[j, k], f1_nrf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_epochs_estimators_f1_messidor.png')
+    fig.savefig('NRF_epochs_estimators_f1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -188,9 +188,9 @@ if __name__ == '__main__':
     plt.title('NRF_DW')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfdw_mean[j, k], accuracy_nrfdw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfdw_mean[j, k], accuracy_nrfdw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_DW_epochs_estimators_acc_messidor.png')
+    fig.savefig('NRF_DW_epochs_estimators_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -204,9 +204,9 @@ if __name__ == '__main__':
     plt.title('NRF_DW')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfdw_mean[j, k], f1_nrfdw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfdw_mean[j, k], f1_nrfdw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_DW_epochs_estimators_f1_messidor.png')
+    fig.savefig('NRF_DW_epochs_estimators_f1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -219,9 +219,9 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfeldw_mean[j, k], accuracy_nrfeldw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfeldw_mean[j, k], accuracy_nrfeldw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_EL_DW_epochs_estimators_acc_messidor.png')
+    fig.savefig('NRF_EL_DW_epochs_estimators_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -235,9 +235,9 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfeldw_mean[j, k], f1_nrfeldw_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfeldw_mean[j, k], f1_nrfeldw_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_EL_DW_epochs_estimators_f1_messidor.png')
+    fig.savefig('NRF_EL_DW_epochs_estimators_f1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -251,9 +251,9 @@ if __name__ == '__main__':
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_nrfeldw_ultra_mean[j, k], accuracy_nrfeldw_ultra_std[j, k]),
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_nrfeldw_ultra_mean[j, k], accuracy_nrfeldw_ultra_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_EL_DW_identity_epochs_estimators_acc_messidor.png')
+    fig.savefig('NRF_EL_DW_identity_epochs_estimators_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -267,9 +267,9 @@ if __name__ == '__main__':
     plt.title('NRF_EL_DW_identity')
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
-            text = ax.text(k, j, u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_nrfeldw_ultra_mean[j, k], f1_nrfeldw_ultra_std[j, k]),
+            text = ax.text(k, j, u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_nrfeldw_ultra_mean[j, k], f1_nrfeldw_ultra_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('NRF_EL_DW_identity_epochs_estimators_f1_messidor.png')
+    fig.savefig('NRF_EL_DW_identity_epochs_estimators_f1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -283,10 +283,10 @@ if __name__ == '__main__':
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(accuracy_rf_mean[j, k],
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(accuracy_rf_mean[j, k],
                                                             accuracy_rf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('RF_epochs_estimators_acc_messidor.png')
+    fig.savefig('RF_epochs_estimators_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -301,9 +301,9 @@ if __name__ == '__main__':
     for k in range(len(epochs)):
         for j in range(len(n_estimators)):
             text = ax.text(k, j,
-                           u'{:.2f}\n\u00B1\n{:.2f}'.format(f1_rf_mean[j, k], f1_rf_std[j, k]),
+                           u'{:.3f}\n\u00B1\n{:.3f}'.format(f1_rf_mean[j, k], f1_rf_std[j, k]),
                            ha="center", va="center", color="red", fontsize=7)
-    fig.savefig('RF_epochs_estimators_f1_messidor.png')
+    fig.savefig('RF_epochs_estimators_f1.png')
 
 
 

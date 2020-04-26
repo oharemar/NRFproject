@@ -42,31 +42,29 @@ plt.ylabel('y')
 plt.show()
 
 '''
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib
-from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from helpful_functions import *
+from sklearn.model_selection import KFold
+from statistics import mean
+#import keras
+from sklearn.metrics import log_loss
+from statistics import stdev
+import json
 
-df,y = load_datasets('vehicle_silhouette')
+df,y = load_datasets('cars')
 
-X_train,X_test,y_train,y_test = train_test_split(df,y,test_size=0.2)
-
-dt = DecisionTreeClassifier(max_depth=12,max_features=1.0)
-dt.fit(X_train,y_train)
-preds = dt.predict(X_test)
-print(classification_report(y_test,preds))
-
-'''
-y = df.loc[:, 48]
-df = df.loc[:, df.columns != 48]
-scaler = StandardScaler()
-df = scaler.fit_transform(df)
-df = np.array(df, dtype=np.float64)
-y = np.array(y)
-
-'''
+print(df.shape)
 
 
 
