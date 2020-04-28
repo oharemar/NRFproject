@@ -24,6 +24,8 @@ from sklearn import datasets
 # make_circles random states: 1,3
 # make_moons random states: 2
 
+"""TRY TO SIMULATE OVERFITTING  -  complex random forest overfits to the noise in the data - NRF and show that it repairs
+overfitting or add regularization constant and check that it helps to increase accuracy and generalization"""
 
 if __name__ == '__main__':
 
@@ -34,11 +36,11 @@ if __name__ == '__main__':
 
     #X,y = datasets.make_gaussian_quantiles(n_samples=400,n_classes=3,random_state=5)
 
-    X,y = datasets.make_circles(400,noise=0.1,random_state=3)
+    X,y = datasets.make_circles(400,noise=0.3,random_state=3)
 
     #X,y = datasets.make_moons(400,noise=0.3,random_state=2)
 
-    rf = RandomForestClassifier(n_estimators=10,max_depth=6,random_state=1)
+    rf = RandomForestClassifier(n_estimators=2,max_depth=20,random_state=1,max_features=1.0)
 
     h = .05
     X = StandardScaler().fit_transform(X)
@@ -67,8 +69,8 @@ if __name__ == '__main__':
 
     nrfdw = NeuralRandomForest(rf, 'NRF_extraLayer_analyticWeights_ultra_adam', X_train, y_train, output_func='softmax',
                                                cost_func='CrossEntropy',
-                                               gamma_output=1, gamma=[1, 1])  # zde změna, gamma_output je 1
-    nrfdw.get_NRF_ensemble(20, 10, 0.0045, 0.0)
+                                               gamma_output=1, gamma=[10, 10])  # zde změna, gamma_output je 1
+    nrfdw.get_NRF_ensemble(30, 10, 0.0045, 0.0) # demonstrace regularizace, reg.term 0,1,2,3,4 ... střídat pro analyticWeights_ultra,analyticWeights
     predictions_nrfdw = nrfdw.predict(X_test)
 
     predictions = rf.predict(X_test)
