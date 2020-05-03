@@ -26,7 +26,7 @@ import time
 # LOAD DATASET (bank_marketing, cars, vehicle_silhouette,diabetes,messidor)
 if __name__ == '__main__':
 
-    df, y = load_datasets('vehicle_silhouette')
+    df, y = load_datasets('diabetes')
 
     #epochs = [5,10,15,20,25,30,35,40,45,50,55,60,65]
     epochs = [5,10,20,30,40,50]

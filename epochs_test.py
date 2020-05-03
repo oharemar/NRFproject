@@ -81,7 +81,7 @@ if __name__ == '__main__':
                           'weighted avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0}}
     for _ in range(2):
         for train_index, test_index in kf.split(df):
-            rf = RandomForestClassifier(n_estimators=10, criterion='entropy', max_depth=6, max_features='auto')
+            rf = RandomForestClassifier(n_estimators=20, criterion='entropy', max_depth=6, max_features='auto')
             X_train, X_test = df[train_index], df[test_index]
             y_train, y_test = y[train_index], y[test_index]
             # y_train_keras = np.zeros((X_train.shape[0], int(max(y_train) + 1)))
@@ -222,244 +222,278 @@ if __name__ == '__main__':
             loss_test_nrfeldw_ultra.append(loss_temp_test_nrfeldw_ultra)
             #loss_test_nrfel.append(loss_temp_test_nrfel)
 
+    accuracy_train_nrfdw_temp = np.array(accuracy_train_nrfdw, dtype=np.float64)
+    accuracy_train_nrfdw_mean = list(np.mean(accuracy_train_nrfdw_temp, axis=0))
+    accuracy_train_nrfdw_std = list(np.std(accuracy_train_nrfdw_temp, axis=0))
 
-    accuracy_train_nrfdw_mean = list(np.mean(np.array(accuracy_train_nrfdw, dtype=np.float64), axis=0))
-    accuracy_train_nrfdw_std = list(np.std(np.array(accuracy_train_nrfdw, dtype=np.float64), axis=0))
-    accuracy_test_nrfdw_mean = list(np.mean(np.array(accuracy_test_nrfdw, dtype=np.float64), axis=0))
-    accuracy_test_nrfdw_std = list(np.std(np.array(accuracy_test_nrfdw, dtype=np.float64), axis=0))
-    loss_train_nrfdw_mean = list(np.mean(np.array(loss_train_nrfdw, dtype=np.float64), axis=0))
-    loss_train_nrfdw_std = list(np.std(np.array(loss_train_nrfdw, dtype=np.float64), axis=0))
-    loss_test_nrfdw_mean = list(np.mean(np.array(loss_test_nrfdw, dtype=np.float64), axis=0))
-    loss_test_nrfdw_std = list(np.std(np.array(loss_test_nrfdw, dtype=np.float64), axis=0))
+    accuracy_test_nrfdw_temp = np.array(accuracy_test_nrfdw, dtype=np.float64)
+    accuracy_test_nrfdw_mean = list(np.mean(accuracy_test_nrfdw_temp, axis=0))
+    accuracy_test_nrfdw_std = list(np.std(accuracy_test_nrfdw_temp, axis=0))
 
-    accuracy_train_nrf_mean = list(np.mean(np.array(accuracy_train_nrf, dtype=np.float64), axis=0))
-    accuracy_train_nrf_std = list(np.std(np.array(accuracy_train_nrf, dtype=np.float64), axis=0))
-    accuracy_test_nrf_mean = list(np.mean(np.array(accuracy_test_nrf, dtype=np.float64), axis=0))
-    accuracy_test_nrf_std = list(np.std(np.array(accuracy_test_nrf, dtype=np.float64), axis=0))
-    loss_train_nrf_mean = list(np.mean(np.array(loss_train_nrf, dtype=np.float64), axis=0))
-    loss_train_nrf_std = list(np.std(np.array(loss_train_nrf, dtype=np.float64), axis=0))
-    loss_test_nrf_mean = list(np.mean(np.array(loss_test_nrf, dtype=np.float64), axis=0))
-    loss_test_nrf_std = list(np.std(np.array(loss_test_nrf, dtype=np.float64), axis=0))
+    loss_train_nrfdw_temp = np.array(loss_train_nrfdw, dtype=np.float64)
+    loss_train_nrfdw_mean = list(np.mean(loss_train_nrfdw_temp, axis=0))
+    loss_train_nrfdw_std = list(np.std(loss_train_nrfdw_temp, axis=0))
 
-    accuracy_train_nrfeldw_mean = list(np.mean(np.array(accuracy_train_nrfeldw, dtype=np.float64), axis=0))
-    accuracy_train_nrfeldw_std = list(np.std(np.array(accuracy_train_nrfeldw, dtype=np.float64), axis=0))
-    accuracy_test_nrfeldw_mean = list(np.mean(np.array(accuracy_test_nrfeldw, dtype=np.float64), axis=0))
-    accuracy_test_nrfeldw_std = list(np.std(np.array(accuracy_test_nrfeldw, dtype=np.float64), axis=0))
-    loss_train_nrfeldw_mean = list(np.mean(np.array(loss_train_nrfeldw, dtype=np.float64), axis=0))
-    loss_train_nrfeldw_std = list(np.std(np.array(loss_train_nrfeldw, dtype=np.float64), axis=0))
-    loss_test_nrfeldw_mean = list(np.mean(np.array(loss_test_nrfeldw, dtype=np.float64), axis=0))
-    loss_test_nrfeldw_std = list(np.std(np.array(loss_test_nrfeldw, dtype=np.float64), axis=0))
+    loss_test_nrfdw_temp = np.array(loss_test_nrfdw, dtype=np.float64)
+    loss_test_nrfdw_mean = list(np.mean(loss_test_nrfdw_temp, axis=0))
+    loss_test_nrfdw_std = list(np.std(loss_test_nrfdw_temp, axis=0))
 
-    accuracy_train_nrfeldw_ultra_mean = list(np.mean(np.array(accuracy_train_nrfeldw_ultra, dtype=np.float64), axis=0))
-    accuracy_train_nrfeldw_ultra_std = list(np.std(np.array(accuracy_train_nrfeldw_ultra, dtype=np.float64), axis=0))
-    accuracy_test_nrfeldw_ultra_mean = list(np.mean(np.array(accuracy_test_nrfeldw_ultra, dtype=np.float64), axis=0))
-    accuracy_test_nrfeldw_ultra_std = list(np.std(np.array(accuracy_test_nrfeldw_ultra, dtype=np.float64), axis=0))
-    loss_train_nrfeldw_ultra_mean = list(np.mean(np.array(loss_train_nrfeldw_ultra, dtype=np.float64), axis=0))
-    loss_train_nrfeldw_ultra_std = list(np.std(np.array(loss_train_nrfeldw_ultra, dtype=np.float64), axis=0))
-    loss_test_nrfeldw_ultra_mean = list(np.mean(np.array(loss_test_nrfeldw_ultra, dtype=np.float64), axis=0))
-    loss_test_nrfeldw_ultra_std = list(np.std(np.array(loss_test_nrfeldw_ultra, dtype=np.float64), axis=0))
 
+    accuracy_train_nrf_temp = np.array(accuracy_train_nrf, dtype=np.float64)
+    accuracy_train_nrf_mean = list(np.mean(accuracy_train_nrf_temp, axis=0))
+    accuracy_train_nrf_std = list(np.std(accuracy_train_nrf_temp, axis=0))
+
+    accuracy_test_nrf_temp = np.array(accuracy_test_nrf, dtype=np.float64)
+    accuracy_test_nrf_mean = list(np.mean(accuracy_test_nrf_temp, axis=0))
+    accuracy_test_nrf_std = list(np.std(accuracy_test_nrf_temp, axis=0))
+
+    loss_train_nrf_temp = np.array(loss_train_nrf, dtype=np.float64)
+    loss_train_nrf_mean = list(np.mean(loss_train_nrf_temp, axis=0))
+    loss_train_nrf_std = list(np.std(loss_train_nrf_temp, axis=0))
+
+    loss_test_nrf_temp = np.array(loss_test_nrf, dtype=np.float64)
+    loss_test_nrf_mean = list(np.mean(loss_test_nrf_temp, axis=0))
+    loss_test_nrf_std = list(np.std(loss_test_nrf_temp, axis=0))
+
+    accuracy_train_nrfeldw_temp = np.array(accuracy_train_nrfeldw, dtype=np.float64)
+    accuracy_train_nrfeldw_mean = list(np.mean(accuracy_train_nrfeldw_temp, axis=0))
+    accuracy_train_nrfeldw_std = list(np.std(accuracy_train_nrfeldw_temp, axis=0))
+
+    accuracy_test_nrfeldw_temp = np.array(accuracy_test_nrfeldw, dtype=np.float64)
+    accuracy_test_nrfeldw_mean = list(np.mean(accuracy_test_nrfeldw_temp, axis=0))
+    accuracy_test_nrfeldw_std = list(np.std(accuracy_test_nrfeldw_temp, axis=0))
+
+    loss_train_nrfeldw_temp = np.array(loss_train_nrfeldw, dtype=np.float64)
+    loss_train_nrfeldw_mean = list(np.mean(loss_train_nrfeldw_temp, axis=0))
+    loss_train_nrfeldw_std = list(np.std(loss_train_nrfeldw_temp, axis=0))
+
+    loss_test_nrfeldw_temp = np.array(loss_test_nrfeldw, dtype=np.float64)
+    loss_test_nrfeldw_mean = list(np.mean(loss_test_nrfeldw_temp, axis=0))
+    loss_test_nrfeldw_std = list(np.std(loss_test_nrfeldw_temp, axis=0))
+
+    accuracy_train_nrfeldw_ultra_temp = np.array(accuracy_train_nrfeldw_ultra, dtype=np.float64)
+    accuracy_train_nrfeldw_ultra_mean = list(np.mean(accuracy_train_nrfeldw_ultra_temp, axis=0))
+    accuracy_train_nrfeldw_ultra_std = list(np.std(accuracy_train_nrfeldw_ultra_temp, axis=0))
+
+    accuracy_test_nrfeldw_ultra_temp = np.array(accuracy_test_nrfeldw_ultra, dtype=np.float64)
+    accuracy_test_nrfeldw_ultra_mean = list(np.mean(accuracy_test_nrfeldw_ultra_temp, axis=0))
+    accuracy_test_nrfeldw_ultra_std = list(np.std(accuracy_test_nrfeldw_ultra_temp, axis=0))
+
+    loss_train_nrfeldw_ultra_temp = np.array(loss_train_nrfeldw_ultra, dtype=np.float64)
+    loss_train_nrfeldw_ultra_mean = list(np.mean(loss_train_nrfeldw_ultra_temp, axis=0))
+    loss_train_nrfeldw_ultra_std = list(np.std(loss_train_nrfeldw_ultra_temp, axis=0))
+
+    loss_test_nrfeldw_ultra_temp = np.array(loss_test_nrfeldw_ultra, dtype=np.float64)
+    loss_test_nrfeldw_ultra_mean = list(np.mean(loss_test_nrfeldw_ultra_temp, axis=0))
+    loss_test_nrfeldw_ultra_std = list(np.std(loss_test_nrfeldw_ultra_temp, axis=0))
 
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_train_nrf_mean, yerr=accuracy_train_nrf_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_train_nrf_mean, yerr=accuracy_train_nrf_std, ecolor='darkorange', marker='o')
     #ax.plot(epochs, accuracy_train_nrf,color = 'red')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_train_nrf_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_train_nrf_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_train_nrf_mean,yerr = accuracy_train_nrf_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0,110])
     plt.title('NRF')
-    plt.ylim([min(accuracy_train_nrf_mean) - 0.05, max(accuracy_train_nrf_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_train_nrf_temp) - 0.05, np.amax(accuracy_train_nrf_temp) + 0.05])
     fig.savefig('NRF_epochs_acc_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_test_nrf_mean, yerr=accuracy_test_nrf_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_test_nrf_mean, yerr=accuracy_test_nrf_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_test_nrf_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_test_nrf_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_test_nrf_mean,yerr = accuracy_test_nrf_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF')
-    plt.ylim([min(accuracy_test_nrf_mean) - 0.05, max(accuracy_test_nrf_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_test_nrf_temp) - 0.05, np.amax(accuracy_test_nrf_temp) + 0.05])
     fig.savefig('NRF_epochs_acc_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_train_nrf_mean, yerr=loss_train_nrf_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_train_nrf_mean, yerr=loss_train_nrf_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_train_nrf_temp.shape[0]):
+        ax.errorbar(epochs, loss_train_nrf_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_train_nrf_mean,yerr = loss_train_nrf_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF')
-    plt.ylim([min(loss_train_nrf_mean) - 0.05, max(loss_train_nrf_mean) + 0.05])
+    plt.ylim([np.amin(loss_train_nrf_temp) - 0.05, np.amax(loss_train_nrf_temp) + 0.05])
     fig.savefig('NRF_epochs_loss_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_test_nrf_mean, yerr=loss_test_nrf_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_test_nrf_mean, yerr=loss_test_nrf_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_test_nrf_temp.shape[0]):
+        ax.errorbar(epochs, loss_test_nrf_mean[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_test_nrf_mean,yerr = loss_test_nrf_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF')
-    plt.ylim([min(loss_test_nrf_mean) - 0.05, max(loss_test_nrf_mean) + 0.05])
+    plt.ylim([np.amin(loss_test_nrf_temp) - 0.05, np.amax(loss_test_nrf_temp) + 0.05])
     fig.savefig('NRF_epochs_loss_test.png')
 
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_train_nrfdw_mean, yerr=accuracy_train_nrfdw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_train_nrfdw_mean, yerr=accuracy_train_nrfdw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_train_nrfdw_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_train_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_train_nrfdw_mean,yerr = accuracy_train_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0,110])
     plt.title('NRF_DW')
-    plt.ylim([min(accuracy_train_nrfdw_mean) - 0.05, max(accuracy_train_nrfdw_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_train_nrfdw_temp) - 0.05, np.amax(accuracy_train_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_epochs_acc_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_test_nrfdw_mean, yerr=accuracy_test_nrfdw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_test_nrfdw_mean, yerr=accuracy_test_nrfdw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_test_nrfdw_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_test_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_test_nrfdw_mean,yerr = accuracy_test_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_DW')
-    plt.ylim([min(accuracy_test_nrfdw_mean) - 0.05, max(accuracy_test_nrfdw_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_test_nrfdw_temp) - 0.05, np.amax(accuracy_test_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_epochs_acc_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_train_nrfdw_mean, yerr=loss_train_nrfdw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_train_nrfdw_mean, yerr=loss_train_nrfdw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_train_nrfdw_temp.shape[0]):
+        ax.errorbar(epochs, loss_train_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_train_nrfdw_mean,yerr = loss_train_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_DW')
-    plt.ylim([min(loss_train_nrfdw_mean) - 0.05, max(loss_train_nrfdw_mean) + 0.05])
+    plt.ylim([np.amin(loss_train_nrfdw_temp) - 0.05, np.amax(loss_train_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_epochs_loss_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_test_nrfdw_mean, yerr=loss_test_nrfdw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_test_nrfdw_mean, yerr=loss_test_nrfdw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_test_nrfdw_temp.shape[0]):
+        ax.errorbar(epochs, loss_test_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_test_nrfdw_mean,yerr = loss_test_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_DW')
-    plt.ylim([min(loss_test_nrfdw_mean) - 0.05, max(loss_test_nrfdw_mean) + 0.05])
+    plt.ylim([np.amin(loss_test_nrfdw_temp) - 0.05, np.amax(loss_test_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_epochs_loss_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_train_nrfeldw_mean, yerr=accuracy_train_nrfeldw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_train_nrfeldw_mean, yerr=accuracy_train_nrfeldw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_train_nrfeldw_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_train_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_train_nrfeldw_mean,yerr = accuracy_train_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0,110])
     plt.title('NRF_EL_DW')
-    plt.ylim([min(accuracy_train_nrfeldw_mean) - 0.05, max(accuracy_train_nrfeldw_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_train_nrfeldw_temp) - 0.05, np.amax(accuracy_train_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_epochs_acc_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_test_nrfeldw_mean, yerr=accuracy_test_nrfeldw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_test_nrfeldw_mean, yerr=accuracy_test_nrfeldw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_test_nrfeldw_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_test_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_test_nrfeldw_mean,yerr = accuracy_test_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW')
-    plt.ylim([min(accuracy_test_nrfeldw_mean) - 0.05, max(accuracy_test_nrfeldw_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_test_nrfeldw_temp) - 0.05, np.amax(accuracy_test_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_epochs_acc_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_train_nrfeldw_mean, yerr=loss_train_nrfeldw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_train_nrfeldw_mean, yerr=loss_train_nrfeldw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_train_nrfeldw_temp.shape[0]):
+        ax.errorbar(epochs, loss_train_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_train_nrfeldw_mean,yerr = loss_train_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW')
-    plt.ylim([min(loss_train_nrfeldw_mean) - 0.05, max(loss_train_nrfeldw_mean) + 0.05])
+    plt.ylim([np.amin(loss_train_nrfeldw_temp) - 0.05, np.amax(loss_train_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_epochs_loss_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_test_nrfeldw_mean, yerr=loss_test_nrfeldw_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_test_nrfeldw_mean, yerr=loss_test_nrfeldw_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_test_nrfeldw_temp.shape[0]):
+        ax.errorbar(epochs, loss_test_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_test_nrfeldw_mean,yerr = loss_test_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW')
-    plt.ylim([min(loss_test_nrfeldw_mean) - 0.05, max(loss_test_nrfeldw_mean) + 0.05])
+    plt.ylim([np.amin(loss_test_nrfeldw_temp) - 0.05, np.amax(loss_test_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_epochs_loss_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_train_nrfeldw_ultra_mean, yerr=accuracy_train_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_train_nrfeldw_ultra_mean, yerr=accuracy_train_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_train_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_train_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_train_nrfeldw_ultra_mean,yerr = accuracy_train_nrfeldw_ultra_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(accuracy_train_nrfeldw_ultra_mean) - 0.05, max(accuracy_train_nrfeldw_ultra_mean) + 0.05])
+    plt.ylim([min(accuracy_train_nrfeldw_ultra_temp) - 0.05, max(accuracy_train_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_epochs_acc_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, accuracy_test_nrfeldw_ultra_mean, yerr=accuracy_test_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, accuracy_test_nrfeldw_ultra_mean, yerr=accuracy_test_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    for j in range(accuracy_test_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(epochs, accuracy_test_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, accuracy_test_nrfeldw_ultra_mean,yerr = accuracy_test_nrfeldw_ultra_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(accuracy_test_nrfeldw_ultra_mean) - 0.05, max(accuracy_test_nrfeldw_ultra_mean) + 0.05])
+    plt.ylim([np.amin(accuracy_test_nrfeldw_ultra_temp) - 0.05, np.amax(accuracy_test_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_epochs_acc_test.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_train_nrfeldw_ultra_mean, yerr=loss_train_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_train_nrfeldw_ultra_mean, yerr=loss_train_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_train_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(epochs, loss_train_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_train_nrfeldw_ultra_mean,yerr = loss_train_nrfeldw_ultra_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(loss_train_nrfeldw_ultra_mean) - 0.05, max(loss_train_nrfeldw_ultra_mean) + 0.05])
+    plt.ylim([np.amin(loss_train_nrfeldw_ultra_temp) - 0.05, np.amax(loss_train_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_epochs_loss_train.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(epochs, loss_test_nrfeldw_ultra_mean, yerr=loss_test_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
+    #ax.errorbar(epochs, loss_test_nrfeldw_ultra_mean, yerr=loss_test_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    for j in range(loss_test_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(epochs, loss_test_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(epochs, loss_test_nrfeldw_ultra_mean,yerr = loss_test_nrfeldw_ultra_std,ecolor='darkorange',marker = 'o')
     plt.xlim([0, 110])
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(loss_test_nrfeldw_ultra_mean) - 0.05, max(loss_test_nrfeldw_ultra_mean) + 0.05])
+    plt.ylim([np.amin(loss_test_nrfeldw_ultra_temp) - 0.05, np.amax(loss_test_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_epochs_loss_test.png')
-
-    '''
-
-    # prepare neural random tree from @estimator
-
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras import optimizers
-    import keras
-    from sklearn.model_selection import KFold
-    kf = KFold(n_splits=5)
-    for train_index, test_index in kf.split(df):
-        X_train, X_test = df[train_index], df[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        y_train_keras = np.zeros((X_train.shape[0], int(max(y_train) + 1)))
-        y_test_keras = np.zeros((X_train.shape[0], int(max(y_train) + 1)))
-        for j, k in zip(y_train, range(len(y_train))):
-            y_train_keras[int(k), int(j)] = 1
-        for j, k in zip(y_test, range(len(y_test))):
-            y_test_keras[int(k), int(j)] = 1
-        y_train_keras = y_train_keras.astype('int64')
-        y_test_keras = y_test_keras.astype('int64')
-        y_train = y_train.astype('int64')
-        y_test = y_test.astype('int64')
-
-
-        mod = Sequential()
-        mod.add(Dense(units=40, activation='relu', input_shape=(X_train.shape[1],)))
-        mod.add(Dense(units=20, activation='relu'))
-        mod.add(Dense(units=max(y_train) + 1,
-                        activation='softmax'))  # přičítáme 1, protože předpokládáme, že první classa je 0
-        sgd = keras.optimizers.Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999, amsgrad=False)
-
-        mod.compile(loss='categorical_crossentropy',
-                      optimizer=sgd,  # 'sgd',
-                      metrics=['accuracy'])
-        mod.fit(X_train, y_train_keras, epochs=30)
-
-        classes = np.argmax(mod.predict(X_test),axis=1)
-        print(classification_report(y_test,classes))
-'''

@@ -174,96 +174,112 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrf, accuracy_nrf,yerr = accuracy_nrf_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrf, accuracy_nrf, width=0.8 * (learn_rates_nrf[1] - learn_rates_nrf[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('Accuracy')
     plt.xlim([min(learn_rates_nrf) - (learn_rates_nrf[1] - learn_rates_nrf[0]),
               max(learn_rates_nrf) + (learn_rates_nrf[1] - learn_rates_nrf[0])])
+    for j in range(accuracy_nrf_temp.shape[0]):
+        ax.errorbar(learn_rates_nrf, accuracy_nrf_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrf, accuracy_nrf,yerr = accuracy_nrf_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF')
-    plt.ylim([min(accuracy_nrf) - 0.05, max(accuracy_nrf) + 0.05])
+    plt.ylim([np.amin(accuracy_nrf_temp) - 0.05, np.amax(accuracy_nrf_temp) + 0.05])
     fig.savefig('NRF_learning_rate_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrf, f_nrf,yerr = f_nrf_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrf, f_nrf, width=0.8 * (learn_rates_nrf[1] - learn_rates_nrf[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('F1-score')
     plt.xlim([min(learn_rates_nrf) - (learn_rates_nrf[1] - learn_rates_nrf[0]),
               max(learn_rates_nrf) + (learn_rates_nrf[1] - learn_rates_nrf[0])])
+    for j in range(f_nrf_temp.shape[0]):
+        ax.errorbar(learn_rates_nrf, f_nrf_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrf, f_nrf,yerr = f_nrf_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF')
-    plt.ylim([min(f_nrf) - 0.05, max(f_nrf) + 0.05])
+    plt.ylim([np.amin(f_nrf_temp) - 0.05, np.amax(f_nrf_temp) + 0.05])
     fig.savefig('NRF_learning_rate_F1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfdw, accuracy_nrfdw,yerr = accuracy_nrfdw_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrfdw, accuracy_nrfdw, width=0.8 * (learn_rates_nrfdw[1] - learn_rates_nrfdw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('Accuracy')
     plt.xlim([min(learn_rates_nrfdw) - (learn_rates_nrfdw[1] - learn_rates_nrfdw[0]),
               max(learn_rates_nrfdw) + (learn_rates_nrfdw[1] - learn_rates_nrfdw[0])])
+    for j in range(accuracy_nrfdw_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfdw, accuracy_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfdw, accuracy_nrfdw,yerr = accuracy_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF_DW')
-    plt.ylim([min(accuracy_nrfdw) - 0.05, max(accuracy_nrfdw) + 0.05])
+    plt.ylim([np.amin(accuracy_nrfdw_temp) - 0.05, np.amax(accuracy_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_learning_rate_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfdw, f_nrfdw,yerr = f_nrfdw_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrfdw, f_nrfdw, width=0.8 * (learn_rates_nrfdw[1] - learn_rates_nrfdw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('F1-score')
     plt.xlim([min(learn_rates_nrfdw) - (learn_rates_nrfdw[1] - learn_rates_nrfdw[0]),
               max(learn_rates_nrfdw) + (learn_rates_nrfdw[1] - learn_rates_nrfdw[0])])
+    for j in range(f_nrfdw_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfdw, f_nrfdw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfdw, f_nrfdw,yerr = f_nrfdw_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF_DW')
-    plt.ylim([min(f_nrfdw) - 0.05, max(f_nrfdw) + 0.05])
+    plt.ylim([np.amin(f_nrfdw_temp) - 0.05, np.amax(f_nrfdw_temp) + 0.05])
     fig.savefig('NRF_DW_learning_rate_F1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfeldw, accuracy_nrfeldw,yerr = accuracy_nrfeldw_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrfeldw, accuracy_nrfeldw, width=0.8 * (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('Accuracy')
     plt.xlim([min(learn_rates_nrfeldw) - (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]),
               max(learn_rates_nrfeldw) + (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0])])
+    for j in range(accuracy_nrfeldw_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfeldw, accuracy_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfeldw, accuracy_nrfeldw,yerr = accuracy_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF_EL_DW')
-    plt.ylim([min(accuracy_nrfeldw) - 0.05, max(accuracy_nrfeldw) + 0.05])
+    plt.ylim([np.amin(accuracy_nrfeldw_temp) - 0.05, np.amax(accuracy_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_learning_rate_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfeldw, f_nrfeldw,yerr = f_nrfeldw_std,ecolor='darkorange',marker = 'o')
     #ax.bar(learn_rates_nrfeldw, f_nrfeldw, width=0.8 * (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('F1-score')
     plt.xlim([min(learn_rates_nrfeldw) - (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]),
               max(learn_rates_nrfeldw) + (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0])])
+    for j in range(f_nrfeldw_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfeldw, f_nrfeldw_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfeldw, f_nrfeldw,yerr = f_nrfeldw_std,ecolor='darkorange',marker = 'o')
     plt.title('NRF_EL_DW')
-    plt.ylim([min(f_nrfeldw) - 0.05, max(f_nrfeldw) + 0.05])
+    plt.ylim([np.amin(f_nrfeldw_temp) - 0.05, np.amax(f_nrfeldw_temp) + 0.05])
     fig.savefig('NRF_EL_DW_learning_rate_F1.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfeldw_ultra, accuracy_nrfeldw_ultra, yerr=accuracy_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     # ax.bar(learn_rates_nrfeldw, accuracy_nrfeldw, width=0.8 * (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('Accuracy')
     plt.xlim([min(learn_rates_nrfeldw_ultra) - (learn_rates_nrfeldw_ultra[1] - learn_rates_nrfeldw_ultra[0]),
               max(learn_rates_nrfeldw_ultra) + (learn_rates_nrfeldw_ultra[1] - learn_rates_nrfeldw_ultra[0])])
+    for j in range(accuracy_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfeldw_ultra, accuracy_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfeldw_ultra, accuracy_nrfeldw_ultra, yerr=accuracy_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(accuracy_nrfeldw_ultra) - 0.05, max(accuracy_nrfeldw_ultra) + 0.05])
+    plt.ylim([np.amin(accuracy_nrfeldw_ultra_temp) - 0.05, np.amax(accuracy_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_learning_rate_acc.png')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.errorbar(learn_rates_nrfeldw_ultra, f_nrfeldw_ultra, yerr=f_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     # ax.bar(learn_rates_nrfeldw, f_nrfeldw, width=0.8 * (learn_rates_nrfeldw[1] - learn_rates_nrfeldw[0]))
     plt.xlabel('Learning rate')
     plt.ylabel('F1-score')
     plt.xlim([min(learn_rates_nrfeldw_ultra) - (learn_rates_nrfeldw_ultra[1] - learn_rates_nrfeldw_ultra[0]),
               max(learn_rates_nrfeldw_ultra) + (learn_rates_nrfeldw_ultra[1] - learn_rates_nrfeldw_ultra[0])])
+    for j in range(f_nrfeldw_ultra_temp.shape[0]):
+        ax.errorbar(learn_rates_nrfeldw_ultra, f_nrfeldw_ultra_temp[j,:], yerr=None, marker='o',color = 'lightgray',alpha = 0.5,zorder=-32)
+    ax.errorbar(learn_rates_nrfeldw_ultra, f_nrfeldw_ultra, yerr=f_nrfeldw_ultra_std, ecolor='darkorange', marker='o')
     plt.title('NRF_EL_DW_identity')
-    plt.ylim([min(f_nrfeldw_ultra) - 0.05, max(f_nrfeldw_ultra) + 0.05])
+    plt.ylim([np.amin(f_nrfeldw_ultra_temp) - 0.05, np.amax(f_nrfeldw_ultra_temp) + 0.05])
     fig.savefig('NRF_EL_DW_identity_learning_rate_F1.png')

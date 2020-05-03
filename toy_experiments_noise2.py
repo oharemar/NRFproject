@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     for sample in samples:
         fig = plt.figure(figsize=(15, 10))
+        i = 1
         for noise in noises:
             # random_state = 1
             # X_1, y_1 = datasets.make_blobs(sample, 2, centers=[[2, 3], [1, 5], [3, 5]], center_box=(0, 7), cluster_std=0.5+noise,
@@ -47,7 +48,6 @@ if __name__ == '__main__':
             epochs = [5, 10, 20, 30, 50]
             h = .05
             cm_bright = ListedColormap(['#FF0000', '#FFFF00', '#0000FF'])
-            i = 1
             dataset = 1
 
             X = StandardScaler().fit_transform(X)
