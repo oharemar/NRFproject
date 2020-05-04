@@ -2,6 +2,15 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[hang]{footmisc}
+\usepackage{tablefootnote}
+\usepackage{pbox}
+\usepackage{url}
+\usepackage{makecell}
+\usepackage{color, colortbl}
+\usepackage{tabularx}
+\usepackage{hyperref}
 \usepackage{makecell}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
@@ -855,6 +864,7 @@ where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from t
 After initialization of biases to 0 and solving the system of linear equations for all neurons in the output layer (or computing the inverse of matrix $\mathbb{A}$) and for appropriate activation function chosen in advance, we gain also all initialization weights. This initial setting causes the neural network to output same predictions as from the corresponding decision tree and hence to get equally performing classification model.
 
 \section{NN models with decision-tree-initialization}
+\label{NN_models}
 
 \subsection{Perceptron activation function replacement}
 
@@ -924,40 +934,117 @@ Final competitive model is the compound of 'NRT extra layer' and reference model
 
 Combination of multiple neural random trees into an ensemble, similarly as in the case of random forests.
 
-\subsection{MaxVote}
+\subsection{Voting}
 \subsection{Averaging}
 
 
 \chapter{Experiments}
+\setlength\footnotemargin{8pt}
 
-\begin{itemize}
-    \item scaling (standardization)
-    \item choice of models
-    \item choice of hyperparameters/parameters
-    \item choice of loss functions, output functions, optimizers (Adam)
-    \item describe datasets
-    \item describe evaluation (5-fold cross validation)
-    \item insert table with results
-    \item research sensitivity of hyperparameters
-    \item insert supporting graphs
-\end{itemize}
+This chapter focuses on the experimental part of the thesis. Numerous experimental evaluations of the proposed models are presented alongside the thorough description and interpretation of the outcomes. The main emphasis is put especially on the comparison of the Neural Random Forest (NRF) models with the corresponding Random Forest (RF) models. Moreover, the results of NRF and RF are also compared to the performance of other popular classification algorithms, such as Logistic Regression (LR) and Feedforward Neural Network (NN). The experiments are divided into three separate parts.
+
+The first part is dedicated to the evaluation on the pre-selected public datasets. All proposed NRF models are evaluated on these datasets and compared with RF and other models. Additionally, the effect of NRF and RF hyperparameters on the classification performance is examined and visualized on the supporting graphs.
+
+The second part comprises various studies of NRF parameters that could be highly influential on the overall performance of the models. The experiments are conducted on the so called "toy" datasets - artificially created datasets that simulate different benefitial or disadvantegous features, which are more or less favourable to RF or NRF. These experiments reveal some patterns and features of the NRF models that could be exploited in the practical application.
+
+In the last part the best NRF models are applied to the classification task on the real dataset consisting of the medical data from the LUCAS project. The LUCAS project collaborates with medical institutions and hospitals in order to collect the data of the patients diagnosed with any form of lung cancer. These data combine personal information about the patients together with the diagnostic and treatment records. The classification task is to predict the first treatment based on the input diagnostic data of the patient. Generally, the early correct treatments play a crucial role in the overall survival of the patient with such diagnosis. This classification task is characterized by high-dimensionality, sparsity and the lack of the significant records, which makes it challenging for a lot of classification algorithms.
+
+\section{Public datasets experiments}
+
+This section provides comparison of NRF and competitive models evaluated on the set of public datasets selected in advance. Also the effect of the choice of NRF parameters on the overall performance is examined and visualized.
+
+The models are compared with respect to the accuracy and macro-average of F1-score on all datasets. Both values are presented in terms of mean value and standard deviation after two subsequent 5-fold cross validations\footnote{\textit{K-fold cross validation}: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.} (10 iterations in total) in order to avoid statistical fluctuations and gain higher robustness of the outcome.
+
+All applied models are summarized in Table \ref{table::public_models} with their shortcut notations (column MODEL).
+
+\definecolor{Red}{rgb}{0.95,0.3,0.9}
+
+
+
+\begin{table}[h]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|c|}
+    \hline
+     \textbf{MODEL} & \textbf{DESCRIPTION} \\ \hline
+     \cellcolor{yellow}LR & \thead{Logistic regression model} \\ \hline
+     \cellcolor{yellow}NN & \thead{4-layer neural network} \\ \hline
+     \cellcolor{green}RF20 & \thead{Random forest with 20 estimators} \\ \hline
+    \cellcolor{green}RF30 & \thead{Random forest with 30 estimators} \\ \hline
+     \cellcolor{green}RF50 & \thead{Random forest with 50 estimators} \\ \hline
+    \cellcolor{orange}NRF & \thead{Neural random forest consisting of \\ \textit{NRT basic} estimators as in \autoref{NN_models}} \\ \hline
+    \cellcolor{orange}NRF\_DW & \thead{Neural random forest consisting of \\ \textit{NRT - deterministic weights} estimators as in \autoref{NN_models}} \\ \hline
+     \cellcolor{orange}NRF\_EL & \thead{Neural random forest consisting of \\ \textit{NRT extra layer} estimators as in \autoref{NN_models}} \\ \hline
+     \cellcolor{orange}NRF\_EL\_DW & \thead{Neural random forest consisting of \\ \textit{NRT extra layer - deterministic weights} estimators as in \autoref{NN_models}} \\ \hline
+    
+    \end{tabular}
+    \caption{Shortcut notation of the individual models and basic descriptions.}
+    \label{table::public_models}
+\end{table}
+
+Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NRF models. We adopted logistic regression with L2 regularization and 4-layer neural network with ReLU activation function in the hidden layers and softmax in the output layer. Two hidden layers have 60 neurons both. It applies Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). Hyperparameters of NN were chosen as follows: $\eta = 0.01$, $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$, where $\eta$ is a learning rate and the rest are constants of Adam equally noted as in the Chapter [Optimization NN]. We use implementation of LR and NN from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
+
+The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
+
+The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. There were no significant differences in the results between exploitation Log-Likelihood loss function instead of Cross Entropy. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs. We use our own implementation of NRF models in Python.
+
+Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
+\begingroup
+\begin{table}[h]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+     \textbf{ID}&\textbf{DATASET} & \textbf{\#instances} & \textbf{\#features} & \textbf{\#classes} & \textbf{feature type}\\ \hline
+     1&Bank Marketing\tablefootnote{Available at: mldata.io/dataset-details/bank\_marketing/}& 4521&16&2& categorical and numerical \\ \hline
+     2&Cars\tablefootnote{Available at: mldata.io/dataset-details/cars/}& 1728&6&4& categorical \\ \hline
+     3&Diabetes\tablefootnote{Available at: data.world/data-society/pima-indians-diabetes-database}& 768&8&2& numerical \\ \hline
+     4&Messidor\tablefootnote{Available at: archive.ics.uci.edu/ml/datasets/Diabetic+Retinopathy+Debrecen+Data+Set}& 1151&19&2& numerical \\ \hline
+     5&USPS\tablefootnote{Available at: kaggle.com/bistaumanga/usps-dataset}& 9298&256&10& numerical \\ \hline
+     6&Vehicle\tablefootnote{Available at: mldata.io/dataset-details/vehicle\_silhouette/}& 846&18&4& numerical \\ \hline
+     7&Wine\tablefootnote{Available at: scikit-learn.org/stable/modules/generated/sklearn.datasets.load\_wine.html}& 178&13&3& numerical \\ \hline
+     8&OBS\tablefootnote{Available at: archive.ics.uci.edu/ml/datasets/Burst+Header+Packet+\%28BHP\%29+\\flooding+attack+on+Optical+Burst+Switching+\%28OBS\%29+Network}& 1075&21&4& categorical and numerical \\ \hline
+    
+    \end{tabular}
+
+    \caption{Public datasets.}
+    \label{table::public_datasets}
+\end{table}
+\endgroup
+
+All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined as 
+\begin{equation}
+    [\zeta(k_j)]_l = \begin{cases}
+    1, & j = l \\
+    0, & \text{otherwise}
+    \end{cases} \hspace{0.2cm}.
+\end{equation}
+Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1) to ensure better numerical stability. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
+
+Final results of macro-average of F1-score resp. accuracy are presented in Table [ref] resp. Table [ref].
+
+
+
+
+
 \begingroup
 %\verb|\medmuskip=0mu:|
-\setlength{\medmuskip}{0mu}
+%\setlength{\medmuskip}{0mu}
 \begin{table}[h]
     \centering
     \small\addtolength{\tabcolsep}{-5pt}
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
     \hline
-     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_DW\_EL&NRF\_EL\\ \hline
-     Bank&$69.8\pm3.1$&$68.8\pm4.1$&$55.9\pm1.9$&$55.8\pm2.0$&$56.1\pm3.5$&$72.6\pm3.4$&$72.6\pm2.8$&$72.0\pm2.5$&$\boldsymbol{73.5}\pm3.7$ \\ \hline
-     Cars&$99.9\pm0.1$&$84.5\pm2.8$&$56.0\pm6.0$&$56.1\pm7.8$&$59.4\pm5.9$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
-     Diabetes&$71.7\pm3.8$&$72.8\pm5.2$&$70.7\pm2.5$&$71.4\pm5.4$&$72.3\pm2.1$&$72.0\pm3.6$&$\boldsymbol{73.5}\pm3.2$&$72.0\pm5.5$&$72.7\pm1.2$ \\ \hline
-     Messidor&$70.4\pm3.2$&$72.3\pm2.3$&$64.5\pm2.8$&$66.7\pm3.0$&$65.2\pm2.7$&$71.3\pm1.4$&$73.9\pm5.4$&$\boldsymbol{74.2}\pm2.6$&$72.1\pm5.3$ \\ \hline
-     USPS&$94.4\pm2.3$&$92.5\pm1.4$&$92.5\pm1.4$&$92.5\pm1.4$&$91.1\pm1.9$&$96.2\pm1.7$&$\boldsymbol{96.7}\pm1.7$&$96.5\pm1.4$&$95.8\pm1.4$ \\ \hline
-     Vehicle&$80.1\pm4.1$&$79.4\pm3.3$&$71.2\pm6.5$&$71.1\pm4.0$&$71.1\pm4.9$&$82.4\pm3.6$&$83.1\pm2.1$&$\boldsymbol{84.3}\pm1.3$&$79.0\pm3.0$ \\ \hline
-     Wine&$98.7\pm0.7$&$97.6\pm2.6$&$97.8\pm1.2$&$98.5\pm2.2$&$98.8\pm1.6$&$97.9\pm2.4$&$\boldsymbol{99.4}\pm1.3$&$99.0\pm1.5$&$\boldsymbol{99.4}\pm1.4$ \\ \hline
-     OBS&$99.2\pm0.7$&$99.7\pm0.4$&$89.2\pm2.6$&$91.2\pm2.2$&$92.6\pm2.2$&$99.7\pm0.5$&$\boldsymbol{100}\pm0.0$&$99.6\pm0.5$&$98.3\pm1.4$ \\ \hline
+     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
+     Bank&$69.3\pm1.8$&$68.6\pm2.5$&$55.5\pm2.0$&$55.7\pm2.2$&$54.6\pm2.4$&$\boldsymbol{71.9}\pm3.2$&$71.6\pm1.5$&$71.7\pm2.6$&$\boldsymbol{71.9}\pm2.7$ \\ \hline
+     Cars&$99.8\pm0.4$&$66.6\pm5.4$&$61.5\pm6.4$&$59.5\pm4.9$&$60.1\pm6.3$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
+     Diabetes&$68.9\pm3.0$&$\boldsymbol{73.0}\pm4.8$&$72.7\pm4.7$&$72.3\pm2.8$&$72.7\pm2.9$&$71.6\pm3.9$&$72.7\pm2.4$&$72.3\pm3.1$&$71.6\pm5.2$ \\ \hline
+     Messidor&$71.3\pm3.0$&$72.0\pm1.5$&$67.4\pm3.0$&$70.0\pm3.7$&$65.7\pm2.1$&$\boldsymbol{73.8}\pm2.6$&$73.5\pm1.0$&$73.7\pm2.3$&$73.6\pm3.7$ \\ \hline
+     USPS&$94.0\pm1.9$&$92.6\pm1.2$&$90.2\pm1.8$&$90.9\pm1.7$&$90.9\pm1.3$&$\boldsymbol{97.3}\pm1.4$&$97.1\pm1.5$&$97.0\pm1.4$&$97.0\pm1.3$ \\ \hline
+     Vehicle&$81.3\pm3.3$&$77.3\pm2.5$&$71.8\pm3.5$&$72.1\pm1.9$&$71.4\pm3.0$&$\boldsymbol{84.2}\pm3.5$&$\boldsymbol{84.2}\pm2.3$&$83.2\pm3.1$&$83.9\pm3.0$ \\ \hline
+     Wine&$97.7\pm1.9$&$98.2\pm2.1$&$97.9\pm2.0$&$97.5\pm3.0$&$97.9\pm2.0$&$97.9\pm2.3$&$97.9\pm2.4$&$97.5\pm2.0$&$\boldsymbol{98.5}\pm2.1$ \\ \hline
+     OBS&$99.4\pm0.4$&$99.2\pm1.0$&$90.2\pm2.0$&$91.9\pm1.9$&$92.4\pm1.8$&$99.8\pm0.4$&$\boldsymbol{99.9}\pm0.3$&$99.6\pm1.0$&$\boldsymbol{99.9}\pm0.2$ \\ \hline
     \end{tabular}
     \caption{Macro average of F1-score.}
     \label{tab:results_macro_public}
@@ -968,17 +1055,17 @@ Combination of multiple neural random trees into an ensemble, similarly as in th
     \small\addtolength{\tabcolsep}{-5pt}
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
     \hline
-     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_DW\_EL&NRF\_EL\\ \hline
-     Bank&$88.3\pm0.9$&$\boldsymbol{90.1}\pm1.3$&$89.1\pm0.9$&$89.1\pm0.9$&$89.2\pm1.4$&$89.7\pm0.9$&$89.5\pm1.1$&$89.6\pm0.2$&$89.7\pm1.2$ \\ \hline
-     Cars&$99.9\pm0.1$&$92.5\pm1.0$&$88.0\pm2.0$&$90.0\pm1.0$&$90.0\pm2.4$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
-     Diabetes&$74.5\pm2.8$&$\boldsymbol{76.6}\pm4.8$&$75.0\pm6.2$&$76.3\pm2.5$&$76.3\pm2.5$&$74.9\pm4.0$&$76.2\pm3.6$&$74.6\pm4.5$&$75.3\pm0.9$ \\ \hline
-     Messidor&$71.3\pm2.8$&$72.4\pm2.3$&$65.0\pm2.8$&$66.9\pm3.0$&$65.3\pm2.9$&$71.4\pm1.3$&$74.1\pm5.2$&$\boldsymbol{74.2}\pm2.5$&$72.1\pm5.3$ \\ \hline
-     USPS&$95.0\pm1.5$&$93.2\pm1.5$&$93.2\pm1.5$&$93.2\pm1.5$&$92.0\pm1.9$&$96.6\pm1.5$&$\boldsymbol{97.0}\pm1.6$&$96.8\pm1.4$&$96.2\pm1.4$ \\ \hline
-     Vehicle&$80.4\pm4.8$&$79.5\pm3.4$&$72.5\pm6.7$&$72.5\pm4.9$&$74.8\pm2.5$&$82.5\pm3.4$&$83.1\pm2.1$&$\boldsymbol{84.4}\pm1.4$&$79.4\pm1.7$ \\ \hline
-     Wine&$98.9\pm2.5$&$97.7\pm2.4$&$97.7\pm1.3$&$98.3\pm2.5$&$98.9\pm1.5$&$97.8\pm2.3$&$\boldsymbol{99.4}\pm1.3$&$98.9\pm1.5$&$\boldsymbol{99.4}\pm1.3$ \\ \hline
-     OBS&$99.0\pm0.9$&$99.5\pm0.7$&$86.7\pm3.0$&$88.8\pm2.5$&$90.2\pm3.0$&$99.5\pm0.7$&$\boldsymbol{100}\pm0.0$&$99.4\pm0.8$&$98.5\pm1.0$ \\ \hline
+     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
+     Bank&$88.1\pm1.0$&$\boldsymbol{90.0}\pm1.4$&$89.1\pm0.8$&$89.1\pm0.8$&$89.1\pm1.0$&$89.6\pm0.6$&$89.4\pm0.7$&$89.8\pm0.8$&$89.5\pm1.0$ \\ \hline
+     Cars&$99.9\pm0.2$&$88.5\pm1.8$&$89.6\pm1.3$&$89.6\pm1.5$&$90.2\pm2.1$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
+     Diabetes&$71.9\pm3.1$&$\boldsymbol{76.9}\pm4.4$&$76.4\pm4.1$&$76.2\pm2.0$&$76.7\pm2.2$&$74.6\pm3.7$&$75.8\pm2.6$&$75.0\pm2.8$&$74.3\pm5.1$ \\ \hline
+     Messidor&$71.3\pm2.9$&$72.1\pm1.5$&$67.5\pm2.9$&$67.1\pm3.7$&$65.9\pm1.9$&$\boldsymbol{73.8}\pm2.7$&$73.5\pm1.0$&$\boldsymbol{73.8}\pm2.3$&$73.7\pm3.6$ \\ \hline
+     USPS&$94.6\pm1.9$&$93.4\pm1.2$&$91.3\pm1.8$&$91.9\pm1.7$&$91.9\pm1.4$&$\boldsymbol{97.6}\pm1.4$&$97.4\pm1.4$&$97.3\pm1.3$&$97.3\pm1.2$ \\ \hline
+     Vehicle&$81.4\pm3.1$&$77.9\pm2.6$&$73.2\pm4.1$&$73.5\pm1.7$&$72.8\pm3.1$&$84.1\pm4.1$&$\boldsymbol{84.3}\pm2.3$&$83.3\pm2.4$&$83.9\pm3.0$ \\ \hline
+     Wine&$97.7\pm1.8$&$98.3\pm2.0$&$97.8\pm3.2$&$97.8\pm2.9$&$98.0\pm1.9$&$97.8\pm2.2$&$98.0\pm2.3$&$97.5\pm2.1$&$\boldsymbol{98.6}\pm2.0$ \\ \hline
+     OBS&$99.3\pm0.5$&$99.1\pm0.9$&$87.7\pm2.5$&$89.5\pm2.6$&$90.2\pm2.5$&$99.7\pm0.6$&$\boldsymbol{99.9}\pm0.4$&$99.6\pm0.9$&$\boldsymbol{99.9}\pm0.3$ \\ \hline
     \end{tabular}
-    \caption{Average accuracy.}
+    \caption{Accuracy.}
     \label{tab:results_accuracy_public}
 \end{table}
 
@@ -1091,6 +1178,13 @@ http://www.cscjournals.org/library/manuscriptinfo.php
 \bibitem{backprop}http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf citováno 30.3.2020
 
 \bibitem{numpy}https://numpy.org/
+
+\bibitem{adam_weightdecay}https://openreview.net/pdf?id=rk6qdGgCZ
+
+\bibitem{scikit} Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
+
+\bibitem{keras} Keras. Chollet, Francois and others. 2015. \url{https://keras.io}
+
 
 \end{thebibliography}
 
