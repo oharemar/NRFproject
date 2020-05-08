@@ -12,6 +12,8 @@
 \usepackage{tabularx}
 \usepackage{hyperref}
 \usepackage{makecell}
+%\usepackage{subcaption}
+\usepackage{subfig}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 
@@ -939,6 +941,7 @@ Combination of multiple neural random trees into an ensemble, similarly as in th
 
 
 \chapter{Experiments}
+\label{experiments}
 \setlength\footnotemargin{8pt}
 
 This chapter focuses on the experimental part of the thesis. Numerous experimental evaluations of the proposed models are presented alongside the thorough description and interpretation of the outcomes. The main emphasis is put especially on the comparison of the Neural Random Forest (NRF) models with the corresponding Random Forest (RF) models. Moreover, the results of NRF and RF are also compared to the performance of other popular classification algorithms, such as Logistic Regression (LR) and Feedforward Neural Network (NN). The experiments are divided into three separate parts.
@@ -950,6 +953,7 @@ The second part comprises various studies of NRF parameters that could be highly
 In the last part the best NRF models are applied to the classification task on the real dataset consisting of the medical data from the LUCAS project. The LUCAS project collaborates with medical institutions and hospitals in order to collect the data of the patients diagnosed with any form of lung cancer. These data combine personal information about the patients together with the diagnostic and treatment records. The classification task is to predict the first treatment based on the input diagnostic data of the patient. Generally, the early correct treatments play a crucial role in the overall survival of the patient with such diagnosis. This classification task is characterized by high-dimensionality, sparsity and the lack of the significant records, which makes it challenging for a lot of classification algorithms.
 
 \section{Public datasets experiments}
+\label{public:experiments}
 
 This section provides comparison of NRF and competitive models evaluated on the set of public datasets selected in advance. Also the effect of the choice of NRF parameters on the overall performance is examined and visualized.
 
@@ -986,7 +990,7 @@ Models in Table \ref{table::public_models} are color-coded into three different 
 
 The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
 
-The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. There were no significant differences in the results between exploitation Log-Likelihood loss function instead of Cross Entropy. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs. We use our own implementation of NRF models in Python.
+The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.1$. We use our own implementation of NRF models in Python.
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
@@ -997,7 +1001,7 @@ Datasets used in the experiments are summarized in Table \ref{table::public_data
     \begin{tabular}{|c|c|c|c|c|c|}
     \hline
      \textbf{ID}&\textbf{DATASET} & \textbf{\#instances} & \textbf{\#features} & \textbf{\#classes} & \textbf{feature type}\\ \hline
-     1&Bank Marketing\tablefootnote{Available at: mldata.io/dataset-details/bank\_marketing/}& 4521&16&2& categorical and numerical \\ \hline
+     1&Bank\tablefootnote{Available at: mldata.io/dataset-details/bank\_marketing/}& 4521&16&2& categorical and numerical \\ \hline
      2&Cars\tablefootnote{Available at: mldata.io/dataset-details/cars/}& 1728&6&4& categorical \\ \hline
      3&Diabetes\tablefootnote{Available at: data.world/data-society/pima-indians-diabetes-database}& 768&8&2& numerical \\ \hline
      4&Messidor\tablefootnote{Available at: archive.ics.uci.edu/ml/datasets/Diabetic+Retinopathy+Debrecen+Data+Set}& 1151&19&2& numerical \\ \hline
@@ -1013,20 +1017,16 @@ Datasets used in the experiments are summarized in Table \ref{table::public_data
 \end{table}
 \endgroup
 
-All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined as 
+All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined $\forall j,l \in \{1,...,m\}$ as 
 \begin{equation}
     [\zeta(k_j)]_l = \begin{cases}
     1, & j = l \\
     0, & \text{otherwise}
     \end{cases} \hspace{0.2cm}.
 \end{equation}
-Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1) to ensure better numerical stability. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
+Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1 ) to ensure better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of $j$-th feature. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
 
-Final results of macro-average of F1-score resp. accuracy are presented in Table [ref] resp. Table [ref].
-
-
-
-
+Final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public}.
 
 \begingroup
 %\verb|\medmuskip=0mu:|
@@ -1034,9 +1034,10 @@ Final results of macro-average of F1-score resp. accuracy are presented in Table
 \begin{table}[h]
     \centering
     \small\addtolength{\tabcolsep}{-5pt}
+    \makebox[\textwidth][c]{
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
     \hline
-     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
+     DATASET & NN&LR&RF20&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
      Bank&$69.3\pm1.8$&$68.6\pm2.5$&$55.5\pm2.0$&$55.7\pm2.2$&$54.6\pm2.4$&$\boldsymbol{71.9}\pm3.2$&$71.6\pm1.5$&$71.7\pm2.6$&$\boldsymbol{71.9}\pm2.7$ \\ \hline
      Cars&$99.8\pm0.4$&$66.6\pm5.4$&$61.5\pm6.4$&$59.5\pm4.9$&$60.1\pm6.3$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
      Diabetes&$68.9\pm3.0$&$\boldsymbol{73.0}\pm4.8$&$72.7\pm4.7$&$72.3\pm2.8$&$72.7\pm2.9$&$71.6\pm3.9$&$72.7\pm2.4$&$72.3\pm3.1$&$71.6\pm5.2$ \\ \hline
@@ -1046,6 +1047,7 @@ Final results of macro-average of F1-score resp. accuracy are presented in Table
      Wine&$97.7\pm1.9$&$98.2\pm2.1$&$97.9\pm2.0$&$97.5\pm3.0$&$97.9\pm2.0$&$97.9\pm2.3$&$97.9\pm2.4$&$97.5\pm2.0$&$\boldsymbol{98.5}\pm2.1$ \\ \hline
      OBS&$99.4\pm0.4$&$99.2\pm1.0$&$90.2\pm2.0$&$91.9\pm1.9$&$92.4\pm1.8$&$99.8\pm0.4$&$\boldsymbol{99.9}\pm0.3$&$99.6\pm1.0$&$\boldsymbol{99.9}\pm0.2$ \\ \hline
     \end{tabular}
+}
     \caption{Macro average of F1-score.}
     \label{tab:results_macro_public}
 \end{table}
@@ -1053,9 +1055,10 @@ Final results of macro-average of F1-score resp. accuracy are presented in Table
 \begin{table}[h]
     \centering
     \small\addtolength{\tabcolsep}{-5pt}
+    \makebox[\textwidth][c]{
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
     \hline
-     DATASET & NN&LR&RF10&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
+     DATASET & NN&LR&RF20&RF30&RF50&NRF\_DW&NRF&NRF\_EL&NRF\_EL\_DW\\ \hline
      Bank&$88.1\pm1.0$&$\boldsymbol{90.0}\pm1.4$&$89.1\pm0.8$&$89.1\pm0.8$&$89.1\pm1.0$&$89.6\pm0.6$&$89.4\pm0.7$&$89.8\pm0.8$&$89.5\pm1.0$ \\ \hline
      Cars&$99.9\pm0.2$&$88.5\pm1.8$&$89.6\pm1.3$&$89.6\pm1.5$&$90.2\pm2.1$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$&$\boldsymbol{100}\pm0.0$ \\ \hline
      Diabetes&$71.9\pm3.1$&$\boldsymbol{76.9}\pm4.4$&$76.4\pm4.1$&$76.2\pm2.0$&$76.7\pm2.2$&$74.6\pm3.7$&$75.8\pm2.6$&$75.0\pm2.8$&$74.3\pm5.1$ \\ \hline
@@ -1065,18 +1068,89 @@ Final results of macro-average of F1-score resp. accuracy are presented in Table
      Wine&$97.7\pm1.8$&$98.3\pm2.0$&$97.8\pm3.2$&$97.8\pm2.9$&$98.0\pm1.9$&$97.8\pm2.2$&$98.0\pm2.3$&$97.5\pm2.1$&$\boldsymbol{98.6}\pm2.0$ \\ \hline
      OBS&$99.3\pm0.5$&$99.1\pm0.9$&$87.7\pm2.5$&$89.5\pm2.6$&$90.2\pm2.5$&$99.7\pm0.6$&$\boldsymbol{99.9}\pm0.4$&$99.6\pm0.9$&$\boldsymbol{99.9}\pm0.3$ \\ \hline
     \end{tabular}
+    }
     \caption{Accuracy.}
     \label{tab:results_accuracy_public}
 \end{table}
-
-
-
 \endgroup
 
+From the first observation we may notice that all models performed very similarly on the majority of datasets with respect to both researched evaluation metrics. Essentially, overall performance of NRF models in comparison with other competitive models is in fact equal or slightly better than in case of concurrent models. There is no significant deterioration of any of NRF models compared to other models, especially compared to the RF models. On the contrary, we can see enhancement of values of NRF models in most cases.
 
+The most significant differences between NRF models and RF models could be seen in the cases of Cars, Messidor, USPS, Vehicle and OBS datasets, where NRF models have superior performance in comparison with RF models. On Bank dataset is performance of NRF models basically equal or only slightly better. Only exception is visible in case of Diabetes dataset, where NRF models do not produce any improvement and perform similarly or sligthly worse than RF models. It could be caused by many influencing factors, especially inappropriate choice of hyperparameters of NRF models. The effect of hyperparameters on final performance will be researched later.
 
+NRF models among themselves produce very similar results. NRF\_DW and NRF\_EL\_DW have almost same performance on all datasets with very small differences, which is a good sign, since they both aim to simulate random forest already before training individual estimators with backpropagation and therefore have comparable initial conditions. Moreover, NRF\_DW has one hidden layer less, so stacking more layers do not necessarily mean better performance. NRF and NRF\_EL have relaxing layers with random weights, so there is more space left for individual neural networks to forget about decision tree initial knowledge and adapt in its own way. This could be beneficial especially in cases where RF models produce superior performance in comparison with other models and therefore there is not much space for further significant improvement if RF model is imitated. This is nicely demonstrated in the case of Diabetes dataset, where RF models produce fine results in the beginning and then NRF\_DW and NRF\_EL\_DW are not successful in further improving it. It even reached slightly "worse" results (note the quotation marks since there is a relatively high standard deviation, which makes it hard to distinguish better model from the worse one). On the other hand, NRF and NRF\_EL managed to come fairly close to RF model performance or even equalize it and have slightly better and more stable (lower standard deviations) performance than NRF\_DW and NRF\_EL\_DW in this case. Of course, better choice of hyperparameters of NRF\_DW and NRF\_EL\_DW (especially number of training epochs and transition parameters $\beta_1$ and $\beta_2$ which control the quality of imitation of a single decision tree) could lead eventually to surpassing even the well-performing RF. This issue will be studied later in the thesis.
 
+\subsection{The effect of hyperparameters}
 
+In this section are studied various combinations of hyperparameters of NRF and RF models and different visualizations are provided to compare the results. Knowledge of RF model features and applied NRF model beforehand could define suitable range of hyperparameter values, which could result in correct choice and superior performance of the model.
+
+We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NRF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NRF. If we choose bad hyperparameters in the case of poor RF, the resulting NRF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NRF could perform worse than the corresponding RF, which is undesirable. We present some graphs directly in this section, whereas other graphs are referenced and presented in the Chapter [Figures].
+
+\subsubsection{Learning rate}
+
+Learning rate stands for one of the most crucial hyperparameters that need to be set conscientiously in order to achieve quality performance. This choice usually depends on model type and dataset itself. It is done almost exclusively by exhaustive grid search on some specific validation dataset before picking a suitable value for the training phase. It is not possible to state versatile learning rate optimal for all applications.
+
+We study different settings for learning rates in our model and research the sensitivity of NRF models to the learning rate choice. We compare this sensitivity with same feedforward NN as applied on public dataset experiments (defined in \autoref{public:experiments}).
+
+NRF and corresponding RF models were set in the same manner as was described in the beginning of the \autoref{public:experiments} with 20 estimators. Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure [ref] in Chapter [Figures]. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
+
+\begin{figure}[h!]
+\centering
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_DW_learning_rate_acc_ROUGH.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH.png}}
+    \hspace{0mm}
+    \\[-1.5ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_learning_rate_acc_ROUGH.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH.png}}
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NN_learning_rate_acc_rough.png}}
+    \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value after 2 times 5-fold cross validation (10 iterations in total), orange lines symbolizes standard deviation and dimmed gray lines are single realizations.}
+\label{learning_rates}
+\end{figure}
+
+Based on the Figure \ref{learning_rates}, we can see that in all cases the optimal value for learning rates could be found close to zero, approximately in the range $(0.001,0.02)$. With increasing value of learning rate, the performance of models is declining. The steepest downfall is registered in the case of NN model, where for the learning rate equals 0.1 drops accuracy to approximately 50\% of maximum reached accuracy. On the other hand, NRF models did not suffer from such eminent decrease in the given range. This experiment suggests, that NRF models could be slightly less sensitive to learning rate as single NN. Similar trend could be seen in the Figure \ref{figures:learning_rates_diabetes} in Chapter [Figures] on Diabetes dataset, altough not that vigorous. In this case the accuracy of NRF models remains almost constant in the given range of learning rates, whereas we can notice slow decrease of accuracy of NN.
+
+\subsubsection{Number of epochs and number of estimators}
+
+Another important hyperparameter of NRF is a number of training epochs. Especially in the case of NRF models which simulate RF behaviour since the beginning, it could be time-efficient to set number of epochs as low as possible and still get enhancement of results in comparison with the initial RF. We will investigate this issue alongside the effect of number of estimators in NRF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The fixed hyperparameters of NRF and RF remain same as in the previous experiments.
+
+\chapter{Figures}
+
+\begin{figure}[h!]
+\centering
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_DW_learning_rate_acc_ROUGH_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH_dia.png}}
+    \hspace{0mm}
+    \\[-1.5ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_learning_rate_acc_ROUGH_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH_dia.png}}
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat[]{
+    \centering
+    \includegraphics[width=0.5\textwidth]{NN_learning_rate_acc_rough_dia.png}}
+    \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value after 2 times 5-fold cross validation (10 iterations in total), orange lines symbolizes standard deviation and dimmed gray lines are single realizations.}
+\label{figures:learning_rates_diabetes}
+\end{figure}
 
 
 
@@ -1087,7 +1161,7 @@ Final results of macro-average of F1-score resp. accuracy are presented in Table
 
 \bibitem{evaluation1}G. Canbek, S. Sagiroglu, T. T. Temizel and N. Baykal, "Binary classification performance measures/metrics: A comprehensive visualized roadmap to gain new insights," 2017 International Conference on Computer Science and Engineering (UBMK), Antalya, 2017, pp. 821-826
 
-\bibitem{evaluation2}Koyejo, O. & Natarajan, Nagarajan \& Ravikumar, P. & Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
+\bibitem{evaluation2}Koyejo, O. \& Natarajan, Nagarajan \& Ravikumar, P. \& Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
 
 \bibitem{multieval1}Hossin, Mohammad & M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
 
