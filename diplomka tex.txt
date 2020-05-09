@@ -990,7 +990,7 @@ Models in Table \ref{table::public_models} are color-coded into three different 
 
 The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
 
-The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.1$. We use our own implementation of NRF models in Python.
+The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.1$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
@@ -1084,7 +1084,9 @@ NRF models among themselves produce very similar results. NRF\_DW and NRF\_EL\_D
 
 In this section are studied various combinations of hyperparameters of NRF and RF models and different visualizations are provided to compare the results. Knowledge of RF model features and applied NRF model beforehand could define suitable range of hyperparameter values, which could result in correct choice and superior performance of the model.
 
-We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NRF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NRF. If we choose bad hyperparameters in the case of poor RF, the resulting NRF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NRF could perform worse than the corresponding RF, which is undesirable. We present some graphs directly in this section, whereas other graphs are referenced and presented in the Chapter [Figures].
+We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NRF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NRF. If we choose bad hyperparameters in the case of poor RF, the resulting NRF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NRF could perform worse than the corresponding RF, which is undesirable.
+
+All graphical visualizations are presented in the Chapter [Figures] and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results for RF model are presented together with results of NRF models in one figure, then this RF model was used to initialize all NRF models in the same figure. In all following experiments, the hyperparameters of NRF models which are not examined at the time remain same as defined in the previous section.
 
 \subsubsection{Learning rate}
 
@@ -1092,69 +1094,254 @@ Learning rate stands for one of the most crucial hyperparameters that need to be
 
 We study different settings for learning rates in our model and research the sensitivity of NRF models to the learning rate choice. We compare this sensitivity with same feedforward NN as applied on public dataset experiments (defined in \autoref{public:experiments}).
 
-NRF and corresponding RF models were set in the same manner as was described in the beginning of the \autoref{public:experiments} with 20 estimators. Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure [ref] in Chapter [Figures]. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
+NRF and corresponding RF models were set in the same manner as was described in the beginning of the \autoref{public:experiments} with 20 estimators. Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure \ref{figures:learning_rates_diabetes}. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
 
-\begin{figure}[h!]
-\centering
-\subfloat{
-    \centering
-    \includegraphics[width=0.5\textwidth]{NRF_DW_learning_rate_acc_ROUGH.png}}
-\subfloat{
-    \centering
-    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH.png}}
-    \hspace{0mm}
-    \\[-1.5ex]
-\subfloat{
-    \centering
-    \includegraphics[width=0.5\textwidth]{NRF_learning_rate_acc_ROUGH.png}}
-\subfloat{
-    \centering
-    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH.png}}
-        \hspace{0mm}
-        \\[-0.8ex]
-\subfloat{
-    \centering
-    \includegraphics[width=0.5\textwidth]{NN_learning_rate_acc_rough.png}}
-    \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value after 2 times 5-fold cross validation (10 iterations in total), orange lines symbolizes standard deviation and dimmed gray lines are single realizations.}
-\label{learning_rates}
-\end{figure}
 
-Based on the Figure \ref{learning_rates}, we can see that in all cases the optimal value for learning rates could be found close to zero, approximately in the range $(0.001,0.02)$. With increasing value of learning rate, the performance of models is declining. The steepest downfall is registered in the case of NN model, where for the learning rate equals 0.1 drops accuracy to approximately 50\% of maximum reached accuracy. On the other hand, NRF models did not suffer from such eminent decrease in the given range. This experiment suggests, that NRF models could be slightly less sensitive to learning rate as single NN. Similar trend could be seen in the Figure \ref{figures:learning_rates_diabetes} in Chapter [Figures] on Diabetes dataset, altough not that vigorous. In this case the accuracy of NRF models remains almost constant in the given range of learning rates, whereas we can notice slow decrease of accuracy of NN.
+Based on the Figure \ref{learning_rates}, we can see that in all cases the optimal value for learning rates could be found close to zero, approximately in the range $(0.001,0.02)$. With increasing value of learning rate, the performance of models is declining. The steepest downfall is registered in the case of NN model, where for the learning rate equals 0.1 drops accuracy to approximately 50\% of maximum reached accuracy. On the other hand, NRF models did not suffer from such eminent decrease in the given range. This experiment suggests, that NRF models could be slightly less sensitive to learning rate as single NN, but it really depends on the specific application. Resembling trend could be seen in the Figure \ref{figures:learning_rates_diabetes} on Diabetes dataset, altough not that vigorous. In this case the accuracy of NRF models fluctuates a bit around almost constant value (mild decrease at the end of the range) in the given range of learning rates, whereas in the case of NN we can notice early decrease of accuracy in the range $(0.001,0.12)$ and then it remains basically constant. Consequently, we could choose suitable learning rates from wider range in the case of NRF models than in the case of single NN.
 
 \subsubsection{Number of epochs and number of estimators}
 
-Another important hyperparameter of NRF is a number of training epochs. Especially in the case of NRF models which simulate RF behaviour since the beginning, it could be time-efficient to set number of epochs as low as possible and still get enhancement of results in comparison with the initial RF. We will investigate this issue alongside the effect of number of estimators in NRF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The fixed hyperparameters of NRF and RF remain same as in the previous experiments.
+Another important hyperparameter of NRF is a number of training epochs. Especially in the case of NRF models which simulate RF behaviour since the beginning, they could improve the performance of initial RF already after few epochs, which could be time-efficient. We will investigate this issue alongside the effect of number of estimators in NRF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The fixed hyperparameters of NRF and RF remain same as in the previous experiments.
+
+First we will focus on the experiments on Vehicle dataset showed in the Figure \ref{figures:estimators_epochs_vehicle}. This is the case when RF model does not perform well in the comparison with other models, as was already seen in tables \ref{tab:results_macro_public} and \ref{tab:results_accuracy_public}. One may notice apparent pattern that increase of a number of training epochs causes enhancement of accuracy. This happens among all NRF models and also in the case of single NN. NRF\_DW and NRF\_EL\_DW models could outperform initial RF already after 5 epochs of training and reach slightly higher values of accuracy than NRF models with one layer of random weights until 30 epochs of training. For higher number of epochs are results very similar among all NRF models except of NRF\_EL, which has slightly lower accuracy. Also NRF\_DW and NRF\_EL\_DW converge faster to the maximum values of accuracy, acquiring it at approximately 30 epochs of training, whereas other NRF models still register increase of accuracy with higher number of training epochs. It could be due to the nature of individual models, where NRF\_DW and NRF\_EL\_DW imitate RF more precisely than other NRF models and therefore could be closer to some optimal value of loss function than NRF and NRF\_EL since the beginning. Therefore it is more likely to reach its optimal performance earlier.
+
+We can see only small differences in accuracy values with varying number of estimators. With increasing number of estimators the accuracy values usually also increase, but a number of epochs is more distinguishing factor. 
+
+Another situation occurs in the case of Diabetes dataset, as illustrated in the Figure \ref{figures:estimators_epochs_diabetes}. This is the case of RF model performing well in the comparison with other models.
+
+In this case arises quite an opposite situation than in the previous case on Vehicle dataset. With increasing number of training epochs is accuracy of NRF models decreasing. All NRF models except of NRF\_EL outperform RF with any number of estimators in the given range already after 5 epochs of training. They also reach their maximum accuracy in the given range of epochs. With higher number of epochs the accuracy decreases, eventually ending up with a worse model than initial RF. It could be caused by the problem of overfitting, which will be examined later. Especially in the case of NRF\_DW and NRF\_EL\_DW, the accuracy is decreasing quickly. In the case of NRF\_EL, the accuracy acquires its maximum value at approximately 20 epochs and then is slowly decreasing. It is beneficial to use early stopping\footnote{Early stopping is a method that check accuracy or error rate on validation dataset after each epoch and stop the training if the performance of the model stops improving.} technique during training NRF models to avoid this problem. Moreover, single NN model follows the same pattern of decreasing accuracy with increasing number of epochs as NRF models, which suggests that neural networks in this case converge quickly to optimal solution and with increasing number of epochs overfit to the problem. One noticeable fact is that performance of NRF models degradates slower than single NN model, which may be caused by the benefit of ensemble voting (or averaging) of NRF.
+
+\subsubsection{Maximum depth of trees in RF}
+
+Another examined hyperparameter of NRF is a number of neurons in the first and second hidden layer of the individual neural networks. This number is fully controlled by the depth of the corresponding tree. We will examine the influence of maximum depth of trees in RF (which is set before the training of RF) on performance of NRF. Especially for overgrown trees there is a significant risk of overfitting either in the case of the decision tree or subsequently in the case of transformed neural network, which will be tested. We also add number of training epochs of NRF as another variable.
+
+We only present graphs on Diabetes dataset for NRF\_DW and NRF models, because for NRF models with extra added layer the trend is same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
+
+It can be seen in the graphs that NRF\_DW model is much more prone to overfitting than NRF model, which is logical, since NRF\_DW model simulate RF behaviour better already before training with backpropagation. This applies especially to larger maximum depths (starting from maximum depth equals 6), where we can register fast decrease in accuracy and increase in loss function with increasing number of training epochs. In the case of NRF this decrease is not that vigorous and straightforward, but for larger depths is still visible. ZDE VYZKOUŠET REGULARIZACI
+
+\subsubsection{Transition parameters $\beta_1$ and $\beta_2$}
+
+Transition parameters $\beta_1$ and $\beta_2$ control the degree of transition of RF to NRF. The higher both values are, the better approximation of RF is obtained by NRF. Under certain circumstances it could be advantegous to increase those parameters and approximate RF accurately, especially when RF produces competitive results. Accuracy depending on both transition parameters is depicted for Vehicle dataset resp. Diabetes dataset in the Figure \ref{figures:beta_epochs} resp. Figure \ref{figures:beta_epochs_dia}.
 
 \chapter{Figures}
 
+
 \begin{figure}[h!]
 \centering
+\makebox[\textwidth][c]{
 \subfloat{
     \centering
-    \includegraphics[width=0.5\textwidth]{NRF_DW_learning_rate_acc_ROUGH_dia.png}}
+    \includegraphics[width=0.6\textwidth]{NRF_DW_learning_rate_acc_ROUGH.png}}
 \subfloat{
     \centering
-    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH_dia.png}}
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH.png}}
+    }
     \hspace{0mm}
     \\[-1.5ex]
+    \makebox[\textwidth][c]{
 \subfloat{
     \centering
-    \includegraphics[width=0.5\textwidth]{NRF_learning_rate_acc_ROUGH_dia.png}}
+    \includegraphics[width=0.6\textwidth]{NRF_learning_rate_acc_ROUGH.png}}
 \subfloat{
     \centering
-    \includegraphics[width=0.5\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH_dia.png}}
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH.png}}
+    }
         \hspace{0mm}
         \\[-0.8ex]
-\subfloat[]{
+\subfloat{
     \centering
-    \includegraphics[width=0.5\textwidth]{NN_learning_rate_acc_rough_dia.png}}
-    \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value after 2 times 5-fold cross validation (10 iterations in total), orange lines symbolizes standard deviation and dimmed gray lines are single realizations.}
+    \includegraphics[width=0.6\textwidth]{NN_learning_rate_acc_rough.png}}
+
+    \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
+\label{learning_rates}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_DW_learning_rate_acc_ROUGH_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_learning_rate_acc_ROUGH_dia.png}}
+    \hspace{0mm}
+    }
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_learning_rate_acc_ROUGH_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_learning_rate_acc_ROUGH_dia.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NN_learning_rate_acc_rough_dia.png}}
+    \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
 \label{figures:learning_rates_diabetes}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_DW_epochs_estimators_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_epochs_estimators_acc.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_epochs_estimators_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_epochs_estimators_acc.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+        \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_epochs_estimators_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NN_epochs_estimators_acc.png}}
+    }
+    \caption{Dependence of accuracy on number of estimators and number of training epochs on Vehicle dataset.}
+\label{figures:estimators_epochs_vehicle}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_DW_epochs_estimators_acc_dia.png}
+    }
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_epochs_estimators_acc_dia.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_epochs_estimators_acc_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_epochs_estimators_acc_dia.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+        \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_epochs_estimators_acc_dia.png}}
+    \subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NN_epochs_estimators_acc_dia.png}}
+    }
+    \caption{Dependence of accuracy on number of estimators and number of training epochs on Diabetes dataset.}
+\label{figures:estimators_epochs_diabetes}
 \end{figure}
 
 
 
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.65\textwidth]{NRF_DW_epochs_depth_acc_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.65\textwidth]{NRF_DW_epochs_depth_loss_dia.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_acc_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_loss_dia.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_epochs_depth_acc_dia.png}}
+    \caption{Dependence of accuracy and loss function on maximum depth of the decision trees in RF and number of training epochs. This experiment is performed on Diabetes dataset.}
+\label{figures:depth_epochs}
+\end{figure}
 
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.60\textwidth]{NRF_DW_beta1_beta2_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_beta1_beta2_acc.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_beta1_beta2_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_beta1_beta2_acc.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_beta1_beta2_acc.png}}
+    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Vehicle dataset.}
+\label{figures:beta_epochs}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.60\textwidth]{NRF_DW_beta1_beta2_acc_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_beta1_beta2_acc_dia.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_beta1_beta2_acc_dia.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_beta1_beta2_acc_dia.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_beta1_beta2_acc_dia.png}}
+    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Diabetes dataset.}
+\label{figures:beta_epochs_dia}
+\end{figure}
 
 \begin{thebibliography}{}
 \bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
@@ -1163,7 +1350,7 @@ Another important hyperparameter of NRF is a number of training epochs. Especial
 
 \bibitem{evaluation2}Koyejo, O. \& Natarajan, Nagarajan \& Ravikumar, P. \& Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
 
-\bibitem{multieval1}Hossin, Mohammad & M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
+\bibitem{multieval1}Hossin, Mohammad \& M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
 
 \bibitem{multieval2} Branco, Paula \& Torgo, Luís & Ribeiro, Rita. (2017). Relevance-Based Evaluation Metrics for Multi-class Imbalanced Domains. Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics). 698-710. 10.1007/978-3-319-57454-7\_54. 
 
