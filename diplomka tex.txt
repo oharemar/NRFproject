@@ -952,7 +952,7 @@ The second part comprises various studies of NRF parameters that could be highly
 
 In the last part the best NRF models are applied to the classification task on the real dataset consisting of the medical data from the LUCAS project. The LUCAS project collaborates with medical institutions and hospitals in order to collect the data of the patients diagnosed with any form of lung cancer. These data combine personal information about the patients together with the diagnostic and treatment records. The classification task is to predict the first treatment based on the input diagnostic data of the patient. Generally, the early correct treatments play a crucial role in the overall survival of the patient with such diagnosis. This classification task is characterized by high-dimensionality, sparsity and the lack of the significant records, which makes it challenging for a lot of classification algorithms.
 
-\section{Public datasets experiments}
+\section{Public dataset experiments}
 \label{public:experiments}
 
 This section provides comparison of NRF and competitive models evaluated on the set of public datasets selected in advance. Also the effect of the choice of NRF parameters on the overall performance is examined and visualized.
@@ -990,7 +990,7 @@ Models in Table \ref{table::public_models} are color-coded into three different 
 
 The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
 
-The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.1$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
+The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
@@ -1109,7 +1109,7 @@ We can see only small differences in accuracy values with varying number of esti
 
 Another situation occurs in the case of Diabetes dataset, as illustrated in the Figure \ref{figures:estimators_epochs_diabetes}. This is the case of RF model performing well in the comparison with other models.
 
-In this case arises quite an opposite situation than in the previous case on Vehicle dataset. With increasing number of training epochs is accuracy of NRF models decreasing. All NRF models except of NRF\_EL outperform RF with any number of estimators in the given range already after 5 epochs of training. They also reach their maximum accuracy in the given range of epochs. With higher number of epochs the accuracy decreases, eventually ending up with a worse model than initial RF. It could be caused by the problem of overfitting, which will be examined later. Especially in the case of NRF\_DW and NRF\_EL\_DW, the accuracy is decreasing quickly. In the case of NRF\_EL, the accuracy acquires its maximum value at approximately 20 epochs and then is slowly decreasing. It is beneficial to use early stopping\footnote{Early stopping is a method that check accuracy or error rate on validation dataset after each epoch and stop the training if the performance of the model stops improving.} technique during training NRF models to avoid this problem. Moreover, single NN model follows the same pattern of decreasing accuracy with increasing number of epochs as NRF models, which suggests that neural networks in this case converge quickly to optimal solution and with increasing number of epochs overfit to the problem. One noticeable fact is that performance of NRF models degradates slower than single NN model, which may be caused by the benefit of ensemble voting (or averaging) of NRF.
+In this case arises quite an opposite situation than in the previous case on Vehicle dataset. With increasing number of training epochs is accuracy of NRF models decreasing. All NRF models except of NRF\_EL outperform RF with any number of estimators in the given range already after 5 epochs of training. They also reach their maximum accuracy in the given range of epochs. With higher number of epochs the accuracy decreases, eventually ending up with a worse model than initial RF. It could be caused by the problem of overfitting, which will be examined later. Especially in the case of NRF\_DW and NRF\_EL\_DW, the accuracy is decreasing quickly. In the case of NRF\_EL, the accuracy acquires its maximum value at approximately 20 epochs and then is slowly decreasing. It is beneficial to use early stopping\footnote{Early stopping is a method that check accuracy or error rate on validation dataset after each epoch and stops the training if the performance of the model stops improving.} technique during training NRF models to avoid this problem. Moreover, single NN model follows the same pattern of decreasing accuracy with increasing number of epochs as NRF models, which suggests that neural networks in this case converge quickly to optimal solution and with increasing number of epochs overfit to the problem. One noticeable fact is that performance of NRF models degradates slower than single NN model, which may be caused by the benefit of ensemble voting (or averaging) of NRF.
 
 \subsubsection{Maximum depth of trees in RF}
 
@@ -1117,11 +1117,42 @@ Another examined hyperparameter of NRF is a number of neurons in the first and s
 
 We only present graphs on Diabetes dataset for NRF\_DW and NRF models, because for NRF models with extra added layer the trend is same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
 
-It can be seen in the graphs that NRF\_DW model is much more prone to overfitting than NRF model, which is logical, since NRF\_DW model simulate RF behaviour better already before training with backpropagation. This applies especially to larger maximum depths (starting from maximum depth equals 6), where we can register fast decrease in accuracy and increase in loss function with increasing number of training epochs. In the case of NRF this decrease is not that vigorous and straightforward, but for larger depths is still visible. ZDE VYZKOUŠET REGULARIZACI
+It can be seen in the graphs that NRF\_DW model is much more prone to overfitting than NRF model, which is logical, since NRF\_DW model simulate RF behaviour better already before training with backpropagation. This applies especially to larger maximum depths (starting from maximum depth equals 6), where we can register fast decrease in accuracy and increase in loss function with increasing number of training epochs. In the case of NRF this decrease is not that vigorous and straightforward, but for larger depths is still visible.
+
+In the Figure \ref{figures:depth_epochs_reg} are illustrated same models with regularization constant increased to $\lambda = 10$, which intensifies the influence of regularization term in the loss function. We can see that this modification prevent the models from the significant decrease of accuracy especially for the larger numbers of epochs, but in majority of depth values the maximum reached accuracy among those two variants remains favourable in the first case from the Figure \ref{figures:depth_epochs}. Still the differences are very small.
 
 \subsubsection{Transition parameters $\beta_1$ and $\beta_2$}
 
 Transition parameters $\beta_1$ and $\beta_2$ control the degree of transition of RF to NRF. The higher both values are, the better approximation of RF is obtained by NRF. Under certain circumstances it could be advantegous to increase those parameters and approximate RF accurately, especially when RF produces competitive results. Accuracy depending on both transition parameters is depicted for Vehicle dataset resp. Diabetes dataset in the Figure \ref{figures:beta_epochs} resp. Figure \ref{figures:beta_epochs_dia}.
+
+In the case of Vehicle dataset we can observe that it is not beneficial to increase $\beta_1$ and $\beta_2$ since the highest reached accuracy belongs to the point $\beta_1 = 1$ and $\beta_2 = 1$ among all NRF models. Since RF model performs badly in comparison with other models, this suggests that copying this RF model makes the subsequent NRF model performs worse than it could when $\beta_1$ and $\beta_2$ are kept low and NRF model is more relaxed. Increasing both values simultaneously causes deterioration of the results almost monotonically.
+
+The situation is different in the case of Diabetes dataset in the Figure \ref{figures:beta_epochs_dia}. In the contrast with the Vehicle dataset, we may observe some pairs of $\beta_1$ and $\beta_2$ other than (1,1) that are more beneficial in terms of higher accuracy. Even points (12,12) perform more favourably in the most cases of NRF models than point (1,1). This suggests that taking advantage of simulating well-performing RF model more accurately is the step towards better performance of NRF.
+
+Be aware of a problem of choosing transition parameters too high since it could negatively affect optimization process of neural networks. For high transition parameters the tanh functions approximate threshold functions too precisely and therefore the neurons in the first and second hidden layer could suffer from early saturation\footnote{The state of saturation in the terms of neural networks refers to the neuron which mainly outputs values close to the asymptotical endings (for tanh function it would be $\pm1$) \cite{saturation}. Since the gradient in this range is close to 0, it is unlikely that the current value of neuron is going to change significantly in the following iterations.}. Consequently, this could make the learning process of neural networks more difficult.
+
+\subsubsection{Max. considered features in the split}
+
+We also examined maximum number of considered features in the split of RF and its influence on the performance of NRF. Standardly we leave this hyperparameter on the value $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ represents number of features in the dataset. We tested the NRF performance for values of max. considered features set to 0.2, 0.4, 0.6, 0.8 and 1, where each number symbolizes the fraction of considered features with respect to $d$. Number of estimators has been set to 20.
+
+So far we can claim from the performed experiments on Vehicle dataset and Diabetes dataset, the effect of this hyperparameter is not very significant and differences between various settings of this hyperparameter are negligible.
+
+\subsubsection{Summary of the previous observations}
+
+In this part we shortly sum up the provisional experiments with NRF and RF hyperparameters performed in the previous paragraphs of this section.
+
+We saw that the sensitivity of learning rate has been slightly lower in the case of NRF models than in the case of single NN. This could be due to the ensemble nature of NRF with variety of single specific NN estimators, each differently sensitive to the current learning rate value. Overall sensitivity of NRF model to the learning rate is then "averaged" over single NN estimators and therefore could be reduced in comparison with only single NN. Note that this comparison has been done for other parameters fixed and the sensitivity to the learning rate could correlate with other hyperparameters too, mainly with the transition parameters $\beta_1$ and $\beta_2$. So the most suitable learning rate should be picked after some grid search on the validation dataset with other hyperparameters set beforehand.
+
+Following observations based on varying number of training epochs and other hyperparameters, such as maximum depth or number of estimators, offered another interesting perspective. Especially the NRF models initialized with RF consisting of trees with large depth are more prone to overfitting then in the case of lower depths, so it should be beneficial to prevent overfitting by employing techniques such as early stopping or adding a regularization term to the loss function (L2-regularization for instance). The differences between results of NRF models with varying number of estimators were small, slightly favourable in the case of larger number of estimators, as corresponds to the logical intuition.
+
+As another hyperparameters were investigated the transition parameters $\beta_1$ and $\beta_2$. It turned out that in the case of poor-performing RF it is beneficial to leave both values low (for instance $\beta_1 = 1$ and $\beta_2 = 1$) and start with relaxed NRF that do not simulate that RF accurately. On the other hand, when operating with well-performing RF with competitive results, it could reach more favourable performance when simulating RF more accurately by increasing both transition parameters. This issue will be also studied in the next chapter.
+
+Last studied hyperparameter was the number of maximum considered features in the split of RF. From the performed experiments we did not detect a significant dependence influencing the performance of subsequent NRF.
+
+\section{Toy dataset experiments}
+
+
+
 
 \chapter{Figures}
 
@@ -1290,6 +1321,31 @@ Transition parameters $\beta_1$ and $\beta_2$ control the degree of transition o
 \makebox[\textwidth][c]{
 \subfloat{
     \centering
+    \includegraphics[width=0.60\textwidth]{NRF_DW_epochs_depth_acc_reg_dia_reg.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_DW_epochs_depth_loss_reg_dia_reg.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_epochs_depth_acc_reg_dia_reg.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_epochs_depth_loss_reg_dia_reg.png}}
+    }
+
+    \caption{Same models as in the Figure \ref{figures:depth_epochs} with regularization constant set to $\lambda = 10$.}
+\label{figures:depth_epochs_reg}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
     \includegraphics[width=0.60\textwidth]{NRF_DW_beta1_beta2_acc.png}}
 \subfloat{
     \centering
@@ -1446,6 +1502,7 @@ http://www.cscjournals.org/library/manuscriptinfo.php
 
 \bibitem{keras} Keras. Chollet, Francois and others. 2015. \url{https://keras.io}
 
+\bibitem{saturation}Bosman, Anna \& Engelbrecht, Andries. (2015). Measuring Saturation in Neural Networks. 10.1109/SSCI.2015.202. 
 
 \end{thebibliography}
 
