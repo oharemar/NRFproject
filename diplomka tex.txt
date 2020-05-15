@@ -1,8 +1,10 @@
 \documentclass{report}
+%\documentstyle[a4]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{geometry}
 \usepackage[hang]{footmisc}
 \usepackage{tablefootnote}
 \usepackage{pbox}
@@ -988,7 +990,7 @@ All applied models are summarized in Table \ref{table::public_models} with their
 
 Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NRF models. We adopted logistic regression with L2 regularization and 4-layer neural network with ReLU activation function in the hidden layers and softmax in the output layer. Two hidden layers have 60 neurons both. It applies Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). Hyperparameters of NN were chosen as follows: $\eta = 0.01$, $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$, where $\eta$ is a learning rate and the rest are constants of Adam equally noted as in the Chapter [Optimization NN]. We use implementation of LR and NN from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
 
-The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
+The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
 
 The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
 
@@ -1133,7 +1135,7 @@ Be aware of a problem of choosing transition parameters too high since it could 
 
 \subsubsection{Max. considered features in the split}
 
-We also examined maximum number of considered features in the split of RF and its influence on the performance of NRF. Standardly we leave this hyperparameter on the value $\lceil\sqrt{d}\rceil$, where $d \in \mathbb{N}$ represents number of features in the dataset. We tested the NRF performance for values of max. considered features set to 0.2, 0.4, 0.6, 0.8 and 1, where each number symbolizes the fraction of considered features with respect to $d$. Number of estimators has been set to 20.
+We also examined maximum number of considered features in the split of RF and its influence on the performance of NRF. Standardly we leave this hyperparameter on the value $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ represents number of features in the dataset. We tested the NRF performance for values of max. considered features set to 0.2, 0.4, 0.6, 0.8 and 1, where each number symbolizes the fraction of considered features with respect to $d$. Number of estimators has been set to 20.
 
 So far we can claim from the performed experiments on Vehicle dataset and Diabetes dataset, the effect of this hyperparameter is not very significant and differences between various settings of this hyperparameter are negligible.
 
@@ -1151,12 +1153,35 @@ Last studied hyperparameter was the number of maximum considered features in the
 
 \section{Toy dataset experiments}
 
+This section comprises experiments on artificially created data in 2D, where we draw and compare decision boundaries learned by individual methods and search for properties and inclinations of NRF models based on varying hyperparameters.
+
+We conducted the experiments by generating a various datasets, each one of different shape and trend. Moreover, we investigate datasets of different random noise and test the ability of classifiers to find the correct decision boundary and not to overfit on noise data, as tend to do especially overgrown RF models.
+
+Each dataset was split to the training and testing set with ratio of 8:2 and the decision boundary was drawn on the input space. It is difficult and not straightforward to aggregate decision boundaries of several NRFs and visualize it while preserving correct interpretability, especially when classifying into more than two labels. Suppose that we trained 4 independent NRF classifiers on 3-class dataset (classes are denoted simply as 0,1,2) and decisions of NRFs are subsequently [0,0,1,2] in that point. Also suppose that each class occupies different color (defined as a vector (R,G,B,$\alpha$), where R,G,B denote typical red,green,blue triplet and $\alpha$ denotes transparency level). If we pick the most frequent decision (or average the decision probabilities) and draw the point with the color of the most favourable class, then the result corresponds to the decision of an ensemble method consisting of several NRFs and that is not what we desire to illustrate. Also we cannot depict all decisions in the picture, since the combination of 3 colors could result in an uninformative colors that does not capture the trend. For 2-class case, it is possible to illustrate the frequency of decisions by adopting the color gradient between two colors, but since we work also with 3-class datasets, we will not present the results separately in a different way for 2-class datasets.
+
+Instead, the decision boundaries and their tendencies are for individual NRFs demonstrated on multiple datasets, each of varying size, and for varying hyperparameters of NRFs. Single NRFs are trained on one training set, which remains same for all presented models. As the hyperparameters change, we can see the evolution of decision boundaries of different NRFs and their inclinations. We also present a single value of accuracy on testing set for all models only for quick comparison, but since this corresponds to the one realization, it should not be decisive in the comparison of models. The comparison is more stable and reliable when comparing visually the decision boundaries in general and comparing their generalization ability.
+
+\subsection{Number of epochs}
+
+In this part we investigate the effect of varying number of training epochs on evolution of individual decision boundaries. Decision boundaries are drawn on 3 types of artificial datasets, each type is also depicted for different sizes, specifically for 50 and 200 instances. RF model used for NRF initialization has 10 estimators, maximum depth of individual trees is set to 6 and number of features considered in the split is set to 1 (since $d = 2$ in this case). Transition parameters $\beta_1$ and $\beta_2$ of NRF models are set to 1. NRF models are compared with single NN model of same hyperparameters as defined in the \autoref{experiments} and also with RF model used for initialization of all NRF models.
+
+All illustrations are depicted in the Figure \ref{figures:epochs_toy1}, Figure \ref{figures:epochs_toy2} and Figure \ref{figures:epochs_toy3}. We can see that in the cases of 50 input instances the NRF\_DW and NRF\_EL\_DW models manages to tune finely already after 5 epochs of training, whereas NRF and NRF\_EL do not adapt very reliably and their decision boundary is very far from ideal separation (for 5 to 30 training epochs). For larger number of training epochs NRF\_EL could establish decision boundaries competitively with other models, but NRF model could not. NRF model even struggle to learn competitive separation in the case of 200 input instances and can catch up slower than other models, approximately around 30 training epochs. Then mainly for higher number of input instances the NRF model could perform competitively with other models.
+
+Also we can highlight the striking resemblance of decision boundaries of NRF\_DW and \\NRF\_EL\_DW in all cases and even for every single number of training epochs. This proves the concept since both models target to simulate RF and therefore should share some similarities. 
+
+This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW) share some similarities and could learn faster than other NRF models. Also they can adapt better to the problems with less training inputs.
+
+\subsection{Transition parameters $\beta_1$ and $\beta_2$}
+
+
+
 
 
 
 \chapter{Figures}
 
-
+\pagestyle{empty}
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1186,7 +1211,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
 \label{learning_rates}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1215,7 +1242,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
 \label{figures:learning_rates_diabetes}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1249,7 +1278,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Dependence of accuracy on number of estimators and number of training epochs on Vehicle dataset.}
 \label{figures:estimators_epochs_vehicle}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1284,9 +1315,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Dependence of accuracy on number of estimators and number of training epochs on Diabetes dataset.}
 \label{figures:estimators_epochs_diabetes}
 \end{figure}
+\vfill
 
-
-
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1315,7 +1346,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Dependence of accuracy and loss function on maximum depth of the decision trees in RF and number of training epochs. This experiment is performed on Diabetes dataset.}
 \label{figures:depth_epochs}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1340,7 +1373,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Same models as in the Figure \ref{figures:depth_epochs} with regularization constant set to $\lambda = 10$.}
 \label{figures:depth_epochs_reg}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1369,7 +1404,9 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Vehicle dataset.}
 \label{figures:beta_epochs}
 \end{figure}
+\vfill
 
+\vfill
 \begin{figure}[h!]
 \centering
 \makebox[\textwidth][c]{
@@ -1398,6 +1435,68 @@ Last studied hyperparameter was the number of maximum considered features in the
     \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Diabetes dataset.}
 \label{figures:beta_epochs_dia}
 \end{figure}
+\vfill
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_1_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_1_samples200.png}}}
+    \caption{Type 1. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+\label{figures:epochs_toy1}
+\end{figure}
+%\restoregeometry
+\vfill
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_2_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_2_samples200.png}}}
+    \caption{Type 2. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+\label{figures:epochs_toy2}
+\end{figure}
+%\restoregeometry
+\vfill
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_3_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{epochs_3_samples200.png}}}
+    \caption{Type 3. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner.}
+\label{figures:epochs_toy3}
+\end{figure}
+%\restoregeometry
+\vfill
+
 
 \begin{thebibliography}{}
 \bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
