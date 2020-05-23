@@ -202,7 +202,7 @@ Now will be provided mathematical details of the both stages.
 
 \subsection{Training stage}
 
-Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of vectors in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
+Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of instances in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
 
 Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire training dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
 
@@ -321,17 +321,17 @@ where $j$ is the leaf node where $x$ ended.
 
 \section{Ensemble of decision trees}
 
-Ensemble of decision trees forms a strong classifier with higher predictive ability than individual decision trees. Idea behind this is to combine several weak classifiers to create one strong classifier. Ensembles generally boost the performance in the comparison with the single classifier (decision tree). For instance, there is a chance of single classifiers to get stuck in the local optima when optimizing different criterions (e.g. minimizing error rate). With more and more data, it could be for many classifiers computationally unreachable to find the best optimal value. In such cases, the employment of ensemble methods is valuable, because training of independent classifiers with different subsets of input data and merging their output could approximate real prediction function far better \cite{ensemble}.
+Ensemble of decision trees forms a strong classifier with higher predictive ability than individual decision trees. Idea behind this is to combine several weak classifiers to create one strong classifier. Ensembles generally boost the performance in the comparison with the single classifier (decision tree). For instance, there is a chance of single classifiers to get stuck in the local optima when optimizing different criterions (e.g. minimizing error rate). With more and more data, it could be for many classifiers computationally unreachable to find the best optimal value. In such cases, the employment of ensemble methods is valuable, because training of independent classifiers and merging their output could approximate real prediction function far better \cite{ensemble}.
 
 Ensemble methods also significantly benefit from the averaging of results from individual classifiers, especially in the case of insufficient number of training data points. In such case, the learning algorithm could find many applicable parameters (e.g. hyperplanes of the decision tree) that will result in the same accuracy on the training dataset. Combining those models could suppress the possibility of picking a wrong classifier \cite{ensemble}.
 
 Among popular techniques to create an ensemble of decision trees belong:
 \begin{itemize}
-    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to the train the decision tree. Then the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
+    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to train the decision tree. Then the ensemble of the decision trees is obtained and the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
     \item \textbf{Boosting} This method is based on idea of iterative boosting of weak classifiers into a strong one. In each iteration, the algorithm aims to boost previous-staged classifier by checking of the misclassified instances and attempting to fix these errors. As popular boosting algorithm could be mentioned AdaBoost algorithm \cite{adaboost2}. These methods often tend to overfitting problem \cite{adaboost}.
 \end{itemize}
 
-In the experimental part of this thesis is used exclusively bagging technique to make an ensemble of decision trees. To obtain random forest from the ensemble obtained by bagging algorithm, the \textit{randomization} of single trees needs to be added into the process. This technique helps to avoid correlation between individual decision trees and secures better indepedence of classifiers. An idea is to suppress the influence of strongly distinguishing features (dimensions), that are natural choice to split by. Occurrence of these features could result in the correlation of the decision trees, because algorithm would prefer those features especially in the early stages of growing phase and therefore indicates detectable similarity of the trees. Randomization attempts to obviate this problem and selects some random subset of the features in each splitting iteration and only those selected features are used for the split.
+In the experimental part of this thesis is used entire training dataset for tuning individual decision trees, thus it is a variation on the bagging technique with bootstrapping of $N$ instances, where $N$ is a total number of instances in the training dataset. To obtain random forest from the ensemble obtained by bagging algorithm, the \textit{randomization} of single trees needs to be added into the process. This technique helps to avoid correlation between individual decision trees and secures better indepedence of classifiers. An idea is to suppress the influence of strongly distinguishing features (dimensions), that are natural choice to split by. Occurrence of these features could result in the correlation of the decision trees, because algorithm would prefer those features especially in the early stages of growing phase and therefore indicates detectable similarity of the trees. Randomization attempts to obviate this problem and selects some random subset of the features in each splitting iteration and only those selected features are used for the split.
 
 \subsection{Combining predictions of the decision trees}
 
@@ -1088,7 +1088,7 @@ In this section are studied various combinations of hyperparameters of NRF and R
 
 We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NRF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NRF. If we choose bad hyperparameters in the case of poor RF, the resulting NRF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NRF could perform worse than the corresponding RF, which is undesirable.
 
-All graphical visualizations are presented in the Chapter [Figures] and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results for RF model are presented together with results of NRF models in one figure, then this RF model was used to initialize all NRF models in the same figure. In all following experiments, the hyperparameters of NRF models which are not examined at the time remain same as defined in the previous section.
+All graphical visualizations are presented in the \autoref{figures} and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results for RF model are presented together with results of NRF models in one figure, then this RF model was used to initialize all NRF models in the same figure. In all following experiments, the hyperparameters of NRF models which are not examined at the time remain same as defined in the previous section.
 
 \subsubsection{Learning rate}
 
@@ -1105,7 +1105,7 @@ Based on the Figure \ref{learning_rates}, we can see that in all cases the optim
 
 Another important hyperparameter of NRF is a number of training epochs. Especially in the case of NRF models which simulate RF behaviour since the beginning, they could improve the performance of initial RF already after few epochs, which could be time-efficient. We will investigate this issue alongside the effect of number of estimators in NRF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The fixed hyperparameters of NRF and RF remain same as in the previous experiments.
 
-First we will focus on the experiments on Vehicle dataset showed in the Figure \ref{figures:estimators_epochs_vehicle}. This is the case when RF model does not perform well in the comparison with other models, as was already seen in tables \ref{tab:results_macro_public} and \ref{tab:results_accuracy_public}. One may notice apparent pattern that increase of a number of training epochs causes enhancement of accuracy. This happens among all NRF models and also in the case of single NN. NRF\_DW and NRF\_EL\_DW models could outperform initial RF already after 5 epochs of training and reach slightly higher values of accuracy than NRF models with one layer of random weights until 30 epochs of training. For higher number of epochs are results very similar among all NRF models except of NRF\_EL, which has slightly lower accuracy. Also NRF\_DW and NRF\_EL\_DW converge faster to the maximum values of accuracy, acquiring it at approximately 30 epochs of training, whereas other NRF models still register increase of accuracy with higher number of training epochs. It could be due to the nature of individual models, where NRF\_DW and NRF\_EL\_DW imitate RF more precisely than other NRF models and therefore could be closer to some optimal value of loss function than NRF and NRF\_EL since the beginning. Therefore it is more likely to reach its optimal performance earlier.
+First we will focus on the experiments on Vehicle dataset showed in the Figure \ref{figures:estimators_epochs_vehicle}. This is the case when RF model does not perform well in the comparison with other models, as was already seen in tables \ref{tab:results_macro_public} and \ref{tab:results_accuracy_public}. One may notice apparent pattern that increase of a number of training epochs causes enhancement of accuracy. This happens among all NRF models and also in the case of single NN. NRF\_DW and NRF\_EL\_DW models could outperform initial RF already after 5 epochs of training and reach slightly higher values of accuracy than NRF models with one layer of random weights until 30 epochs of training. For higher number of epochs are results very similar among all NRF models except of NRF\_EL, which has slightly lower accuracy. Also NRF\_DW and NRF\_EL\_DW converge faster to the maximum values of accuracy, acquiring it at approximately 30 epochs of training, whereas other NRF models still register increase of accuracy with higher number of training epochs. It could be due to the nature of individual models, where NRF\_DW and NRF\_EL\_DW imitate RF more precisely than other NRF models and therefore could be closer to some optimal value of loss function than NRF and NRF\_EL since the beginning. Therefore they are more likely to reach their optimal performance earlier.
 
 We can see only small differences in accuracy values with varying number of estimators. With increasing number of estimators the accuracy values usually also increase, but a number of epochs is more distinguishing factor. 
 
@@ -1117,7 +1117,7 @@ In this case arises quite an opposite situation than in the previous case on Veh
 
 Another examined hyperparameter of NRF is a number of neurons in the first and second hidden layer of the individual neural networks. This number is fully controlled by the depth of the corresponding tree. We will examine the influence of maximum depth of trees in RF (which is set before the training of RF) on performance of NRF. Especially for overgrown trees there is a significant risk of overfitting either in the case of the decision tree or subsequently in the case of transformed neural network, which will be tested. We also add number of training epochs of NRF as another variable.
 
-We only present graphs on Diabetes dataset for NRF\_DW and NRF models, because for NRF models with extra added layer the trend is same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
+We only present graphs created on Diabetes dataset for NRF\_DW and NRF models, because for NRF models with extra added layer the trend has turned out to be same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
 
 It can be seen in the graphs that NRF\_DW model is much more prone to overfitting than NRF model, which is logical, since NRF\_DW model simulate RF behaviour better already before training with backpropagation. This applies especially to larger maximum depths (starting from maximum depth equals 6), where we can register fast decrease in accuracy and increase in loss function with increasing number of training epochs. In the case of NRF this decrease is not that vigorous and straightforward, but for larger depths is still visible.
 
@@ -1153,32 +1153,64 @@ Last studied hyperparameter was the number of maximum considered features in the
 
 \section{Toy dataset experiments}
 
-This section comprises experiments on artificially created data in 2D, where we draw and compare decision boundaries learned by individual methods and search for properties and inclinations of NRF models based on varying hyperparameters.
+This section comprises experiments on artificially created data in 2D, where we draw and compare decision boundaries learned by individual methods and search for properties and inclinations of NRF models based on varying hyperparameters and different properties of datasets.
 
 We conducted the experiments by generating a various datasets, each one of different shape and trend. Moreover, we investigate datasets of different random noise and test the ability of classifiers to find the correct decision boundary and not to overfit on noise data, as tend to do especially overgrown RF models.
 
-Each dataset was split to the training and testing set with ratio of 8:2 and the decision boundary was drawn on the input space. It is difficult and not straightforward to aggregate decision boundaries of several NRFs and visualize it while preserving correct interpretability, especially when classifying into more than two labels. Suppose that we trained 4 independent NRF classifiers on 3-class dataset (classes are denoted simply as 0,1,2) and decisions of NRFs are subsequently [0,0,1,2] in that point. Also suppose that each class occupies different color (defined as a vector (R,G,B,$\alpha$), where R,G,B denote typical red,green,blue triplet and $\alpha$ denotes transparency level). If we pick the most frequent decision (or average the decision probabilities) and draw the point with the color of the most favourable class, then the result corresponds to the decision of an ensemble method consisting of several NRFs and that is not what we desire to illustrate. Also we cannot depict all decisions in the picture, since the combination of 3 colors could result in an uninformative colors that does not capture the trend. For 2-class case, it is possible to illustrate the frequency of decisions by adopting the color gradient between two colors, but since we work also with 3-class datasets, we will not present the results separately in a different way for 2-class datasets.
+Each dataset was split to the training and testing set with ratio of 6:4 and the decision boundary was drawn on the input space. It is difficult and not straightforward to aggregate decision boundaries of several NRFs and visualize it while preserving correct interpretability, especially when classifying into more than two labels. Suppose that we trained 4 independent NRF classifiers on 3-class dataset (classes are denoted simply as 0,1,2) and decisions of NRFs are subsequently [0,0,1,2] in that point. Also suppose that each class occupies different color (defined as a vector (R,G,B,$\alpha$), where R,G,B denote typical red,green,blue triplet and $\alpha$ denotes transparency level). If we pick the most frequent decision (or average the decision probabilities) and draw the point with the color of the most favourable class, then the result corresponds to the decision of an ensemble method consisting of several NRFs and that is not what we desire to illustrate. Also we cannot depict all decisions in the picture, since the combination of 3 colors could result in an uninformative colors that does not capture the trend. For 2-class case, it is possible to illustrate the frequency of decisions by adopting the color gradient between two colors, but since we work also with 3-class datasets, we will not present the results separately in a different way for 2-class datasets.
 
 Instead, the decision boundaries and their tendencies are for individual NRFs demonstrated on multiple datasets, each of varying size, and for varying hyperparameters of NRFs. Single NRFs are trained on one training set, which remains same for all presented models. As the hyperparameters change, we can see the evolution of decision boundaries of different NRFs and their inclinations. We also present a single value of accuracy on testing set for all models only for quick comparison, but since this corresponds to the one realization, it should not be decisive in the comparison of models. The comparison is more stable and reliable when comparing visually the decision boundaries in general and comparing their generalization ability.
 
 \subsection{Number of epochs}
 
-In this part we investigate the effect of varying number of training epochs on evolution of individual decision boundaries. Decision boundaries are drawn on 3 types of artificial datasets, each type is also depicted for different sizes, specifically for 50 and 200 instances. RF model used for NRF initialization has 10 estimators, maximum depth of individual trees is set to 6 and number of features considered in the split is set to 1 (since $d = 2$ in this case). Transition parameters $\beta_1$ and $\beta_2$ of NRF models are set to 1. NRF models are compared with single NN model of same hyperparameters as defined in the \autoref{experiments} and also with RF model used for initialization of all NRF models.
+In this part we investigate the effect of varying number of training epochs on evolution of individual decision boundaries. Decision boundaries are drawn on 3 types of artificial datasets, each type is also depicted for different sizes, specifically for 50 and 200 instances. RF model used for NRF initialization has 10 estimators, maximum depth of individual trees is set to 6 and number of features considered in the split is set to 1 (since $d = 2$ in this case). Transition parameters $\beta_1$ and $\beta_2$ of NRF models are set to 1 and we use Adam as optimization algorithm (parameters of Adam and other hyperparameters of NRF models are same as in the \autoref{experiments}). NRF models are compared with single NN model of same hyperparameters as defined in the \autoref{experiments} and also with RF model used for initialization of all NRF models.
 
-All illustrations are depicted in the Figure \ref{figures:epochs_toy1}, Figure \ref{figures:epochs_toy2} and Figure \ref{figures:epochs_toy3}. We can see that in the cases of 50 input instances the NRF\_DW and NRF\_EL\_DW models manages to tune finely already after 5 epochs of training, whereas NRF and NRF\_EL do not adapt very reliably and their decision boundary is very far from ideal separation (for 5 to 30 training epochs). For larger number of training epochs NRF\_EL could establish decision boundaries competitively with other models, but NRF model could not. NRF model even struggle to learn competitive separation in the case of 200 input instances and can catch up slower than other models, approximately around 30 training epochs. Then mainly for higher number of input instances the NRF model could perform competitively with other models.
+All illustrations are depicted in the Figure \ref{figures:epochs_toy1}, Figure \ref{figures:epochs_toy2} and Figure \ref{figures:epochs_toy3}. We can see that in the cases of 50 input instances the NRF\_DW and NRF\_EL\_DW models manages to tune finely already after 5 epochs of training, whereas NRF and NRF\_EL do not adapt very reliably and their decision boundary is very far from ideal separation (for 5 to 30 training epochs). For larger number of training epochs NRF\_EL could establish decision boundaries competitively with other models, but NRF model could not. NRF model even struggle to learn competitive separation in the case of 200 input instances and can catch up slower than other models, approximately around 30 training epochs. Eventually for higher number of input instances the NRF model could perform competitively with other models.
 
-Also we can highlight the striking resemblance of decision boundaries of NRF\_DW and \\NRF\_EL\_DW in all cases and even for every single number of training epochs. This proves the concept since both models target to simulate RF and therefore should share some similarities. 
+Also we can highlight the striking resemblance of decision boundaries of NRF\_DW and \\NRF\_EL\_DW in all cases and even for every single number of training epochs. This proves the concept since both models are deterministic and they target to simulate RF, therefore they should share some similarities. 
 
-This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW) share some similarities and could learn faster than other NRF models. Also they can adapt better to the problems with less training inputs.
+This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW) share some similarities and could learn faster than other NRF models. Moreover, they can adapt better to the problems with less training inputs.
 
 \subsection{Transition parameters $\beta_1$ and $\beta_2$}
 
+This part comprises experiments based on varying transition parameters $\beta_1$ and $\beta_2$, which control the accuracy of transition of RF to the corresponding NRF. We will keep these parameters simultaneously on the same values and increase them at the same time, since increasing of both values results in more accurate simulation of RF. We use $\beta$ to denote both values $\beta_1$ and $\beta_2$ simultaneously, thus $\beta = \beta_1 = \beta_2$.
 
+We use same RF model for initialization of all NRF models. NRF models are trained for 25 training epochs and other hyperparameters of NRF models and RF remain same as defined in the previous part. We show decision boundaries on 3 different types of datasets, each consisting of 50 and 200 instances.
 
+The illustrations of decision boundaries depending on $\beta$ are depicted in the Figure \ref{figures:betas_toy1}, Figure \ref{figures:betas_toy2} and Figure \ref{figures:betas_toy3}. We can see that in case of 50 data inputs the NRF model could not tune its decision boundary sufficiently even after 25 training epochs (for all $\beta$s), which further confirms that this model is not suitable when working with low number of training inputs. For 200 instances is NRF model able to catch up and produce competitive decision boundaries with other models.
 
+For $\beta = 1$ all NRF models produce various nonlinear decision boundaries, which are more adaptable then RF decision boundaries parallel with axes. They are able to create more complex (e.g. round or ellipsoidal related) shapes. This means that for low $\beta$s the NRF models could benefit more from their neural network properties and therefore could tune better to the problems that cannot be solved properly by finite number of splits by RF, e.g. 3 classes ordered in concentric nested spheres made of data generated by standard normal distribution, as could be seen in the Figure \ref{figures:betas_toy3}.
 
+When $\beta$ is increasing, we can see that the decision boundaries of NRF models gradually converge to the decision boundary of corresponding RF model. Especially in the case of NRF\_DW and NRF\_EL\_DW the resemblance is obvious and the decision boundaries for $\beta = 50$ are almost identical. Also with increasing $\beta$ the decision boundaries of NRF models evolve more in the RF manner, preferring more perpendicular and parallel shapes, as does RF itself. It is nicely demonstrated in the Figure \ref{figures:betas_toy3} in the case of 200 data inputs, where for $\beta = 1$ are the decision boundaries of NRF models in a great contrast with the RF boundary. They form concentric spheres which separate the classes, whereas the boundary of RF is created as concentric rectangles. But already for $\beta = 5$ the decision boundary of individual NRF models become rectangular as well.
+
+We see that all NRF models with higher values of $\beta_1$ and $\beta_2$ simulate initial RF quite precisely. For lower values of $\beta$ is resemblance less visible and the decision boundaries of NRF models look more similar to the NN decision boundary, as could be seen for instance in the Figure \ref{figures:epochs_toy3}, where both transition parameters are set to 1.
+
+\subsection{Noise in data}
+
+In this part we investigate the influence of noise in data on NRF decisions. We conduct these experiments in two variants, the first for $\beta = \beta_1 = \beta_2 = 1$ and the second for $\beta = \beta_1 = \beta_2 = 50$. We fix the size of dataset to 100 and all NRF models are trained for 25 training epochs. All other hyperparameters of NRF, RF and NN remain same as in the previous experiments. The noise is randomly generated from the normal distribution and takes on values ranging from 0.1 to 0.5. Each value denotes standard deviation of normal distribution that generates noise.
+
+If noise occurs among data, the RF model in general tends to overfitting on this noise, especially when the individual trees are overgrown (large depth) and unpruned. We depict the dependence of decision boundaries on the noise in the Figure \ref{figures:noise_toy}.
+
+We can see that in the case of $\beta = 1$ all NRF models establish a fine separation of data despite the increasing amount of noise, whereas the RF model produces signs of overfitting (demonstrated by small areas cut out in the territory of different class). In this case the overfitting of RF model was not simulated by NRF models and all NRF models and NN model produced sufficiently generalized boundaries.
+
+A different situation arises when we increase both transition parameters to $\beta = \beta_1 = \beta_2 = 50$. Then we could see a significant signs of overfitting among all NRF models, especially in the case of NRF\_DW and NRF\_EL\_DW, which simulate the RF accurately and thus share similar properties as RF. This problem should be resolved by decreasing the transition parameters or adopting some regularization techniques, as will be briefly investigated in the next part.
+
+\subsection{Overfitting and regularization}
+
+When initializing NRF models with RF consisting of a number of overgrown trees, there exists a significant risk that RF overfits the data and therefore even a subsequent NRF model could be prone to overfitting as well, especially if the transition parameters are larger than 1. One way to avoid this problem is to decrease the transition parameters or add a regularization term to the loss function, where the overfitting should be controlled by modifying the regularization parameter $\lambda$.
+
+We demonstrate the benefit of using L2-regularization term in the case of NRF\_DW and NRF\_EL\_DW models initialized with overtrained RF suffering from overfitting. It is done on artificially created dataset consisting of 100 instances and divided into 2 classes as depicted in the Figure \ref{figures:toy_reg}. Transition parameters are set to $\beta_1 = \beta_2 = 10$. The results were obtained after 2 subsequent 5-fold cross validations (10 iterations in total) and are presented in the Figure \ref{figures:toy_reg}. Apparently, adding the regularization term is helpful in this case, resulting in an increase of accuracy among both NRF\_DW and NRF\_EL\_DW models. Unfortunately, the most suitable value of regularization constant cannot be stated generally and depends on specific data and model. Therefore it should be picked after a grid search and cross validation.
+
+\subsection{Commentary on the space and time complexity}
+
+One paragraph, mention parallelization - time complexity is same as a single NN if trained on a sufficient number of CPUs. It could be further accelerated by GPU. Viděl jsem, že se v článcích příliš neřeší time complexita neuronek, ale můžeme uvést nějakou O() notaci. Nepřijde mi to ale příliš zajímavé, možná můžeme uvést jen odkaz na článek, kde je odvozena complexita jedné neuronky, každý si pak může dosadit tam. Co se týče space complexity, tam bychom museli odvodit, co všechno si musí neuronka pamatovat, aby se mohla natrénovat , tzn. všechny váhy a biasy + všechny potřebné mezivýpočty backpropu + hyperparametry - opět podle mě ne příliš zajímavá informace, řešeno v nekonečně mnoha článcích nejspíše. A je to možná na delší odvozování
+
+\section{LUCAS dataset experiments}
+
+In this part we focus on applying proposed NRF models on the real-world dataset, which was obtained from the data collected by LUCAS project\footnote{More info on LUCAS could be found at: www.lucascz.cz}.
 
 \chapter{Figures}
+\label{figures}
 
 \pagestyle{empty}
 \vfill
@@ -1329,7 +1361,7 @@ This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW
     \includegraphics[width=0.65\textwidth]{NRF_DW_epochs_depth_loss_dia.png}}
     }
     \hspace{0mm}
-    \\[-1.5ex]
+    \\[-5.0ex]
     \makebox[\textwidth][c]{
 \subfloat{
     \centering
@@ -1339,10 +1371,10 @@ This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW
     \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_loss_dia.png}}
     }
         \hspace{0mm}
-        \\[-0.8ex]
+        \\[-5.0ex]
 \subfloat{
     \centering
-    \includegraphics[width=0.6\textwidth]{RF_epochs_depth_acc_dia.png}}
+    \includegraphics[width=0.65\textwidth]{RF_epochs_depth_acc_dia.png}}
     \caption{Dependence of accuracy and loss function on maximum depth of the decision trees in RF and number of training epochs. This experiment is performed on Diabetes dataset.}
 \label{figures:depth_epochs}
 \end{figure}
@@ -1354,20 +1386,20 @@ This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW
 \makebox[\textwidth][c]{
 \subfloat{
     \centering
-    \includegraphics[width=0.60\textwidth]{NRF_DW_epochs_depth_acc_reg_dia_reg.png}}
+    \includegraphics[width=0.65\textwidth]{NRF_DW_epochs_depth_acc_reg_dia_reg.png}}
 \subfloat{
     \centering
-    \includegraphics[width=0.6\textwidth]{NRF_DW_epochs_depth_loss_reg_dia_reg.png}}
+    \includegraphics[width=0.65\textwidth]{NRF_DW_epochs_depth_loss_reg_dia_reg.png}}
     }
     \hspace{0mm}
     \\[-1.5ex]
     \makebox[\textwidth][c]{
 \subfloat{
     \centering
-    \includegraphics[width=0.6\textwidth]{NRF_epochs_depth_acc_reg_dia_reg.png}}
+    \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_acc_reg_dia_reg.png}}
 \subfloat{
     \centering
-    \includegraphics[width=0.6\textwidth]{NRF_epochs_depth_loss_reg_dia_reg.png}}
+    \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_loss_reg_dia_reg.png}}
     }
 
     \caption{Same models as in the Figure \ref{figures:depth_epochs} with regularization constant set to $\lambda = 10$.}
@@ -1497,6 +1529,100 @@ This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW
 %\restoregeometry
 \vfill
 
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas1_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas1_samples200.png}}}
+    \caption{Type 1. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+\label{figures:betas_toy1}
+\end{figure}
+%\restoregeometry
+\vfill
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas2_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas2_samples200.png}}}
+    \caption{Type 2. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+\label{figures:betas_toy2}
+\end{figure}
+%\restoregeometry
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas3_samples50.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{betas3_samples200.png}}}
+    \caption{Type 3. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner.}
+\label{figures:betas_toy3}
+\end{figure}
+%\restoregeometry
+
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{noise31_samples100.png}}}
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=\textwidth]{noise31_samples100_beta50.png}}}
+    \caption{Decision boundaries based on occurrence of noise in data. The effect of noise is illustrated on dataset with 100 instances. In the upper figure is $\beta_1 = \beta_2 = 1$ among all NRF models. In the bottom figure is $\beta_1 = \beta_2 = 50$. The accuracy on the testing subset is in the right-bottom corner.}
+\label{figures:noise_toy}
+\end{figure}
+%\restoregeometry
+
+%\newgeometry{bottom=0.1cm,top=0.1cm}
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.7\textwidth]{input_data_reg.png}}
+    \subfloat{
+    \centering
+    \includegraphics[width=0.5\textwidth]{toy_reg_100samples.png}}}
+    \caption{Accuracy depending on the regularization constant $\lambda$. In the left figure are depicted input data (100 instances) as two circles distorted by noise. The results are presented for RF, NRF\_DW and NRF\_EL\_DW in the form "mean $\pm$ std" after 2 subsequent 5-fold cross validations. The transition parameters $\beta_1$ and $\beta_2$ are set to 10.}
+\label{figures:toy_reg}
+\end{figure}
+%\restoregeometry
 
 \begin{thebibliography}{}
 \bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
