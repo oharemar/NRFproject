@@ -1032,7 +1032,7 @@ All categorical features were one-hot encoded, ie. transformed by function $\zet
 \end{equation}
 Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1 ) to ensure better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of $j$-th feature. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
 
-Final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public}.
+Final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public} (results in both tables correspond to the original values multiplied by 100).
 
 \begingroup
 %\verb|\medmuskip=0mu:|
@@ -1235,7 +1235,7 @@ Since our classification task corresponds to the binary classification on imbala
 
 We employ two NF models - NRF\_DW and NRF\_EL\_DW and compare their performance with logistic regression classifier, single NN and the RF used for initialization of NF models. We use same logistic regression model with L2 regularization as in the public experiments. Single NN has two hidden layers, each consisting of 150 neurons with ReLU activation functions and the softmax in the output layer. We use Cross Entropy as the loss function and Adam as optimization algorithm. All other hyperparameters remain same as defined for single NN in the public experiments.
 
-RF consists of 30 decision trees, maximum depth is set to 6 and the number of features considered in the split is set to $\lfloor d \rfloor$, where $d \in \mathbb{N}$ denotes number of features. We employ entropy as impurity function in information gain criterion.
+RF consists of 30 decision trees, maximum depth is set to 6 and the number of features considered in the split is set to $\lfloor \sqrt{d} \rfloor$, where $d \in \mathbb{N}$ denotes number of features. We employ entropy as impurity function in information gain criterion.
 
 NF models were initialized with RF model described above, with transition parameters set to $\beta_1 = 10$ and $\beta_2 = 10$. Learning rate for NRF\_DW is set to 0.002 and for NRF\_EL\_DW to 0.0025. We use Cross Entropy as loss function and Adam as optimization algorithm with same hyperparameters as single NN model. This time we omit adding the regularization term to the loss function and instead we employ early stopping technique (we use it also in the case of single NN model). This technique monitors the loss function on validation dataset (different from the testing dataset) after each epoch. It tracks the loss function for 10 subsequent epochs from each new epoch and if there is no occurrence of decrease, the training process is terminated. 
 
@@ -1243,7 +1243,7 @@ The testing fold in each iteration of cross validation was randomly divided into
 
 \subsection{Results}
 
-The results of individual models are presented in the Table \ref{table::real_dataset}.
+The results of individual models are presented in the Table \ref{table::real_dataset} (original values multiplied by 100).
 
 \begingroup
 \begin{table}[h]
@@ -1252,14 +1252,18 @@ The results of individual models are presented in the Table \ref{table::real_dat
     \small\addtolength{\tabcolsep}{-5pt}
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
     \hline
-     \multirow{2}{*}{MODEL}&\multicolumn{3}{c|}{Class 0} &\multicolumn{3}{c|}{Class 1}& \multirow{2}{*}{Macro-avg F1-score}& \multirow{2}{*}{Accuracy}\\ \cline{2-7}
+     \multirow{2}{*}{MODEL}&\multicolumn{3}{c|}{Class 0} &\multicolumn{3}{c|}{Class 1}& \multirow{2}{*}{Macro-avg F1}& \multirow{2}{*}{Accuracy}\\ \cline{2-7}
      & Precision & Recall & F1-score &Precision & Recall & F1-score & & \\ \hline
-     
+     LR & $89.6 \pm 1.9$&$96.3 \pm 1.8$ & $92.8 \pm 1.3$&$72.1 \pm 13.7$&$46.6 \pm 12.1$ & $56.0 \pm 12.0$ & $74.4 \pm 6.6$&$87.6 \pm 6.6$\\ \hline
+     NN & $88.6 \pm 2.1$& $93.4 \pm 2.7$ & $90.9 \pm 2.0$&$58.3 \pm 15.3$&$43.0 \pm 12.4$ & $49.0 \pm 12.6$&$69.9 \pm 7.2$& $84.6 \pm 3.4$\\ \hline
+     RF & $88.9 \pm 1.7$& $98.7 \pm 1.0$& $93.5 \pm 0.9$&$87.0 \pm 10.5$&$41.0 \pm 11.4$ & $54.8 \pm 12.1$&$74.2 \pm 6.4$& $88.7 \pm 1.7$\\ \hline
+     NRF\_DW & $89.6 \pm 1.7$& $98.3 \pm 1.0$& $93.7 \pm 1.0$&$84.7 \pm 7.8$ &$45.7 \pm 10.4$ & $58.7 \pm 10.5$&$76.2 \pm 5.7$&$89.1 \pm 1.8$\\ \hline
+     NRF\_EL\_DW &$89.8 \pm 1.8$&$98.4 \pm 0.9$& $93.9 \pm 1.1$ &$85.5 \pm 7.4$& $46.6 \pm 11.4$ & $59.6 \pm 11.3$&$76.8 \pm 6.1$&$89.4 \pm 2.0$\\ \hline
      
     
     \end{tabular}
 
-    \caption{Real dataset results.}
+    \caption{LUCAS dataset results.}
     \label{table::real_dataset}
 \end{table}
 \endgroup
