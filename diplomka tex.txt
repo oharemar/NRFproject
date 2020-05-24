@@ -3,6 +3,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{adjustbox}
 \usepackage{xcolor}
 \usepackage{geometry}
 \usepackage[hang]{footmisc}
@@ -988,11 +992,11 @@ All applied models are summarized in Table \ref{table::public_models} with their
     \label{table::public_models}
 \end{table}
 
-Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NRF models. We adopted logistic regression with L2 regularization and 4-layer neural network with ReLU activation function in the hidden layers and softmax in the output layer. Two hidden layers have 60 neurons both. It applies Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). Hyperparameters of NN were chosen as follows: $\eta = 0.01$, $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$, where $\eta$ is a learning rate and the rest are constants of Adam equally noted as in the Chapter [Optimization NN]. We use implementation of LR and NN from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
+Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NRF models. We adopted logistic regression with L2 regularization and 4-layer neural network with ReLU activation function in the hidden layers and softmax in the output layer. Two hidden layers have 60 neurons both. It applies Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). The mini-batch size was set to 10 and it was trained for 30 training epochs. Hyperparameters of NN were chosen as follows: $\eta = 0.01$, $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$, where $\eta$ is a learning rate and the rest are constants of Adam equally noted as in the Chapter [Optimization NN]. We use implementation of LR and NN from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
 
-The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ is a total number of features. We use implementation from Scikit learn.
+The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ is a total number of features. All decision trees were trained with entire training dataset and we use entropy as the impurity function in the information gain criterion. We use implementation from Scikit learn.
 
-The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. Parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
+The orange area includes all NRF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NRF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The mini-batch size was set to 10 and the parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NRF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NRF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NRF models in Python.
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
@@ -1207,7 +1211,65 @@ One paragraph, mention parallelization - time complexity is same as a single NN 
 
 \section{LUCAS dataset experiments}
 
-In this part we focus on applying proposed NRF models on the real-world dataset, which was obtained from the data collected by LUCAS project\footnote{More info on LUCAS could be found at: www.lucascz.cz}.
+In this part we focus on applying proposed NRF models on the real-world dataset, which was obtained from the data collected by LUCAS project \cite{lucas}. This project focuses on patients diagnosed with bronchogenic carcinoma (lung cancer) and their treatment and examination. Unfortunately, the diagnosis of lung cancer belongs to the most severe and complicated cancer diseases ever. Only in the Czech Republic dies approximately 5400 patients per year on such diagnosis, which ensures sad primacy among all other tumor diseases.
+
+LUCAS project was developed to thoroughly describe and analyze the complex path of such patients through the treatment process already from the diagnosis and therefore to provide subsequent analytical studies evaluating the scope and structure of the overall care, pharmacoeconomic background, overall survival and the sequence and efficiency of the treatments. All of these outcomes could help to enhance the diagnostic and treatment system and therefore could ensure superior care about patients diagnosed with lung cancer.
+
+This project was launched on 1.6.2018 and already includes data of 2285 patients (in the period from 1.6.2018 to 14.5.2020). The data contain various information about the individual patients, including diagnostic records, personal characteristics, treatment records and information about patient's progress. The data are collected from seven medical centers in the Czech Republic - FN Olomouc, FN Hradec Králové, FN Brno, FN Motol, FN Plzeň, Nemocnice Na Bulovce Praha and Thomayerova nemocnice Praha.
+
+The treatment options have widely expanded in the last couple of years and right now they include chemotherapy, radiotherapy, immunotherapy, targeted therapy and operational interventions. Since there exist only few tumors that could be removed by operation intervention, the other treatments are gaining great importance, especially targeted therapy and immunotherapy, which may prolong the life of patients by several years. But still the chemotherapy is more common choice and is often accepted as the preferred choice in the first line treatment (first treatment after diagnosis).
+
+\subsection{Classification task and data}
+
+For the overall survival of patients is in addition to the early diagnosis important also the very first treatment after the diagnosis. From the available data of LUCAS project this first treatment (among pharmacotherapy) is usually chemotherapy in most cases, but from the previously mentioned, it could be sometimes beneficial to replace chemotherapy (if the patient and illness have required properties) with other kinds of treatment, especially with targeted treatment and immunotherapy. Also it could be used in combination with the chemotherapy as well.
+
+We test the ability of our NRF models to predict the first line treatment based on patient's diagnostic and personal records. We define binary classification task with negative class (class 0) symbolizing chemotherapy and positive class (class 1) symbolizing all other treatments belonging to the pharmacotherapy (especially targeted therapy and immunotherapy). The solution of this classification task could help the doctors to decide on the choice of the first line treatment and potentially highlight the possibility of employing other treatments besides chemotherapy.
+
+Overall we have 1133 records with any form of pharmacotherapy in the first line treatment, of which there are 937 cases of chemotherapy (class 0) and 196 cases of other treatment (class 1). We could notice that this dataset is slightly imbalanced with the negative instances to positive instances ratio equal approximately to 7:1. This makes this classification task challenging for many classifiers.
+
+Unfortunately, according to the non-disclosure agreement we cannot describe the dataset in full detail, so at least we provide a shallow description. The dataset consists of 21 features, which were picked from the diagnostic and personal data of individual patients. There are 6 numerical features including for instance height and weight of patients, number of years of smoking, etc. Other 15 features are categorical which comprise symptoms, details of diagnosis, tumor type, tumor stage, etc. All categorical features were one-hot encoded, resulting together with numerical features in 91 final features. Finally, all features were standardized (normalized to mean value equal 0 and standard deviation equal 1).
+
+\subsection{Models and evaluation}
+
+Since our classification task corresponds to the binary classification on imbalanced dataset, we evaluate the performance mainly with respect to the precision and recall of the positive class. Moreover, we present the comparison of individual models with respect to the Precision - Recall (PR) curves and also according to the average precision (AP) score as defined in the Chapter [Evaluation]. Eventually, we present macro-average of F1-score and accuracy as well. We conducted 2 subsequent 5-fold cross validations (10 iterations in total) and we present final results in the form "mean$\pm$std", similarly as in the public experiments. To all individual iterations of single training - testing pairs correspond one PR curve and we visualize all iterations in one graph for each classification model. Additionally, we draw one PR curve corresponding to the concatenation of correct labels and predictions from all iterations. Since there is no natural and straightforward way (such as averaging) to combine PR curves from individual iterations into one, this PR curve serves as "aggregation" of individual PR curves and it is highlighted in the corresponding graphs. From now, we will refer to this PR curve as aggregation PR curve. All individual PR curves have also their AP (average precision score) and at aggregation PR curve we present mean value of individual APs and standard deviation of these APs (but not AP of aggregation PR curve, since this is hardly intepretable and we want it to represent the performance only visually).
+
+We employ two NF models - NRF\_DW and NRF\_EL\_DW and compare their performance with logistic regression classifier, single NN and the RF used for initialization of NF models. We use same logistic regression model with L2 regularization as in the public experiments. Single NN has two hidden layers, each consisting of 150 neurons with ReLU activation functions and the softmax in the output layer. We use Cross Entropy as the loss function and Adam as optimization algorithm. All other hyperparameters remain same as defined for single NN in the public experiments.
+
+RF consists of 30 decision trees, maximum depth is set to 6 and the number of features considered in the split is set to $\lfloor d \rfloor$, where $d \in \mathbb{N}$ denotes number of features. We employ entropy as impurity function in information gain criterion.
+
+NF models were initialized with RF model described above, with transition parameters set to $\beta_1 = 10$ and $\beta_2 = 10$. Learning rate for NRF\_DW is set to 0.002 and for NRF\_EL\_DW to 0.0025. We use Cross Entropy as loss function and Adam as optimization algorithm with same hyperparameters as single NN model. This time we omit adding the regularization term to the loss function and instead we employ early stopping technique (we use it also in the case of single NN model). This technique monitors the loss function on validation dataset (different from the testing dataset) after each epoch. It tracks the loss function for 10 subsequent epochs from each new epoch and if there is no occurrence of decrease, the training process is terminated. 
+
+The testing fold in each iteration of cross validation was randomly divided into two halves, one used as validation dataset for early stopping and the rest for testing.
+
+\subsection{Results}
+
+The results of individual models are presented in the Table \ref{table::real_dataset}.
+
+\begingroup
+\begin{table}[h]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+    \hline
+     \multirow{2}{*}{MODEL}&\multicolumn{3}{c|}{Class 0} &\multicolumn{3}{c|}{Class 1}& \multirow{2}{*}{Macro-avg F1-score}& \multirow{2}{*}{Accuracy}\\ \cline{2-7}
+     & Precision & Recall & F1-score &Precision & Recall & F1-score & & \\ \hline
+     
+     
+    
+    \end{tabular}
+
+    \caption{Real dataset results.}
+    \label{table::real_dataset}
+\end{table}
+\endgroup
+
+
+
+
+
+
+
 
 \chapter{Figures}
 \label{figures}
@@ -1728,6 +1790,8 @@ http://www.cscjournals.org/library/manuscriptinfo.php
 \bibitem{keras} Keras. Chollet, Francois and others. 2015. \url{https://keras.io}
 
 \bibitem{saturation}Bosman, Anna \& Engelbrecht, Andries. (2015). Measuring Saturation in Neural Networks. 10.1109/SSCI.2015.202. 
+
+\bibitem{lucas} www.lucascz.cz (cited 14.5.2020)
 
 \end{thebibliography}
 
