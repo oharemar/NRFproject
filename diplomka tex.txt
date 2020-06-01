@@ -625,7 +625,7 @@ To provide more intuitive perspective, gradient descent algorithm iteratively se
 \caption{Gradient descent algorithm. In each iteration it finds the direction in which loss function decreases. In this case, the green point is "rolling down" towards the global minimum $(0,0)^T$.}
 \label{fig:grad}
 \end{figure}
-Of course, gradient descent is not universal method which always find global minimum of the arbitrary function. There are some requirements on loss function to ensure functionality. Especially when the loss function is not "nice" as one in the Figure \ref{fig:grad}, it could stuck in the local minimum instead or even do not converge, which also depends on the initial point of algorithm. Theory behind the convergence to global optimum is properly described almost exclusively for (strictly) convex functions \cite{grad}, which is for example function in the Figure \ref{fig:grad}, $f(x,y) = x^2 + y^2$ or quadratic cost function defined in \eqref{mse}.
+Of course, gradient descent is not universal method which always find global minimum of the arbitrary function. There are some requirements on loss function to ensure functionality. Especially when the loss function is not "nice" as one in the Figure \ref{fig:grad}, it could stuck in the local minimum instead or even do not converge, which also depends on the initial point of algorithm. Theory behind the convergence to global optimum is properly described almost exclusively for (strictly) convex functions \cite{grad}.
 
 Also the learning rate $\eta$ significantly affects convergence. If it is too small, the time until convergence could be very long and if it is too big, it could bounce back and forth around the optimal value and never reach it. Deriving the most suitable learning rate for particular application usually requires a bit of experimenting around. There also exists methods to set learning rate or adjust it during execution. Some of them has been used in the experimental part of this thesis and will be mentioned later.
 
@@ -721,21 +721,22 @@ In the \eqref{mean} respectively \eqref{variance}, the exponential moving averag
 
 
 \section{Backpropagation algorithm}
+\label{chapter:backprop}
 
 We already presented an idea of training neural network via different optimization methods, but we did not provide the way of computing partial derivatives (gradients) of loss function with respect to weights and biases, which are necessary to execute the training algorithm. This could be of course done by computing the derivatives analytically, which is definitely very uncomfortable and almost insane idea, especially when adopting large neural networks. For this reason, the \textit{backpropagation algorithm} was developed in order to retrieve partial derivatives with respect to all weights and biases involved in the neural network in comfortable and quick way.
 
 The derivation and description of backpropagation algorithm is motivated by papers \cite{backprop} and \cite{feedforward}. We define some helpful notation in advance in order to simplify the derivation. Let us denote output from $l$-th layer of neural network and $j$-th neuron of that layer as $a_j^l$, also entire output vector of $l$-th layer will be denoted as $\boldsymbol{a}^l$. Term $w_{jk}^l$ denotes weight of connection going from neuron $k$ in previous layer $(l-1)$ to neuron $j$ in layer $l$ (it is in reversed order on purpose, it will simplify further notation with respect to the matrix multiplication) and term $\mathbb{W}^l = (w_{jk}^l)_{j,k}$ denotes matrix of weights directed from layer $(l-1)$ to $l$. Bias of node $j$ in layer $l$ is denoted as $b_j^l$ and biases folded into vector of biases of layer $l$ is $\boldsymbol{b}^l$. By applying this notation, we could write comfortably a feedforward dependency for output from layer $l$ as
 \begin{equation}
-    \boldsymbol{a}^l = \sigma(\mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l) \hspace{0.5cm},
+    \boldsymbol{a}^l = \phi(\mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l) \hspace{0.5cm},
     \label{comfort_write}
 \end{equation}
-where $\sigma(\cdot)$ is arbitrary activation function used in neurons of layer $l$ (this definition apparently depends on the current layer $l$, but we omit notation of this dependence for simplification), which is applied in element-wise fashion. We also denote argument of $\sigma(\cdot)$ in \eqref{comfort_write} as
+where $\phi(\cdot)$ is arbitrary activation function used in neurons of layer $l$ (this definition apparently depends on the current layer $l$, but we omit notation of this dependence for simplification), which is applied in element-wise fashion. We also denote argument of $\phi(\cdot)$ in \eqref{comfort_write} as
 \begin{equation}
     \boldsymbol{z}^l = \mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l
 \end{equation}
 The aim of backpropagation algorithm is to compute $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$ (we will omit arguments of the functions for simplification, all of them are evaluated in the values of current weights, biases and training instance) with respect to arbitrary weight $w$ and bias $b$. These partial derivatives expresses, how much is loss function changed when $w$ or $b$ is changed. Of course, the main goal is to find optimal weights and biases, which corresponds to the local (global) minimum of loss function. Intuitively, we could imagine that in each layer of neural network arises some error (from imperfection of current weights and biases), which cause flaws in the output layer. Furthermore, we could say that even individual neurons produce these errors, which consequently leads to corrupted output. But what we can measure is only deviation of current output (extracted from output layer) of neural network from desired value, because we do not know in advance "correct" output (activation values) of other layers. So briefly, what backpropagation really does is that it \textit{backpropagates} error from the output layer to the previous layers and then from these \textit{error} terms computes corresponding partial derivatives $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
 
-We will now define this \textit{error} term heuristically. Output from $j$-th neuron of layer $l$ could be written as $a_j^l = \sigma(z_j^l)$. Let's imagine for a moment, that layer $l$ has corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \sigma(\hat{z}_j^l) =\sigma(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses deviation of argument $z_j^l$ from optimal value. In case that other weights and biases are already optimal, the difference between optimal cost and "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). Deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. Also when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then neuron is very close to optimal state. Therefore, we could define error term as
+We will now define this \textit{error} term heuristically. Output from $j$-th neuron of layer $l$ could be written as $a_j^l = \phi(z_j^l)$. Let's imagine for a moment, that layer $l$ has corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \phi(\hat{z}_j^l) =\phi(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses deviation of argument $z_j^l$ from optimal value. In case that other weights and biases are already optimal, the difference between optimal cost and "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). Deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. Also when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then neuron is very close to optimal state. Therefore, we could define error term as
 \begin{equation}
     \delta_j^l = \frac{\partial \Lambda}{\partial z_j^l}
 \end{equation}
@@ -744,22 +745,26 @@ This is heuristic derivation and of course, it is not absolutely precise and cer
 The algorithm always backpropagates the error of single training instance $\boldsymbol{x}$ (we can use only one training instance in time), so what it really computes is $\frac{\partial\Lambda_\boldsymbol{x}}{\partial w}$ and $\frac{\partial \Lambda_\boldsymbol{x}}{\partial b}$. Therefore the loss function $\Lambda$ needs to be rewritten in the same manner as in \eqref{good_shape}, which we assume. From now, we will omit the subscript and denote $\Lambda_\boldsymbol{x}$ simply as $\Lambda$. Another assumption on loss function is that it can be expressed as function of output $\boldsymbol{a}^L$ from the output layer, where $L$ denotes the output layer. We need $\Lambda = \Lambda(\boldsymbol{a}^L)$, but it may depend also on other variables. This assumption will be explained later. For instance, both assumptions are fulfilled by quadratic cost function and also by other loss functions presented later in this thesis.
 
 
-Since we defined $\delta_j^l$, we now need to find equations for values of real interest, ig. partial derivatives of loss function with respect to weights and biases. Entire backpropagation algorithm stands on 4 equations, which allow us to compute values of real interest from errors in individual layers of neural network. They can be simply derived by careful application of the chain rule from multivariate calculus.
+Since we defined $\delta_j^l$, we now need to find equations for values of real interest, ig. partial derivatives of loss function with respect to weights and biases. Entire backpropagation algorithm stands on 4 equations, which allow us to compute values of real interest from errors in individual layers of neural network. They can be simply derived by careful application of the chain rule from multivariate calculus. Note that all of these equations are specifically written for arbitrary activation functions $\phi: \mathbb{R}^1 \rightarrow \mathbb{R}^1$ (tanh, sigmoid, ReLU). This corresponds with our experiments since we used such functions in the hidden layers of our networks (it is also common in practice). Only one exception was the case of the output layer, where we used both sigmoid and softmax. But softmax is a vector function and therefore the general equation \eqref{BP1} should be slightly modified as a special case for softmax (or vector functions in general). Other equations remain same. We write down this special shape for softmax in the commentary to the corresponding equation.
 
 \begin{enumerate}
     \item \textbf{Equation to calculate error $\boldsymbol{\delta}^L$ of the output layer L}:
     \begin{equation}
-        \delta_j^L = \frac{\partial \Lambda}{\partial a_j^L}\sigma'(z_j^L)
+        \delta_j^L = \frac{\partial \Lambda}{\partial a_j^L}\phi'(z_j^L)
         \label{BP1}
     \end{equation}
-    As we mentioned before, the backpropagation algorithm runs backwards. First, we need to compute error in the output layer. It is calculated by multiplication of partial derivative of loss function with respect to the output $a_j^L$ of $j$-th neuron of layer $L$ and derivative of activation function $\sigma$ in $z_j^L$. This equation is perfectly intuitively understandable, because the error term is basically expressed as trade-off between "how much is loss function changing with respect to the output from neuron ($\frac{\partial \Lambda}{\partial a_j^L}$)" and "how much is output of the neuron changing with respect to the input value to the activation function ($\sigma'(z_j^L)$)". If any of these values are small, then error of that neuron is also small. Furthermore, both values could be easily retrieved and the shape of derivatives is usually computed analytically (obviously depending on the shape of loss function and activation function). We may also notice that the partial derivative of $\Lambda$ is computed with respect to $a_j^L$. This is the reason why we need the assumption of $\Lambda$ depending on $\boldsymbol{a}^L$.
+    As we mentioned before, the backpropagation algorithm runs backwards. First, we need to compute error in the output layer. It is calculated by multiplication of partial derivative of loss function with respect to the output $a_j^L$ of $j$-th neuron of layer $L$ and derivative of activation function $\phi$ in $z_j^L$. This equation is perfectly intuitively understandable, because the error term is basically expressed as trade-off between "how much is loss function changing with respect to the output from neuron ($\frac{\partial \Lambda}{\partial a_j^L}$)" and "how much is output of the neuron changing with respect to the input value to the activation function ($\phi'(z_j^L)$)". If any of these values are small, then error of that neuron is also small. Furthermore, both values could be easily retrieved and the shape of derivatives is usually computed analytically (obviously depending on the shape of loss function and activation function). We may also notice that the partial derivative of $\Lambda$ is computed with respect to $a_j^L$. This is the reason why we need the assumption of $\Lambda$ depending on $\boldsymbol{a}^L$. Note that this shape corresponds to the sigmoid function $\sigma$ used in the output layer (or any arbitrary scalar function with the scalar input). For softmax function $\boldsymbol{\theta}$ it would be 
+    \begin{equation}
+            \delta_j^L = \sum_{k=1}^{n_L}\frac{\partial \Lambda}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} \label{BP1_softmax}\hspace{0.2cm},
+    \end{equation}
+since $\forall k \in \{1,...,n_L\}$, the function $\boldsymbol{\theta}(\boldsymbol{z}^L)]_k$ depends on $z_j^L$ where $n_L$ denotes number of neurons in the output layer.
     
     \item \textbf{Equation to backpropagate the error from layer $(l+1)$ to previous layer $l$}
     \begin{equation}
-        \delta_j^l = [(\mathbb{W}^{(l+1)})^T\boldsymbol{\delta}^{(l+1)}]_j \sigma'(z_j^l)
+        \delta_j^l = [(\mathbb{W}^{(l+1)})^T\boldsymbol{\delta}^{(l+1)}]_j \phi'(z_j^l)
         \label{BP2}
     \end{equation}
-    This equation gives us a way to backpropagate the error backwards. Together with \eqref{BP1}, we can compute $\boldsymbol{\delta}^l$ (vector of errors $\delta_j^l$ of neurons in layer $l$) in arbitrary layer $l$. It is obtained by multiplying transpose of weight matrix $\mathbb{W}^{(l+1)}$ with vector of errors of $(l+1)$ layer $\boldsymbol{\delta}^{(l+1)}$. This could be thought as a "projection" of error to the previous layer. Then the result is multiplied by $\sigma'(z_j^l)$, same as in the case \eqref{BP1}, because the error is also influenced by the speed of change of the activation function.
+    This equation gives us a way to backpropagate the error backwards. Together with \eqref{BP1}, we can compute $\boldsymbol{\delta}^l$ (vector of errors $\delta_j^l$ of neurons in layer $l$) in arbitrary layer $l$. It is obtained by multiplying transpose of weight matrix $\mathbb{W}^{(l+1)}$ with vector of errors of $(l+1)$ layer $\boldsymbol{\delta}^{(l+1)}$. This could be thought as a "projection" of error to the previous layer. Then the result is multiplied by $\phi'(z_j^l)$, same as in the case \eqref{BP1}, because the error is also influenced by the speed of change of the activation function.
     
     \item \textbf{Equation to calculate} $\frac{\partial \Lambda}{\partial b_j^l}$
     \begin{equation}
@@ -781,13 +786,73 @@ By applying these 4 equations, we could compute all values of interest easily. A
 
 In this part we shortly summarize and describe some properties of different activation functions related to the backpropagation that influence entire training procedure.
 
-First we will discuss the so called \textit{vanishing gradient problem}. This problem occurs especially in the case of multi-layer neural networks. Consider equations \eqref{BP1} and \eqref{BP2} mentioned in the previous part. These equations include the derivatives of activation functions in the corresponding layers. If the error backpropagates recursively from the output layer to previous layers as in the \eqref{BP2}, then more and more derivative terms are multiplied together. If some of them are close to zero, than the final term is supposed to be low as well. The gradients of loss function are computed with the usage of the error term (as suggested in \eqref{BP3} and \eqref{BP4}) and therefore the update of parameters could be insignificant in early layers due to small gradients. This is often the case of sigmoid activation function. The derivative of sigmoid is $\sigma'(z) = \sigma(z)(1-\sigma(z))$ and therefore it reaches maximum value of 0.25. Multiplication of multiple sigmoid derivatives could result in significant reduction of gradients in early layers of neural network due to chain interaction of individual derivatives.
+First we will discuss the so called \textit{vanishing gradient problem}. This problem occurs especially in the case of multi-layer neural networks. Consider equations \eqref{BP1}  and \eqref{BP2} mentioned in the previous part. These equations include the derivatives of activation functions in the corresponding layers. If the error backpropagates recursively from the output layer to previous layers as in the \eqref{BP2}, then more and more derivative terms are multiplied together. If some of them are close to zero, than the final term is supposed to be low as well. The gradients of loss function are computed with the usage of the error term (as suggested in \eqref{BP3} and \eqref{BP4}) and therefore the update of parameters could be insignificant in early layers due to small gradients. This is often the case of sigmoid activation function. The derivative of sigmoid is $\sigma'(z) = \sigma(z)(1-\sigma(z))$ \cite{note_backprop} and therefore it reaches maximum value of 0.25. Multiplication of multiple sigmoid derivatives could result in significant reduction of gradients in early layers of neural network due to chain interaction of individual derivatives.
 
 Situation is slightly better in the case of tanh activation function, which derivative lies within 0 and 1, but still the vanishing gradient problem occurs, because values are often less than 1. Especially when the sigmoid or tanh output values close to the asymptotic tails, the derivative is close to 0 and therefore there is likely only a small update of weight and bias which hardly change the current behaviour of a neuron. This state is called \textit{saturation}. Vanishing gradient and saturation make the training procedure more difficult and could negatively affect the quality of performance.
 
 Problem of vanishing gradient could be considerably suppressed by adoption of (Leaky) ReLU activation function. In the case of ReLU, the derivative is always either 1 or 0. When the ReLU operates in the positive area, the derivatives are always 1 and therefore no vanishing gradient occurs. Problem arises when ReLU moves to the negative area, where the derivative is 0. This produces a so called \textit{dead neurons}, because the derivative is 0 and error is not backpropagated from this neuron. Also it is not likely to recover from this state as the training proceeds. From this reason Leaky ReLU was introduced, that it has not-null derivative in the negative area and therefore allows neuron to recover. This prevents producing of dead neurons.
 
 \section{Loss functions}
+
+In this section we summarize popular loss functions among neural network context and discuss their properties. We already define quadratic cost function (MSE) in \eqref{mse}. It is widely-applied in the machine learning area, but it has some drawbacks related to the backpropagation algorithm. Specifically, we refer to the \textit{learning slowdown} problem \cite{feedforward,learn_slow}, which is the issue especially in the case of classification.
+
+We demonstrate this problem on the quadratic cost function and sigmoid in the output layer. Since the quadratic cost function is a sum of functions defined in \eqref{good_shape}, we are justified to work only with these single functions. We slightly ease the notation and use some notation defined in the \autoref{chapter:backprop}. Let us denote the MSE single function as
+\begin{equation}
+    \Lambda = \frac{||\boldsymbol{y} - \boldsymbol{a}^L||^2}{2} \hspace{0.2cm},
+\end{equation}
+where $\boldsymbol{y}$ denotes the correct output and $\boldsymbol{a}^L$ denotes the output of the neural network (which is the same as output from the output layer $\boldsymbol{a}^L$). Now we will express the derivatives of loss function $\Lambda$ with respect to weights and biases in the output layer $L$ with usage of backpropagation equations. First we compute the error term for node $j$ in the output layer as in \eqref{BP1}. Since $\frac{\partial \Lambda}{\partial a_j^L} = y_j - a_j^L$, the error term is
+
+\begin{equation}
+    \delta_j^L = (y_j - a_j^L)\phi'(z_j^L) \hspace{0.2cm}.
+\end{equation}
+
+Now we substitute this term in the equations \eqref{BP3} and \eqref{BP4}.
+
+\begin{align}
+    \frac{\partial \Lambda}{\partial b_j^L} &= (y_j - a_j^L)\phi'(z_j^L)\\
+    \frac{\partial \Lambda}{\partial w_{jk}^L} &= a_k^{(L-1)}(y_j - a_j^L)\phi'(z_j^L)
+\end{align}
+
+In these equations occur derivatives of the activation function (sigmoid in this example) in the output layer. Eventually, this causes the learning slowdown problem. If the values of sigmoid are close to 0 or 1 (asymptotic tails), the derivative is very close to 0 and therefore it produces very low updates, since the corresponding partial derivatives are low. Therefore training this neural network to switch values close to asymptotic tails (if this is incorrect behaviour) is very slow, hence the learning slowdown.
+
+It would be similar in the case of MSE combined with softmax. It is easy to derive that derivative of softmax fulfills the equation \cite{note_backprop}
+\begin{equation}
+    \frac{\partial [[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} = [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k(\delta_{jk} - [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j) \hspace{0.2cm},
+    \label{derivative_softmax}
+\end{equation}
+
+where $\delta_{jk}$ is Kronecker delta. Since softmax produces probability distribution, so if value for specific $k$ is close to 1, then other values are close to 0 and therefore $\forall k$ the derivative in \eqref{derivative_softmax} is close to 0. Thus the error term in \eqref{BP1_softmax} would be also low.
+
+To fix this drawback, the Cross Entropy loss function can be exploited, which results in the absence of the learning slowdown problem.
+
+\subsubsection{Cross Entropy loss function}
+
+Cross Entropy loss function is often a preferred choice among loss functions in the case of classification. It is frequently applied in combination with softmax or sigmoid in the output layer. It is defined as
+
+\begin{equation}
+    \Lambda^{CE}(\mathbb{X}) = -\frac{1}{N}\sum_{\boldsymbol{x} \in \mathbb{X}}\sum_{i = 1}^{n_L}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm},
+    \label{CE}
+\end{equation}
+
+where $\mathbb{X}$ is a set of input instances, $N = |\mathbb{X}|$, $n_L$ denotes number of neurons in the output layer (equal to number of classes), $y_i(\boldsymbol{x})$ is $i$-th component of $\boldsymbol{y}(\boldsymbol{x})$, which denotes the correct output for single instance $\boldsymbol{x}$ and $\hat{y}_i(\boldsymbol{x})$ denotes the $i$-th component of the prediction of neural network $\boldsymbol{\hat{y}}(\boldsymbol{x})$ for single instance $\boldsymbol{x}$. The definition in \eqref{CE} acts as overall loss across multiple instances (averaging similarly as in the case of quadratic cost function). Cross Entropy of single instance $\boldsymbol{x}$ is therefore
+
+\begin{equation}
+    \Lambda^{CE}(\boldsymbol{x}) = -\sum_{i = 1}^{n_L}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm}.
+    \label{CE_single}
+\end{equation}
+
+It measures the similarity between correct label distribution and the predicted label distribution for $\boldsymbol{x}$. Since there exists only one $i \in \{1,...,n_L\}$ (corresponding to the ground-truth label), where $y_i(\boldsymbol{x}) = 1$ (all other components are 0), then a sum in  \eqref{CE_single} reduces only to one summand. Therefore the Cross Entropy of single instance $\boldsymbol{x}$ decreases if the predicted value corresponding to the ground-truth label of $\boldsymbol{x}$ increases and vice versa, which is favourable behaviour in the task of classification.
+
+Now we will show that combination of Cross Entropy loss function and softmax in the output layer prevents the learning slowdown problem. We compute the error term for softmax as in \eqref{BP1_softmax} and show that it does not depend on the derivatives of softmax. Also we use the notation from the \autoref{chapter:backprop} and denote $a_i^L = \hat{y}_i$ (from now we omit dependence on $\boldsymbol{x}$ for simplification).
+\begin{align*}
+\delta_j^L &= \frac{\partial \Lambda^{CE}}{\partial z_j^L} = \sum_{k=1}^{n_L}\frac{\partial \Lambda^{CE}}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} = \sum_{k=1}^{n_L}(-\frac{y_k}{[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k})[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k(\delta_{kj} - [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j) = \\
+&=  \sum_{k=1}^{n_L}(-y_k\delta_{kj}) + \sum_{k=1}^{n_L}y_k[\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = -y_j + [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = a_j^L - y_j = \hat{y}_j - y_j
+\end{align*}
+
+We can see that $\delta_j^L$ is fully controlled only by the difference between predicted and correct value and no derivative of activation function occurs in the final equation. Therefore this approach is not affected by the learning slowdown problem as in the case of MSE.
+
+There are also other loss functions applied in the neural network context, but none of them are more popular than MSE and Cross Entropy. Other loss functions can be found in \cite{loss_func}.
+
 
 \section{Regularization}
 
@@ -1974,6 +2039,12 @@ DOI: 10.3233/IDA-130592
 \bibitem{adam2}Diederik P. Kingma and Jimmy Lei Ba. Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, pages 1–13, 2015.
 
 \bibitem{adam3}https://arxiv.org/pdf/1412.6980.pdf
+
+\bibitem{learn_slow}Golik, Pavel & Doetsch, Patrick & Ney, Hermann. (2013). Cross-Entropy vs. Squared Error Training: a Theoretical and Experimental Comparison. Proceedings of the Annual Conference of the International Speech Communication Association, INTERSPEECH. 1756-1760. 
+
+\bibitem{note_backprop}https://www.ics.uci.edu/~pjsadows/notes.pdf
+
+\bibitem{loss_func}https://arxiv.org/pdf/1702.05659.pdf
 
 \end{thebibliography}
 
