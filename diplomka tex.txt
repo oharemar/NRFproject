@@ -883,7 +883,15 @@ Early stopping is possibly the most natural regularization technique. It basical
 
 \subsubsection{Dropout}
 
-Drouput is a popular regularization technique among neural networks, which has shown state-of-the-art results in many applications \cite{dropout}.
+Dropout is a popular regularization technique among neural networks, which has shown state-of-the-art results in many applications. The algorithm basically works as follows: During the training of neural network is randomly dropped half of the neurons (temporarily) in each hidden layer for each mini-batch. Then the forward pass and backward pass is performed through the subnetwork and the weights and biases of the subnetwork are updated \cite{feedforward,dropout}. The dropped neurons are then recovered and the same procedure is repeated for the following mini-batches as training continues. More generally, the neurons could be dropped with probability $p$, but at least one neuron must stay in each hidden layer in order to conduct meaningful updates.
+
+For a testing phase is eventually applied entire network with all neurons and (in the case of dropping half of the neurons) we halve all weights of connections outgoing from the hidden neurons since we operate with twice as many hidden neurons as the subnetworks were trained with.
+
+There are not many theoretical researches that would clarify the functionality of this method, but there exists plenty of heuristic explanations. The first possible explanation of functionality is that Dropout basically "average" several different neural networks, and therefore the full network is supposed to have higher generalization ability than single networks. The second one is that this technique reduces influence and dependencies between individual neurons and thus the neurons are forced to learn more robust features rather than relying on outputs of particular neurons \cite{dropout}.
+
+We mentioned three different regularization techniques frequently used among neural networks and machine learning in general. Other regularization techniques are for instance \textit{dataset augmentation}, \textit{parameter sharing}, etc. The descriptions of other methods could be found in \cite{regularization}. It is also common to combine individual regularization techniques to secure even higher generalization ability, but they must be applied carefully since the regularizers can be more decisive in training than the data itself.
+
+
 
 
 
