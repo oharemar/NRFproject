@@ -755,9 +755,9 @@ Since we defined $\delta_j^l$, we now need to find equations for values of real 
     \end{equation}
     As we mentioned before, the backpropagation algorithm runs backwards. First, we need to compute error in the output layer. It is calculated by multiplication of partial derivative of loss function with respect to the output $a_j^L$ of $j$-th neuron of layer $L$ and derivative of activation function $\phi$ in $z_j^L$. This equation is perfectly intuitively understandable, because the error term is basically expressed as trade-off between "how much is loss function changing with respect to the output from neuron ($\frac{\partial \Lambda}{\partial a_j^L}$)" and "how much is output of the neuron changing with respect to the input value to the activation function ($\phi'(z_j^L)$)". If any of these values are small, then error of that neuron is also small. Furthermore, both values could be easily retrieved and the shape of derivatives is usually computed analytically (obviously depending on the shape of loss function and activation function). We may also notice that the partial derivative of $\Lambda$ is computed with respect to $a_j^L$. This is the reason why we need the assumption of $\Lambda$ depending on $\boldsymbol{a}^L$. Note that this shape corresponds to the sigmoid function $\sigma$ used in the output layer (or any arbitrary scalar function with the scalar input). For softmax function $\boldsymbol{\theta}$ it would be 
     \begin{equation}
-            \delta_j^L = \sum_{k=1}^{n_L}\frac{\partial \Lambda}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} \label{BP1_softmax}\hspace{0.2cm},
+            \delta_j^L = \sum_{k=1}^{|\mathbb{C}|}\frac{\partial \Lambda}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} \label{BP1_softmax}\hspace{0.2cm},
     \end{equation}
-since $\forall k \in \{1,...,n_L\}$, the function $\boldsymbol{\theta}(\boldsymbol{z}^L)]_k$ depends on $z_j^L$ where $n_L$ denotes number of neurons in the output layer.
+since $\forall k \in \{1,...,|\mathbb{C}|\}$, the function $\boldsymbol{\theta}(\boldsymbol{z}^L)]_k$ depends on $z_j^L$ where $|\mathbb{C}|$ denotes number of neurons in the output layer, which is same as number of classes (\mathbb{C} denotes a set of all classes).
     
     \item \textbf{Equation to backpropagate the error from layer $(l+1)$ to previous layer $l$}
     \begin{equation}
@@ -830,23 +830,23 @@ To fix this drawback, the Cross Entropy loss function can be exploited, which re
 Cross Entropy loss function is often a preferred choice among loss functions in the case of classification. It is frequently applied in combination with softmax or sigmoid in the output layer. It is defined as
 
 \begin{equation}
-    \Lambda^{CE}(\mathbb{X}) = -\frac{1}{N}\sum_{\boldsymbol{x} \in \mathbb{X}}\sum_{i = 1}^{n_L}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm},
+    \Lambda^{CE}(\mathbb{W},\mathbb{B},\mathbb{X}) = -\frac{1}{n}\sum_{\boldsymbol{x} \in \mathbb{X}}\sum_{i = 1}^{|\mathbb{C}|}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm},
     \label{CE}
 \end{equation}
 
-where $\mathbb{X}$ is a set of input instances, $N = |\mathbb{X}|$, $n_L$ denotes number of neurons in the output layer (equal to number of classes), $y_i(\boldsymbol{x})$ is $i$-th component of $\boldsymbol{y}(\boldsymbol{x})$, which denotes the correct output for single instance $\boldsymbol{x}$ and $\hat{y}_i(\boldsymbol{x})$ denotes the $i$-th component of the prediction of neural network $\boldsymbol{\hat{y}}(\boldsymbol{x})$ for single instance $\boldsymbol{x}$. The definition in \eqref{CE} acts as overall loss across multiple instances (averaging similarly as in the case of quadratic cost function). Cross Entropy of single instance $\boldsymbol{x}$ is therefore
+where $\mathbb{X}$ is a set of input instances, $n = |\mathbb{X}|$, $|\mathbb{C}|$ denotes number of neurons in the output layer (equal to number of classes), $y_i(\boldsymbol{x})$ is $i$-th component of $\boldsymbol{y}(\boldsymbol{x})$, which denotes the correct output for single instance $\boldsymbol{x}$ and $\hat{y}_i(\boldsymbol{x})$ denotes the $i$-th component of the prediction of neural network $\boldsymbol{\hat{y}}(\boldsymbol{x})$ for single instance $\boldsymbol{x}$. Also we explicitly mark the dependence on a set of weights $\mathbb{W}$ and a set of biases $\mathbb{B}$. The definition in \eqref{CE} acts as overall loss across multiple instances (averaging similarly as in the case of quadratic cost function). Cross Entropy of single instance $\boldsymbol{x}$ is therefore
 
 \begin{equation}
-    \Lambda^{CE}(\boldsymbol{x}) = -\sum_{i = 1}^{n_L}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm}.
+    \Lambda^{CE}(\mathbb{W},\mathbb{B},\boldsymbol{x}) = -\sum_{i = 1}^{|\mathbb{C}|}y_i(\boldsymbol{x})\ln{\hat{y}_i(\boldsymbol{x})} \hspace{0.2cm}.
     \label{CE_single}
 \end{equation}
 
-It measures the similarity between correct label distribution and the predicted label distribution for $\boldsymbol{x}$. Since there exists only one $i \in \{1,...,n_L\}$ (corresponding to the ground-truth label), where $y_i(\boldsymbol{x}) = 1$ (all other components are 0), then a sum in  \eqref{CE_single} reduces only to one summand. Therefore the Cross Entropy of single instance $\boldsymbol{x}$ decreases if the predicted value corresponding to the ground-truth label of $\boldsymbol{x}$ increases and vice versa, which is favourable behaviour in the task of classification.
+It measures the similarity between correct label distribution and the predicted label distribution for $\boldsymbol{x}$. Since there exists only one $i \in \{1,...,|\mathbb{C}|\}$ (corresponding to the ground-truth label), where $y_i(\boldsymbol{x}) = 1$ (all other components are 0), then a sum in  \eqref{CE_single} reduces only to one summand. Therefore the Cross Entropy of single instance $\boldsymbol{x}$ decreases if the predicted value corresponding to the ground-truth label of $\boldsymbol{x}$ increases and vice versa, which is favourable behaviour in the task of classification.
 
-Now we will show that combination of Cross Entropy loss function and softmax in the output layer prevents the learning slowdown problem. We compute the error term for softmax as in \eqref{BP1_softmax} and show that it does not depend on the derivatives of softmax. Also we use the notation from the \autoref{chapter:backprop} and denote $a_i^L = \hat{y}_i$ (from now we omit dependence on $\boldsymbol{x}$ for simplification).
+Now we will show that combination of Cross Entropy loss function and softmax in the output layer prevents the learning slowdown problem. We compute the error term for softmax as in \eqref{BP1_softmax} and show that it does not depend on the derivatives of softmax. Also we use the notation from the \autoref{chapter:backprop} and denote $a_i^L = \hat{y}_i$. The parentheses with dependencies of $\Lambda^{CE}$ are omitted for simplification.
 \begin{align*}
-\delta_j^L &= \frac{\partial \Lambda^{CE}}{\partial z_j^L} = \sum_{k=1}^{n_L}\frac{\partial \Lambda^{CE}}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} = \sum_{k=1}^{n_L}(-\frac{y_k}{[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k})[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k(\delta_{kj} - [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j) = \\
-&=  \sum_{k=1}^{n_L}(-y_k\delta_{kj}) + \sum_{k=1}^{n_L}y_k[\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = -y_j + [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = a_j^L - y_j = \hat{y}_j - y_j
+\delta_j^L &= \frac{\partial \Lambda^{CE}}{\partial z_j^L} = \sum_{k=1}^{|\mathbb{C}|}\frac{\partial \Lambda^{CE}}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} = \sum_{k=1}^{|\mathbb{C}|}(-\frac{y_k}{[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k})[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k(\delta_{kj} - [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j) = \\
+&=  \sum_{k=1}^{|\mathbb{C}|}(-y_k\delta_{kj}) + \sum_{k=1}^{|\mathbb{C}|}y_k[\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = -y_j + [\boldsymbol{\theta}(\boldsymbol{z}^L)]_j = a_j^L - y_j = \hat{y}_j - y_j
 \end{align*}
 
 We can see that $\delta_j^L$ is fully controlled only by the difference between predicted and correct value and no derivative of activation function occurs in the final equation. Therefore this approach is not affected by the learning slowdown problem as in the case of MSE.
@@ -856,9 +856,34 @@ There are also other loss functions applied in the neural network context, but n
 
 \section{Regularization}
 
+Regularization is a crucial term, which is almost indispensable among machine learning in general nowadays. It addresses the problem of overfitting and introduces some solutions to attain better generalization ability of machine learning models. Neural networks are able to approximate even very complicated, non-linear functions and hence are prone to overfitting quite easily. This is especially true for large networks. We focus on regularization specifically in terms of neural networks and describe some popular regularization techniques.
 
+\subsubsection{Modification of loss function}
 
+This technique works in a way that it adds a special regularization term to the loss function, which usually restricts the size of weights and penalizes the loss function for large weights. A heuristic idea behind this is that weight is allowed to be large only if it has a distinctive influence on decreasing the loss function by improvement of output of the neural network. Thus it is more likely that model increases only those weights that have high general effect on estimating the output and does not increase weights to gain only minor improvement of results by learning a noise in data \cite{regularization}.
 
+We distinguish the representatives of this group based on different regularization terms that are added to the loss function. Among the most popular belong L2 and L1 regularization, which are defined as follows:
+
+\begin{align}
+    \text{\textbf{L2 regularization}}\hspace{0.2cm}\text{:}\hspace{0.2cm}&\Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \Lambda_0(\mathbb{W},\mathbb{B},\mathbb{X}) + \frac{\lambda}{2n}\sum_{w \in \mathbb{W}}|w|^2 \nonumber \\
+    &\frac{\partial \Lambda}{\partial w} = \frac{\partial \Lambda_0}{\partial w} + \frac{\lambda}{n}w  \label{L2reg} \\
+    \text{Update rule}\hspace{0.2cm}\text{:}\hspace{0.2cm} &w^{(k+1)} = (1 - \eta\frac{\lambda}{n})w^{(k)} - \eta\frac{\partial \Lambda_0}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \nonumber \\ 
+    \text{\textbf{L1 regularization}}\hspace{0.2cm}\text{:}\hspace{0.2cm}&\Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \Lambda_0(\mathbb{W},\mathbb{B},\mathbb{X}) + \frac{\lambda}{n}\sum_{w \in \mathbb{W}}|w| \nonumber \\
+     &\frac{\partial \Lambda}{\partial w} = \frac{\partial \Lambda_0}{\partial w} + \frac{\lambda}{n}\text{sgn}(w)  \label{L1reg} \\
+    \text{Update rule}\hspace{0.2cm}\text{:}\hspace{0.2cm} &w^{(k+1)} = w^{(k)}- \eta\frac{\lambda}{n}\text{sgn}(w^{(k)}) - \eta\frac{\partial \Lambda_0}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \nonumber \hspace{0.2cm},
+\end{align}
+
+where $n = |\mathbb{X}|$, $\Lambda_0$ denotes original loss function and $\Lambda$ denotes loss function after addition of regularization term. The effect of regularization term is controlled by the magnitude of regularization parameter $\lambda \geq 0$. The larger $\lambda$ is, the larger penalty is put on weights and vice versa. Both variants penalizes large weights in a slightly different way. The difference is perfectly visible from the individual update rules of weights for Gradient Descent (or SGD) in \eqref{L2reg} respectively \eqref{L1reg}. We can see that in the case of L2 regularization the weights are gradually decreased proportionally to the magnitude of the corresponding weight, whereas in the case of L1 regularization the weights are modified by value of constant magnitude. This means that L2 regularization tends to shrink larger weights more than L1. L2 regularization is sometimes referred to as a \textit{weight decay}.
+
+In the experimental part we adopt mainly L2 regularization as a regularization technique. It could be also used in adaptive optimization algorithms, such as Adam. Generally accepted approach is to replace gradient $\nabla \Lambda_0$ with $\nabla \Lambda$ for initializing corresponding terms (e.g. equations \eqref{mean} and \eqref{variance}), as we did also in the case of SGD. There has been some criticism to this approach related to the adaptive algorithms \cite{adam_criticism}, which led to some proposals and improvements, but they are beyond the scope of this thesis and we will not mention them. In our experiments we use replacement of gradients as suggested above.
+
+\subsubsection{Early stopping}
+
+Early stopping is possibly the most natural regularization technique. It basically terminates the training phase of neural network, if the model starts to deteriorate its generalization ability. It is usually demonstrated at some epoch of training by degradation (stagnation) of performance on the validation dataset, while the performance on the training dataset is still improving. The performance is usually measured by monitoring the accuracy or loss on the validation dataset. There is a patience constant, which determines the number of epochs the algorithm waits for the improvement. If no improvement occurs, the training is terminated.
+
+\subsubsection{Dropout}
+
+Drouput is a popular regularization technique among neural networks, which has shown state-of-the-art results in many applications \cite{dropout}.
 
 
 
@@ -2045,6 +2070,12 @@ DOI: 10.3233/IDA-130592
 \bibitem{note_backprop}https://www.ics.uci.edu/~pjsadows/notes.pdf
 
 \bibitem{loss_func}https://arxiv.org/pdf/1702.05659.pdf
+
+\bibitem{regularization}https://pdfs.semanticscholar.org/0e9f/88e8f47b7a1b73d9090f0da3f0e5c2bec9aa.pdf
+
+\bibitem{adam_criticism}https://openreview.net/pdf?id=rk6qdGgCZ
+
+\bibitem{dropout} https://papers.nips.cc/paper/4878-understanding-dropout.pdf
 
 \end{thebibliography}
 
