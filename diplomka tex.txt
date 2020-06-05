@@ -912,7 +912,7 @@ This reformulation provides a sensible opportunity to enhance the decision tree 
 
 \section{Architecture and initial settings}
 
-The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by \cite{NRF}. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is
+The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by \cite{NRF}. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is threshold function
 \begin{equation}
     \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.5cm},
 \end{equation}
@@ -1052,9 +1052,9 @@ Matrix $\mathbb{A} \in \mathbb{R}^{L\times L}$, where $L$ is a total number of l
 \label{eq:determinant}
 \end{equation}
 
-For the proof of \eqref{eq:determinant} see Chapter [Proves]. Matrix $\mathbb{A}$ is therefore always regular with except of $L = 2$. In this case, $\text{det}\mathbb{A} = 0$ and matrix $\mathbb{A}$ is singular. But for $L=2$, the decision tree has only root node and 2 leaves, which is rarely a well-functional model in practical use. It could have a good performance almost only in case of data with significantly unambigous geometric deployment, where occurs only 2 classes and exists one hyperplane that sufficiently separates them. As the conclusion, we will almost never encounter such an elementary model.
+For the proof of \eqref{eq:determinant} see Chapter [Proves]. Matrix $\mathbb{A}$ is therefore always regular with except of $L = 2$. In this case, $\text{det}\mathbb{A} = 0$ and matrix $\mathbb{A}$ is singular. But for $L=2$, the decision tree has only root node and 2 leaves, which is rarely a well-functional model in practical use. It could have a good performance almost only in case of data with significantly unambigous geometric deployment, where occurs only 2 classes and exists one hyperplane that sufficiently separates them. In practice, we will almost never encounter such an elementary model.
 
-In case of invertible activation function $\sigma(\cdot)$ in the output layer (in our experiments were used sigmoid and Leaky ReLU activation functions, which are both invertible (softmax is problematic, describe it)), we obtain appropriate weights for neuron $c$ (also represents class $c \in \{1,...,C\}$ that this neuron corresponds to) in output layer after solving the following system of linear equations:
+In case of invertible activation function $\boldsymbol{\phi}(\cdot)$ in the output layer, we obtain appropriate weights for neuron $c$ (also represents class $c \in \{1,...,\mathbb{C}\}$ that this neuron corresponds to) in output layer after solving the following system of linear equations:
 
 \begin{equation}
     \mathbb{A}\begin{pmatrix}
@@ -1062,7 +1062,7 @@ In case of invertible activation function $\sigma(\cdot)$ in the output layer (i
     w^c_2\\
     \vdots\\
     w^c_L
-    \end{pmatrix} = \sigma^{-1}(\begin{pmatrix}
+    \end{pmatrix} = \boldsymbol{\phi}^{-1}(\begin{pmatrix}
     p^1_c\\
     p^2_c\\
     \vdots\\
@@ -1071,7 +1071,9 @@ In case of invertible activation function $\sigma(\cdot)$ in the output layer (i
     \label{eq:lin_eq}
 \end{equation}
 
-where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from the second hidden layer to neuron $c$ in the output layer and $\sigma^{-1}(\cdot)$ is inverse function of $\sigma(\cdot)$. In other words, the appropriate weights for neuron $c$ in the output layer are obtained as
+where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from the second hidden layer to neuron $c$ in the output layer and $\boldsymbol{\phi}^{-1}(\cdot)$ is inverse function of $\boldsymbol{\phi}(\cdot)$. We used simplified notation and $\boldsymbol{\phi}$ denotes either vector functions (e.g. softmax) or scalar functions applied in element-wise fashion (sigmoid).
+
+In other words, the appropriate weights for neuron $c$ in the output layer are obtained as
 
 \begin{equation}
     \begin{pmatrix}
@@ -1079,7 +1081,7 @@ where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from t
     w^c_2\\
     \vdots\\
     w^c_L
-    \end{pmatrix} = \mathbb{A}^{-1}(\sigma^{-1}(\begin{pmatrix}
+    \end{pmatrix} = \mathbb{A}^{-1}(\boldsymbol{\phi}^{-1}(\begin{pmatrix}
     p^1_c\\
     p^2_c\\
     \vdots\\
@@ -1088,19 +1090,36 @@ where $\boldsymbol{w}^c = (w^c_1,...,w^c_L)^T$ are weights of connections from t
     \label{eq:weights_output}
 \end{equation}
 
-After initialization of biases to 0 and solving the system of linear equations for all neurons in the output layer (or computing the inverse of matrix $\mathbb{A}$) and for appropriate activation function chosen in advance, we gain also all initialization weights. This initial setting causes the neural network to output same predictions as from the corresponding decision tree and hence to get equally performing classification model.
+This is perfectly feasible for sigmoid or Leaky ReLU, which are both invertible. The situation is little problematic in case of softmax. It could be easily derived that softmax inversion is not unique. More specifically, if we consider vector $\boldsymbol{w}$ and $\boldsymbol{\hat{w}}$, where $\forall i \in \{1,...,L\}, \hat{w}_i = w_i + r$ for arbitrary real constant $r$, then application of softmax on both variants would produce $\forall k \in \{1,...,L\}$ same result, which follows from:
+
+$$[\boldsymbol{\theta}(\boldsymbol{\hat{w}})]_k = \frac{e^{w_k + r}}{\sum_i^{}e^{w_i + r}} = \frac{e^{r}e^{w_k}}{e^{r}\sum_i^{}e^{w_i}} = \frac{e^{w_k}}{\sum_i^{}e^{w_i}} = [\boldsymbol{\theta}(\boldsymbol{w})]_k \hspace{0.2cm}.$$
+
+Fortunately, we are interested in arbitrary solution, which would produce probability vector after application of softmax. Thus we define (one-sided) inversion of softmax $\forall k \in \{1,...,L\}$, $\forall \boldsymbol{z}$, where $\forall k \in \{1,...,L\}, 0 < z_k \leq 1, \sum_k^{}z_k = 1$,  as
+
+\begin{equation}
+[\boldsymbol{\theta}^{-1}(\boldsymbol{z})]_k = \ln(z_k) \hspace{0.2cm}.
+\label{softmax_inversion}
+\end{equation}
+
+This definition fulfills condition $\boldsymbol{\theta}(\boldsymbol{\theta}^{-1}(\boldsymbol{z})) = \boldsymbol{z}$, because $\forall k \in \{1,...,L\}$ holds
+
+$$\frac{e^{\ln z_k}}{\sum_i^{}e^{\ln z_i}} = \frac{z_k}{\sum_i^{}z_i} = z_k \hspace{0.2cm},$$
+
+because $\sum_i z_i = 1$. Note that this only holds when original softmax is applied on the inversion define in \eqref{softmax_inversion}. It does not work in reversed order. In practice sometimes arises case, where $\exists k \in \{1,...,L\}, z_k = 0$. In such case we slightly modify the original value to $10^{-3}$, which secures only negligible deviation from the original probabilities and (in vast majority of cases) does not affect predictions of the model.
+
+After initialization of biases in output layer to 0 and solving the system of linear equations in \eqref{eq:weights_output} for all neurons in the output layer (or computing the inverse of matrix $\mathbb{A}$) and for appropriate activation function chosen in advance, we gain also all initialization weights. This initial setting causes the neural network to output same predictions as from the corresponding decision tree and hence to get equally performing classification model. %We refer to this transformed neural network as \textit{neural tree}.
 
 \section{NN models with decision-tree-initialization}
 \label{NN_models}
 
 \subsection{Perceptron activation function replacement}
 
-In order to apply reasonable training procedure with backpropagation algorithm on proposed method, it is suitable to replace perceptron activation function $\tau(\cdot)$ with its smooth approximation. For this purpose the hyperbolic tangent function was adopted (Figure BLA). This affects original transformation, because due to this approximation the neural random tree is no longer one-to-one transformation to former decision tree. But still under certain conditions (especially the transition slope from the negative part of the $\tanh(\cdot)$ function to the positive one - the more upright, the better approximation we get) it could come fairly close to the perceptron function and therefore entire model performance remains unchanged with respect to the decision tree. Usage of $\tanh(\cdot)$ in first and second hidden layer is necessary with respect to the transformation procedure, even that $\tanh(\cdot)$ has some drawbacks as activation function (e.g. vanishing gradients [ref]). Using other activation functions in this case is not appropriate, because it will lack any decision tree relationship.
+In order to apply reasonable training procedure with backpropagation algorithm on proposed method, it is suitable to replace perceptron activation function $\tau(\cdot)$ (threshold function) with its smooth approximation. For this purpose the hyperbolic tangent function was adopted. This affects original transformation, because due to this approximation the resulting neural network is no longer one-to-one transformation to former decision tree. But still under certain conditions (especially the transition slope from the negative part of the $\tanh(\cdot)$ function to the positive one - the more upright, the better approximation we get) it could come fairly close to $\tau(\cdot)$ and therefore entire model performance remains unchanged with respect to the decision tree. Usage of $\tanh(\cdot)$ in first and second hidden layer is necessary with respect to the transformation procedure, even that $\tanh(\cdot)$ has some drawbacks as activation function (described in \autoref{chapter:backprop}). Using other activation functions in this case is not appropriate, because it will lack any decision tree relationship.
 
 The closeness of $\tanh(\cdot)$ to the perceptron activation function in our experiments is controlled with $\beta > 0$ parameter.
 
 \begin{equation}
-    \tanh(\beta z) = \frac{e^{2\beta z - 1}}{e^{2\beta z} +1} 
+    \tanh(\beta x) = \frac{e^{2\beta x - 1}}{e^{2\beta x} +1} 
 \end{equation}
 
 \begin{figure}[ht]
@@ -1111,49 +1130,48 @@ The closeness of $\tanh(\cdot)$ to the perceptron activation function in our exp
 \end{figure}
 
 
-The higher $\beta$ is, the better approximation of perceptron activation function is observed. With $\beta \rightarrow \infty$, $\tanh(\cdot)$ converges to the $\tau(\cdot)$. In experiments were exploited two parameters, $\beta_1$ and $\beta_2$, each to control transitions of $\tanh(\cdot)$ in different hidden layers. They will be mentioned and examined in further chapters. The influence of these parameters on the shape is depicted in the Figure \ref{fig:tanh}.
+The higher $\beta$ is, the better approximation of perceptron activation function is observed. With $\beta \rightarrow \infty$, $\tanh(\cdot)$ converges to the $\tau(\cdot)$. In the experiments were exploited two parameters, $\beta_1$ in the first hidden layer and $\beta_2$ in the second hidden layer, each to control transitions of $\tanh(\cdot)$ to $\tau(\cdot)$ in the corresponding hidden layers. We will refer to them as \textit{transition parameters}. Their effect on overall performance will be examined in further chapters. The influence of these parameters on the shape is depicted in the Figure \ref{fig:tanh}.
 
 \subsection{Competitive decision-tree-motivated models}
-In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights in output layer (the main model from Chapter 3 has deterministic weights gained from the decision tree in all layers) and leave them random. This reduces inclination of model to overfitting, but does not provide accurate decision tree transformation as our reference model.
+In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model from Chapter 3 has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $l+1$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
 
-\subsubsection{Reference model (NRT deterministic weights)}
+\subsubsection{Reference model (NT)}
 
-Acquisition of this model is described in Chapter 3. Its main purpose is to simulate corresponding decision tree behaviour as good as possible from the very beginning (quality of simulation is controlled with $\beta$ parameter of activation functions in the first and second hidden layer). With both  $\beta$s approach infinity, the reference model gives same predictions as decision tree. Of course, with respect to the predicting procedure of the decision tree, it could converge to predicting same results with $\beta$s only "high enough".
+Acquisition of this model is described in Chapter 3. Its main purpose is to simulate corresponding decision tree behaviour as good as possible from the very beginning (quality of simulation is controlled by $\beta_1$ and $\beta_2$ transition parameters of hyperbolic tangent in the first and second hidden layer). With both $\beta$s approach infinity, the reference model gives same predictions as decision tree. Essentially, with respect to the predicting procedure of the decision tree based on picking label with the highest probability, it could converge to predicting same results with $\beta$s only "high enough".
 % sem dát možná nějaké vysvětlení, jaká vliv má změna v beta na prediction, použít nějaký horní odhad výstupního vektoru, maticové normy
-After transformation the neural network is already a sufficient model capable of making relevant predictions, because it keeps similar behaviour as corresponding decision tree. This feature makes neural network very sensitive to the learning rate hyperparameter, which needs to be set beforehand. Also there exists significant risk of overfitting, which should be reduced by adapting regularization terms. Further analysis of these issues will be provided in later chapters. The closeness of this model to the corresponding decision tree gives good opportunity to enhance performance of the previous model by further backpropagation training. Also convergence should be very fast, which will be examined in the experimental part.
+After transformation the neural network is already a sufficient model capable of making relevant predictions, because it could produce similar predictions as corresponding decision tree. This makes neural network to share resembling features as the decision tree, mainly regarding adjustments of decisions, inclination to overfitting, etc. The closeness of this model to the corresponding decision tree gives good opportunity to enhance performance of the decision tree by further backpropagation training, achieving improvement only after few epochs of training. Analysis of these issues will be provided in later chapters.
 
-\subsubsection{NRT basic}
+\subsubsection{NT\_basic}
 
-First competitive model has first and second hidden layer similar to the layers in the reference model. The difference is in setting weights and biases in the output layer. In this case we leave weights and biases in output layer purely random, as is depicted in Figure \ref{fig:nrt_basic}. This modification should be more relaxing with respect to the backpropagation training and reduce amount of sensitivity to the learning rate and risk of overfitting. On the other hand, it should slow down convergence in comparison with the reference model.
+First competitive model has weights and biases corresponding to the first and second hidden layer initialized similarly to the same layers in the reference model. The difference is in setting weights and biases corresponding to the output layer. In this case we initialize weights and biases randomly, as is depicted in the Figure \ref{fig:nrt_basic}.
+
+This modification should reveal some properties related to advantages or disadvantages of simulating the decision tree since the beginning of backpropagation or leaving the output layer relaxed with space for neural network to adapt it in its own way. Also the sensitivity to different neural network or decision tree hyperparameters can vary. These questions will be examined and tested in the experimental part.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{nrt_basic.png}
-\caption{NRT basic model. In comparison with the reference model, the weights and biases of the output layer are initialized randomly.}
+\caption{NT\_basic model. In contrast with the reference model, the weights and biases corresponding to the output layer are initialized randomly.}
 \label{fig:nrt_basic}
 \end{figure}
 
-\subsubsection{NRT extra layer}
+\subsubsection{NT\_EL}
 
-Next competitive model add one extra layer of neurons between second hidden layer and output layer. This layer should serve as an aggregate layer that first summarize information from the second hidden layer (information from leaves of the decision tree) and then transfer this information to the output layer. Clearly, number of neurons in the third hidden layer is optional, but in our experiments was this value set up same as number of neurons in the output layer (number of classes). Weights and biases in this (third) hidden layer and output layer are purely random, as illustrated in the Figure \ref{fig:nrt_extra_layer}. We also exploited sigmoid function and Leaky ReLu as activation functions. This neural network setting uses decision tree to set a decisive start to the neural network to output leaf membership of an instance in the second hidden layer, then summarize information from this layer in the third hidden layer and extract output in the output layer. Adding extra layer with random parameters should in this case slow down convergence and enlarge the number of hyperparameters, but could have positive impact on the final performance and outperform previous models.
+Next competitive model adds one extra layer of neurons between second hidden layer and output layer of the reference model. Weights and biases corresponding to all layers up to this new extra layer are initialized in the same manner as in the case of NT (extra layer now corresponds to the output layer of NT). This makes the extra layer to output same results as output layer of NT. Finally, weights and biases corresponding to the output layer of NT\_EL are initialized randomly. In the extra layer is used Leaky ReLU as activation function. This model is illustrated in the Figure \ref{fig:nrt_extra_layer_det}.
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{nrt_extra_layer.png}
-\caption{NRT basic model. In comparison with the reference model, the weights and biases of the output layer are initialized randomly.}
-\label{fig:nrt_extra_layer}
-\end{figure}
-
-\subsubsection{NRT extra layer - deterministic weights}
-
-Final competitive model is the compound of 'NRT extra layer' and reference model. There is added an extra layer and weight and biases of the third hidden layer are initialized in the same manner as in the output layer of the reference model (usage of inverse of matrix $\mathbb{A}$). 
+Adding one extra layer increases complexity, but could have positive impact on the final performance and outperform previous models.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{nrt_extra_layer_deterministic.png}
-\caption{NRT basic model. In comparison with the reference model, the weights and biases of the output layer are initialized randomly.}
+\caption{NT\_EL. Weights and biases corresponding to the extra layer are initialized deterministically as in the case of NT model. Other weights and biases are initialized randomly.}
 \label{fig:nrt_extra_layer_det}
 \end{figure}
+
+\subsubsection{NT\_EL\_DW}
+
+This model is motivated by NT\_EL model. The weights and biases up to the extra layer are initialized same as in the case of NT\_EL model. On the contrary, the weights and biases corresponding to the output layer are initialized deterministically. The goal is to adjust the weights in a way that neural network can output same predictions as the decision tree already at the beginning of backpropagation (for sufficiently high transition parameters $\beta_1$ and $\beta_2$). Since the extra layer can output same probabilities as the decision tree, it would be sufficient to traverse the output of the extra layer to the output layer. We achieve this by initializing weights of connections from the extra layer to the output layer by identity matrix. In other words, the connection from $j$-th neuron of the extra layer to $j$-th neuron of the output layer is initialized to 1 and other weights pointing from $j$-th neuron to the output layer are initialized to 0. This procedure is applied for each neuron of the extra layer. Biases corresponding to the output layer are initialized to 0. Then if we use softmax in the output layer, the probabilities would be modified, but order of these values remain same. Since the final prediction corresponds to the class with the highest probability, we end up with same predictions as the decision tree.
+
+
 
 %Describe all five competitive models that we use in experiments with illustrations and algorithms. Discuss replacement of $\tau$ with tanh activation function and its influence on performance and backpropagation. Divide basic model to sparse setting and full connected setting. In sparse setting we allow to train with backpropagation only notnull connections, to preserve decision tree interpretation. That will help us also to demonstrate the effect of backpropagation. In full connected setting we train all parameters.
 
