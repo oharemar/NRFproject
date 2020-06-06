@@ -666,6 +666,7 @@ The algorithm in practice usually runs in several epochs. Each epoch is characte
 In \eqref{sgd_weight} and \eqref{sgd_bias} could be omitted $\frac{1}{m}$ factor, which corresponds only to the scaling of learning rate. Factor $\frac{1}{n}$ is sometimes omitted also in definition of MSE in \eqref{mse} \cite{feedforward}.
 
 \subsection{Other training methods}
+\label{other_training_methods}
 
 Altough gradient descent or SGD are both popular optimization algorithms applied in many optimization tasks (especially in the training phase of neural networks), they are not entirely flawless. In some situations they could report drawbacks which can make a learning procedure much more difficult. Especially in the means of the speed of convergence and stucking in sub-optimal (local) minima. Moreover, the overall sensitivity to the learning rate parameter is in the case of gradient descent and SGD very high, which also affects the convergence and poor choice of learning rate can even lead to divergence.
 
@@ -1192,7 +1193,7 @@ To extract the final prediction we combine decisions from individual neural netw
 \label{experiments}
 \setlength\footnotemargin{8pt}
 
-This chapter focuses on the experimental part of the thesis. Numerous experimental evaluations of the proposed models are presented alongside the thorough description and interpretation of the outcomes. The main emphasis is put especially on the comparison of the Neural Random Forest (NF) models with the corresponding Random Forest (RF) models. Moreover, the results of NF and RF models are also compared to the performance of other popular classification algorithms, such as Logistic Regression (LR) and Feedforward Neural Network (NN). The experiments are divided into three separate parts.
+This chapter focuses on the experimental part of the thesis. Proposed models were applied to several experimental datasets under various parametric settings. The performance were analysed among all models to provide quantitative comparison of quality and stability of outcomes. The main emphasis is put especially on the comparison of the Neural Random Forest (NF) models with the corresponding Random Forest (RF) models. Moreover, the results of NF and RF models are also compared to the performance of other popular classification algorithms, such as Logistic Regression (LR) and Feedforward Neural Network (NN). The experiments are divided into three separate parts.
 
 The first part is dedicated to the evaluation on the pre-selected public datasets. All proposed NF models are evaluated on these datasets and compared with RF and other models. Additionally, the effect of NF and RF hyperparameters on the classification performance is examined and visualized on the supporting graphs.
 
@@ -1205,40 +1206,72 @@ In the last part the best NF models are applied to the classification task on th
 
 This section provides comparison of NF and competitive models evaluated on the set of public datasets selected in advance. Also the effect of the choice of NF parameters on the overall performance is examined and visualized.
 
-The models are compared with respect to the accuracy and macro-average of F1-score on all datasets. Both values are presented in terms of mean value and standard deviation after two subsequent 5-fold cross validations\footnote{\textit{K-fold cross validation}: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.} (10 iterations in total) in order to avoid statistical fluctuations and gain higher robustness of the outcome.
-
-All applied models are summarized in Table \ref{table::public_models} with their shortcut notations (column MODEL).
-
 \definecolor{Red}{rgb}{0.95,0.3,0.9}
-
-
-
-\begin{table}[h]
+\begin{table}[ht!]
     \centering
     %\small\addtolength{\tabcolsep}{-5pt}
     \begin{tabular}{|c|c|c|}
     \hline
-     \textbf{MODEL} & \textbf{DESCRIPTION} \\ \hline
-     \cellcolor{yellow}LR & \thead{Logistic regression model} \\ \hline
-     \cellcolor{yellow}NN & \thead{4-layer neural network} \\ \hline
-     \cellcolor{green}RF20 & \thead{Random forest with 20 estimators} \\ \hline
-    \cellcolor{green}RF30 & \thead{Random forest with 30 estimators} \\ \hline
-     \cellcolor{green}RF50 & \thead{Random forest with 50 estimators} \\ \hline
-    \cellcolor{orange}NRF & \thead{Neural random forest consisting of \\ \textit{NRT basic} estimators as in \autoref{NN_models}} \\ \hline
-    \cellcolor{orange}NRF\_DW & \thead{Neural random forest consisting of \\ \textit{NRT - deterministic weights} estimators as in \autoref{NN_models}} \\ \hline
-     \cellcolor{orange}NRF\_EL & \thead{Neural random forest consisting of \\ \textit{NRT extra layer} estimators as in \autoref{NN_models}} \\ \hline
-     \cellcolor{orange}NRF\_EL\_DW & \thead{Neural random forest consisting of \\ \textit{NRT extra layer - deterministic weights} estimators as in \autoref{NN_models}} \\ \hline
+     \textbf{MODEL} & \textbf{DESCRIPTION} & \textbf{HYPERPARAMETERS}\\ \hline
+     \cellcolor{yellow}LR & \thead{Logistic regression model} & - \\ \hline
+     \cellcolor{yellow}NN & \thead{Neural network with 2 hidden layers} & \thead{Number of epochs = 30, \\
+     Mini-batch size = 10 \\
+     Learning rate $\eta = 0.01$ \\
+     Number of neurons in $1^{\text{st}}$ hidd. layer = 60\\
+     Number of neurons in $2^{\text{nd}}$ hidd. layer = 60} \\ \hline
+     \cellcolor{green}RF20 & \thead{Random forest with 20 estimators} & \thead{Number of estimators = 20 \\
+     Maximum depth = 6 \\
+     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+     ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
+    \cellcolor{green}RF30 & \thead{Random forest with 30 estimators} &\thead{Number of estimators = 30 \\
+     Maximum depth = 6 \\
+     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+     ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
+     \cellcolor{green}RF50 & \thead{Random forest with 50 estimators}& \thead{Number of estimators = 50 \\
+     Maximum depth = 6 \\
+     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+     ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
+    \cellcolor{orange}NRF & \thead{Neural random forest consisting of \\ \textit{NT\_basic} defined in \autoref{NN_models}} & \thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.002$ \\
+    Initial random forest = RF20 \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\} \\ \hline
+    \cellcolor{orange}NRF\_DW & \thead{Neural random forest consisting of \\ \textit{NT} defined in \autoref{NN_models}} & \thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0035$ \\
+        Initial random forest = RF20 \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
+     \cellcolor{orange}NRF\_EL & \thead{Neural random forest consisting of \\ \textit{NT\_EL} defined in \autoref{NN_models}} &\thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.005$ \\
+        Initial random forest = RF20 \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
+     \cellcolor{orange}NRF\_EL\_DW & \thead{Neural random forest consisting of \\ \textit{NT\_EL\_DW} defined in \autoref{NN_models}} &\thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0045$ \\
+        Initial random forest = RF20 \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
     
     \end{tabular}
-    \caption{Shortcut notation of the individual models and basic descriptions.}
+    \caption{Shortcut notation of the individual models and basic descriptions with the choice of hyperparameters.}
     \label{table::public_models}
 \end{table}
 
-Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NF models. We adopted logistic regression with L2 regularization and 4-layer neural network with ReLU activation function in the hidden layers and softmax in the output layer. Two hidden layers have 60 neurons both. It applies Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). The mini-batch size was set to 10 and it was trained for 30 training epochs. Hyperparameters of NN were chosen as follows: $\eta = 0.01$, $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$, where $\eta$ is a learning rate and the rest are constants of Adam equally noted as in the Chapter [Optimization NN]. We use implementation of LR and NN from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
+\subsection{Overall results}
 
-The green area comprises RF models. We adopted three variations with different number of estimators. All RF models have same parameters: maximum depth = 6, number of randomly chosen features considered in the split = $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ is a total number of features. All decision trees were trained with entire training dataset and we use entropy as the impurity function in the information gain criterion. We use implementation from Scikit learn.
 
-The orange area includes all NF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. The results with Cross Entropy were better in comparison with exploitation of Quadratic cost function (MSE). Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. They were chosen as follows: $\eta^{\text{NRF}} = 0.002$, $\eta^{\text{NRF\_DW}} = 0.0035$, $\eta^{\text{NRF\_EL}} = 0.005$, $\eta^{\text{NRF\_EL\_DW}} = 0.0045$. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The mini-batch size was set to 10 and the parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NF models in Python.
+
+The models are compared with respect to the accuracy and macro-average of F1-score on all datasets. Both values are presented in terms of mean value and standard deviation after two subsequent 5-fold cross validations\footnote{\textit{K-fold cross validation}: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.} (10 iterations in total) in order to limit statistical fluctuations and gain higher robustness of the outcome.
+
+All applied models are summarized in Table \ref{table::public_models} with their shortcut notations (column MODEL).
+
+
+
+Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NF models. We adopted logistic regression with L2 regularization and neural network with ReLU activation function in the hidden layers and softmax in the output layer. We apply Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). The hyperparameters of Adam was chosen as follows: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. We use same notation as defined in \autoref{other_training_methods}. The implementation of LR and NN was taken from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
+
+The green area comprises RF models. We adopted three variations with different number of estimators. All decision trees were trained with entire training dataset and we use entropy as the impurity function in the information gain criterion. We use implementation from Scikit learn.
+
+The orange area includes all NF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NF models in Python.
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
@@ -1272,7 +1305,7 @@ All categorical features were one-hot encoded, ie. transformed by function $\zet
     0, & \text{otherwise}
     \end{cases} \hspace{0.2cm}.
 \end{equation}
-Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1 ) to ensure better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of $j$-th feature. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
+Eventually, all dataset features (including newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1) to ensure better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of $j$-th feature. This normalization had also positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
 
 Final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public} (results in both tables correspond to the original values multiplied by 100).
 
@@ -1326,7 +1359,7 @@ From the first observation we may notice that all models performed very similarl
 
 The most significant differences between NF models and RF models could be seen in the cases of Cars, Messidor, USPS, Vehicle and OBS datasets, where NF models have superior performance in comparison with RF models. On Bank dataset is performance of NF models basically equal or only slightly better. Only exception is visible in case of Diabetes dataset, where NF models do not produce any improvement and perform similarly or sligthly worse than RF models. It could be caused by many influencing factors, especially inappropriate choice of hyperparameters of NF models. The effect of hyperparameters on final performance will be researched later.
 
-NF models among themselves produce very similar results. NRF\_DW and NRF\_EL\_DW have almost same performance on all datasets with very small differences, which is a good sign, since they both aim to simulate random forest already before training individual estimators with backpropagation and therefore have comparable initial conditions. Moreover, NRF\_DW has one hidden layer less, so stacking more layers do not necessarily mean better performance. NRF and NRF\_EL have relaxing layers with random weights, so there is more space left for individual neural networks to forget about decision tree initial knowledge and adapt in its own way. This could be beneficial especially in cases where RF models produce superior performance in comparison with other models and therefore there is not much space for further significant improvement if RF model is imitated. This is nicely demonstrated in the case of Diabetes dataset, where RF models produce fine results in the beginning and then NRF\_DW and NRF\_EL\_DW are not successful in further improving it. It even reached slightly "worse" results (note the quotation marks since there is a relatively high standard deviation, which makes it hard to distinguish better model from the worse one). On the other hand, NRF and NRF\_EL managed to come fairly close to RF model performance or even equalize it and have slightly better and more stable (lower standard deviations) performance than NRF\_DW and NRF\_EL\_DW in this case. Of course, better choice of hyperparameters of NRF\_DW and NRF\_EL\_DW (especially number of training epochs and transition parameters $\beta_1$ and $\beta_2$ which control the quality of imitation of a single decision tree) could lead eventually to surpassing even the well-performing RF. This issue will be studied later in the thesis.
+NF models among themselves produce very similar results. NRF\_DW and NRF\_EL\_DW have almost same performance on all datasets with very small differences, which is a good sign, since they both aim to simulate random forest already before training individual estimators with backpropagation and therefore have comparable initial conditions. Moreover, NRF\_DW has one hidden layer less, so stacking more layers do not necessarily mean better performance. NRF and NRF\_EL have relaxing layers with random weights, so there is more space left for individual neural networks to modify decision tree initial knowledge and adapt in its own way. This could be beneficial especially in cases where RF models produce superior performance in comparison with other models and therefore there is not much space for further significant improvement if RF model is imitated. This is nicely demonstrated in the case of Diabetes dataset, where RF models produce fine results in the beginning and then NRF\_DW and NRF\_EL\_DW are not successful in further improving it. It even reached slightly "worse" results (note the quotation marks since there is a relatively high standard deviation, which makes it hard to distinguish better model from the worse one). On the other hand, NRF and NRF\_EL managed to come fairly close to RF model performance or even equalize it and have slightly better and more stable (lower standard deviations) performance than NRF\_DW and NRF\_EL\_DW in this case. Of course, better choice of hyperparameters of NRF\_DW and NRF\_EL\_DW (especially number of training epochs and transition parameters $\beta_1$ and $\beta_2$ which control the quality of imitation of a single decision tree) could lead eventually to surpassing even the well-performing RF. This issue will be studied later in the thesis.
 
 \subsection{The effect of hyperparameters}
 
