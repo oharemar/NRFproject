@@ -903,7 +903,7 @@ We mentioned three different regularization techniques frequently used among neu
 
 
 
-\chapter{Decision-Tree-Inspired NN architecture}
+\chapter{Decision Tree to Neural Network transformation}
 In this section is provided detailed derivation of the basic neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article \cite{NRF} describing 1 to 1 transformation of arbitrary regression tree (random forest regressor) to the specifically designed neural network (ensemble of neural networks).
 
 Unfortunately, an approach presented in \cite{NRF} is not uniformly convertible to the classification problem. Based on this issue, the  alternative architecture and initial settings are proposed in order to simulate the exact behaviour of corresponding decision tree classifier.
@@ -1109,14 +1109,14 @@ because $\sum_i z_i = 1$. Note that this only holds when original softmax is app
 
 After initialization of biases in output layer to 0 and solving the system of linear equations in \eqref{eq:weights_output} for all neurons in the output layer (or computing the inverse of matrix $\mathbb{A}$) and for appropriate activation function chosen in advance, we gain also all initialization weights. This initial setting causes the neural network to output same predictions as from the corresponding decision tree and hence to get equally performing classification model. %We refer to this transformed neural network as \textit{neural tree}.
 
-\section{NN models with decision-tree-initialization}
+\chapter{Decision-tree-motivated models}
 \label{NN_models}
 
-\subsection{Perceptron activation function replacement}
+\section{Threshold function replacement}
 
-In order to apply reasonable training procedure with backpropagation algorithm on proposed method, it is suitable to replace perceptron activation function $\tau(\cdot)$ (threshold function) with its smooth approximation. For this purpose the hyperbolic tangent function was adopted. This affects original transformation, because due to this approximation the resulting neural network is no longer one-to-one transformation to former decision tree. But still under certain conditions (especially the transition slope from the negative part of the $\tanh(\cdot)$ function to the positive one - the more upright, the better approximation we get) it could come fairly close to $\tau(\cdot)$ and therefore entire model performance remains unchanged with respect to the decision tree. Usage of $\tanh(\cdot)$ in first and second hidden layer is necessary with respect to the transformation procedure, even that $\tanh(\cdot)$ has some drawbacks as activation function (described in \autoref{chapter:backprop}). Using other activation functions in this case is not appropriate, because it will lack any decision tree relationship.
+In order to apply reasonable training procedure with backpropagation algorithm on proposed method, it is suitable to replace perceptron activation function $\tau(\cdot)$ (threshold function) with its smooth approximation. For this purpose the hyperbolic tangent function was adopted. This affects original transformation, because due to this approximation the resulting neural network is no longer one-to-one transformation to former decision tree. But still under certain conditions (especially the transition slope from the negative part of the $\tanh(\cdot)$ function to the positive one - the more upright, the better approximation we get) it could come fairly close to $\tau(\cdot)$ and therefore entire model performance remains unchanged with respect to the decision tree. Usage of $\tanh(\cdot)$ in the first and the second hidden layer is necessary with respect to the transformation procedure, even that $\tanh(\cdot)$ has some drawbacks as activation function (described in \autoref{chapter:backprop}). Using other activation functions in this case is not appropriate, because it will lack any decision tree relationship.
 
-The closeness of $\tanh(\cdot)$ to the perceptron activation function in our experiments is controlled with $\beta > 0$ parameter.
+The closeness of $\tanh(\cdot)$ to the perceptron activation function in our experiments is controlled with $\beta \geq 1$ parameter.
 
 \begin{equation}
     \tanh(\beta x) = \frac{e^{2\beta x - 1}}{e^{2\beta x} +1} 
@@ -1132,8 +1132,8 @@ The closeness of $\tanh(\cdot)$ to the perceptron activation function in our exp
 
 The higher $\beta$ is, the better approximation of perceptron activation function is observed. With $\beta \rightarrow \infty$, $\tanh(\cdot)$ converges to the $\tau(\cdot)$. In the experiments were exploited two parameters, $\beta_1$ in the first hidden layer and $\beta_2$ in the second hidden layer, each to control transitions of $\tanh(\cdot)$ to $\tau(\cdot)$ in the corresponding hidden layers. We will refer to them as \textit{transition parameters}. Their effect on overall performance will be examined in further chapters. The influence of these parameters on the shape is depicted in the Figure \ref{fig:tanh}.
 
-\subsection{Competitive decision-tree-motivated models}
-In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model from Chapter 3 has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $l+1$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
+\section{Competitive decision-tree-motivated models}
+In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model from Chapter 3 has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $(l+1)$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
 
 \subsubsection{Reference model (NT)}
 
@@ -1143,7 +1143,7 @@ After transformation the neural network is already a sufficient model capable of
 
 \subsubsection{NT\_basic}
 
-First competitive model has weights and biases corresponding to the first and second hidden layer initialized similarly to the same layers in the reference model. The difference is in setting weights and biases corresponding to the output layer. In this case we initialize weights and biases randomly, as is depicted in the Figure \ref{fig:nrt_basic}.
+First competitive model has weights and biases corresponding to the first and second hidden layer initialized similarly as the same layers in the reference model. The difference is in setting weights and biases corresponding to the output layer. In this case we initialize weights and biases randomly, as is depicted in the Figure \ref{fig:nrt_basic}.
 
 This modification should reveal some properties related to advantages or disadvantages of simulating the decision tree since the beginning of backpropagation or leaving the output layer relaxed with space for neural network to adapt it in its own way. Also the sensitivity to different neural network or decision tree hyperparameters can vary. These questions will be examined and tested in the experimental part.
 
@@ -1169,18 +1169,23 @@ Adding one extra layer increases complexity, but could have positive impact on t
 
 \subsubsection{NT\_EL\_DW}
 
-This model is motivated by NT\_EL model. The weights and biases up to the extra layer are initialized same as in the case of NT\_EL model. On the contrary, the weights and biases corresponding to the output layer are initialized deterministically. The goal is to adjust the weights in a way that neural network can output same predictions as the decision tree already at the beginning of backpropagation (for sufficiently high transition parameters $\beta_1$ and $\beta_2$). Since the extra layer can output same probabilities as the decision tree, it would be sufficient to traverse the output of the extra layer to the output layer. We achieve this by initializing weights of connections from the extra layer to the output layer by identity matrix. In other words, the connection from $j$-th neuron of the extra layer to $j$-th neuron of the output layer is initialized to 1 and other weights pointing from $j$-th neuron to the output layer are initialized to 0. This procedure is applied for each neuron of the extra layer. Biases corresponding to the output layer are initialized to 0. Then if we use softmax in the output layer, the probabilities would be modified, but order of these values remain same. Since the final prediction corresponds to the class with the highest probability, we end up with same predictions as the decision tree.
+This model is motivated by NT\_EL model. The weights and biases up to the extra layer are initialized same as in the case of NT\_EL model. On the contrary, the weights and biases corresponding to the output layer are initialized deterministically. The goal is to adjust the weights in a way that neural network can output same predictions as the decision tree already at the beginning of backpropagation (for sufficiently high transition parameters $\beta_1$ and $\beta_2$), similarly as the reference model. Since the extra layer can output same probabilities as the decision tree, it would be sufficient to traverse the output of the extra layer to the output layer. We achieve this by initializing weights of connections from the extra layer to the output layer by identity matrix. In other words, the weight of the connection from $j$-th neuron of the extra layer to $j$-th neuron of the output layer is initialized to 1 and other weights pointing from $j$-th neuron to the output layer are initialized to 0. This procedure is applied for each neuron of the extra layer. Biases corresponding to the output layer are initialized to 0. Then if we use softmax in the output layer, the probabilities would be modified, but order of these values remain same. Since the final prediction corresponds to the class with the highest probability, we end up with same predictions as the decision tree even that individual values are not exactly same as in the case of the decision tree.
 
+\section{Neural Random Forest}
 
+We already defined several transformations of single decision tree to the neural network. Our main interest is primarily to transform ensemble of decision trees to the ensemble of neural networks. Specifically, we focus on transforming random forest classifier into the ensemble of neural networks, which we refer to as \textit{neural random forest} (NF).
 
-%Describe all five competitive models that we use in experiments with illustrations and algorithms. Discuss replacement of $\tau$ with tanh activation function and its influence on performance and backpropagation. Divide basic model to sparse setting and full connected setting. In sparse setting we allow to train with backpropagation only notnull connections, to preserve decision tree interpretation. That will help us also to demonstrate the effect of backpropagation. In full connected setting we train all parameters.
+Neural random forest is obtained by transforming each decision tree into the neural network by predefined procedure (we described 4 different ways in the previous chapter). Then all neural networks are further trained by backpropagation.
 
-\chapter{Neural Random Forest}
+To extract the final prediction we combine decisions from individual neural networks. We adopted two different ways to extract predictions.
 
-Combination of multiple neural random trees into an ensemble, similarly as in the case of random forests.
+\begin{enumerate}
+    \item \textbf{Voting}: This procedure extracts predictions from individual neural networks and then outputs the label of the most frequently represented class. If occur two or more classes equally represented among predictions, then the \textit{averaging} procedure should be applied.
+    \item \textbf{Averaging}: This works similarly as in the case of random forest. We average probability predictions of individual neural networks and then the neural random forest outputs label corresponding to the highest averaged probability.
+\end{enumerate}
 
-\subsection{Voting}
-\subsection{Averaging}
+\subsubsection{Commentary on the complexity}
+
 
 
 \chapter{Experiments}
