@@ -37,11 +37,15 @@
 \chapter{Introduction}
 
 \chapter{Classification}
+
+K-fold cross validation: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.
+
 \section{State-of-the-art classification models}
 \subsection{Logistic regression}
 \subsection{Support vector machines (SVM)}
 
 \section{Evaluation}
+\label{evaluation}
 
 This section is focused on the summary and description of the evaluation metrics used in the experimental part, alongside the properties of each metric and suitable application. This section includes only metrics that are applied in the testing phase. The correct choice of evaluation is the main and crucial task in the case of searching for optimal classification model. In practice, there exist numerous evaluation methods applied frequently to many classification tasks, each fits better in different cases. Before we choose set of evaluation metrics, we must be aware of the processed data and classification model to set our evaluation correctly. Also the purpose and future application scope of our model is significant. If this foremost analysis of the data and model is neglected or done wrong, we could end up choosing bad-shaped evaluation techniques and therefore misinterpret the performance of our model.
 
@@ -213,7 +217,9 @@ where $\text{Recall}^{(k)}$ denotes Recall value at $k$-th threshold and analogo
 
 In \cite{pr_roc_diff} is also proven that ROC and PR curves are closely related, specifically that curve dominates in ROC space if and only if it dominates in PR space (there is one-to-one relationship).
 
-Both ROC and PR curves can be adapted to the multi-class environment. It is usually done by applying one-vs-all scheme (setting of one class as positive and other classes as negative) and then visualizing individual curves. We apply them only on binary classification in the experimental part, hence we will not describe the multi-class case in this thesis.
+We also define a special PR curve, which summarizes overall performance of classifier among several independent simulations. It is created simply by concatenation of individual labels and corresponding prediction scores from all simulations and then visualizing PR curve of this entire union. We refer to this curve as \textit{aggregation PR curve} and use it in the experimental part.
+
+Both ROC and PR curves can be adapted to the multi-class environment. It is usually done by applying one-vs-all scheme (setting of one class as positive and other classes as negative) and then visualizing individual curves. We applied them only on binary classification in the experimental part, hence we will not describe the multi-class case in this thesis.
 
 
 \chapter{Random Forest}
@@ -1134,6 +1140,7 @@ The closeness of $\tanh(\cdot)$ to the perceptron activation function in our exp
 The higher $\beta$ is, the better approximation of perceptron activation function is observed. With $\beta \rightarrow \infty$, $\tanh(\cdot)$ converges to the $\tau(\cdot)$. In the experiments were exploited two parameters, $\beta_1$ in the first hidden layer and $\beta_2$ in the second hidden layer, each to control transitions of $\tanh(\cdot)$ to $\tau(\cdot)$ in the corresponding hidden layers. We will refer to them as \textit{transition parameters}. Their effect on overall performance will be examined in further chapters. The influence of these parameters on the shape is depicted in the Figure \ref{fig:tanh}.
 
 \section{Competitive decision-tree-motivated models}
+\label{competitive_models}
 In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model from Chapter 3 has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $(l+1)$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
 
 \subsubsection{Reference model (NT)}
@@ -1221,15 +1228,15 @@ This section provides comparison of NF and competitive models evaluated on the s
      Number of neurons in $2^{\text{nd}}$ hidd. layer = 60} \\ \hline
      \cellcolor{green}RF20 & \thead{Random forest with 20 estimators} & \thead{Number of estimators = 20 \\
      Maximum depth = 6 \\
-     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+     Num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
      ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
     \cellcolor{green}RF30 & \thead{Random forest with 30 estimators} &\thead{Number of estimators = 30 \\
      Maximum depth = 6 \\
-     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+    Num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
      ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
      \cellcolor{green}RF50 & \thead{Random forest with 50 estimators}& \thead{Number of estimators = 50 \\
      Maximum depth = 6 \\
-     Maximum num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
+     Num. of features used for split = $\lfloor \sqrt{d} \rfloor$ \\
      ($d \in \mathbb{N}$ denotes total number of features)}\\ \hline
     \cellcolor{orange}NRF & \thead{Neural random forest consisting of \\ \textit{NT\_basic} defined in \autoref{NN_models}} & \thead{Number of epochs = 30 \\
     Mini-batch size = 10\\
@@ -1258,10 +1265,10 @@ This section provides comparison of NF and competitive models evaluated on the s
 \end{table}
 
 \subsection{Overall results}
+\label{overall_public_results}
 
 
-
-The models are compared with respect to the accuracy and macro-average of F1-score on all datasets. Both values are presented in terms of mean value and standard deviation after two subsequent 5-fold cross validations\footnote{\textit{K-fold cross validation}: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.} (10 iterations in total) in order to limit statistical fluctuations and gain higher robustness of the outcome.
+The models are compared with respect to the accuracy and macro-average of F1-score on all datasets. Both values are presented in terms of mean value and standard deviation after two subsequent 5-fold cross validations (10 iterations in total) in order to limit statistical fluctuations and gain higher robustness of the outcome.
 
 All applied models are summarized in Table \ref{table::public_models} with their shortcut notations (column MODEL).
 
@@ -1275,7 +1282,7 @@ The orange area includes all NF models. We tested many different combinations of
 
 Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
-\begin{table}[h]
+\begin{table}[h!]
     \centering
     %\small\addtolength{\tabcolsep}{-5pt}
     \small\addtolength{\tabcolsep}{-5pt}
@@ -1367,56 +1374,63 @@ In this section are studied various combinations of hyperparameters of NF and RF
 
 We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NF. If we choose bad hyperparameters in the case of poor RF, the resulting NF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NF could perform worse than the corresponding RF, which is undesirable.
 
-All graphical visualizations are presented in the \autoref{figures} and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results for RF model are presented together with results of NF models in one figure, then this RF model was used to initialize all NF models in the same figure. In all following experiments, the hyperparameters of NF models which are not examined at the time remain same as defined in the previous section.
+All graphical visualizations are presented in the \autoref{figures} and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results of RF models are presented together with results of NF models in one figure, then these RF models were used to initialize all coresponding NF models in the same figure. In all following experiments, the hyperparameters and settings of models which are not examined at the time remain same as defined in Table \ref{table::public_models} and \autoref{overall_public_results}.
 
 \subsubsection{Learning rate}
+\label{public:learning_rate}
 
 Learning rate stands for one of the most crucial hyperparameters that need to be set conscientiously in order to achieve quality performance. This choice usually depends on model type and dataset itself. It is done almost exclusively by exhaustive grid search on some specific validation dataset before picking a suitable value for the training phase. It is not possible to state versatile learning rate optimal for all applications.
 
-We study different settings for learning rates in our model and research the sensitivity of NF models to the learning rate choice. We compare this sensitivity with same feedforward NN as applied on public dataset experiments (defined in \autoref{public:experiments}).
+We study different settings for learning rates in our model and research the sensitivity of NF models to the learning rate choice. We compare this sensitivity with same feedforward NN as applied on public dataset experiments (defined in Table \ref{table::public_models}).
 
-NF and corresponding RF models were set in the same manner as was described in the beginning of the \autoref{public:experiments} with 20 estimators. Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure \ref{figures:learning_rates_diabetes}. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
+Other hyperparameters of NF and RF models except of learning rate remain same as defined in Table \ref{table::public_models}. NF and RF have 20 estimators.
+
+Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure \ref{figures:learning_rates_diabetes}. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
 
 
 Based on the Figure \ref{learning_rates}, we can see that in all cases the optimal value for learning rates could be found close to zero, approximately in the range $(0.001,0.02)$. With increasing value of learning rate, the performance of models is declining. The steepest downfall is registered in the case of NN model, where for the learning rate equals 0.1 drops accuracy to approximately 50\% of maximum reached accuracy. On the other hand, NF models did not suffer from such eminent decrease in the given range. This experiment suggests, that NF models could be slightly less sensitive to learning rate as single NN, but it really depends on the specific application. Resembling trend could be seen in the Figure \ref{figures:learning_rates_diabetes} on Diabetes dataset, altough not that vigorous. In this case the accuracy of NF models fluctuates a bit around almost constant value (mild decrease at the end of the range) in the given range of learning rates, whereas in the case of NN we can notice early decrease of accuracy in the range $(0.001,0.12)$ and then it remains basically constant. Consequently, we could choose suitable learning rates from wider range in the case of NF models than in the case of single NN.
 
 \subsubsection{Number of epochs and number of estimators}
+\label{public:number_epochs}
 
-Another important hyperparameter of NF is a number of training epochs. Especially in the case of NF models which simulate RF behaviour since the beginning, they could improve the performance of initial RF already after few epochs, which could be time-efficient. We will investigate this issue alongside the effect of number of estimators in NF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The fixed hyperparameters of NF and RF remain same as in the previous experiments.
+Another important hyperparameter of NF is a number of training epochs. Especially in the case of NF models which simulate RF behaviour since the beginning, they could improve the performance of initial RF already after few epochs, which could be time-efficient. We will investigate this issue alongside the effect of number of estimators in NF (RF), because high number of estimators could compensate low number of training epochs and vice versa. The hyperparameters (except of number of epochs and number of estimators) of NF and RF remain same as defined in Table \ref{table::public_models}.
 
 First we will focus on the experiments on Vehicle dataset showed in the Figure \ref{figures:estimators_epochs_vehicle}. This is the case when RF model does not perform well in the comparison with other models, as was already seen in tables \ref{tab:results_macro_public} and \ref{tab:results_accuracy_public}. One may notice apparent pattern that increase of a number of training epochs causes enhancement of accuracy. This happens among all NF models and also in the case of single NN. NRF\_DW and NRF\_EL\_DW models could outperform initial RF already after 5 epochs of training and reach slightly higher values of accuracy than NF models with one layer of random weights until 30 epochs of training. For higher number of epochs are results very similar among all NF models except of NRF\_EL, which has slightly lower accuracy. Also NRF\_DW and NRF\_EL\_DW converge faster to the maximum values of accuracy, acquiring it at approximately 30 epochs of training, whereas other NF models still register increase of accuracy with higher number of training epochs. It could be due to the nature of individual models, where NRF\_DW and NRF\_EL\_DW imitate RF more precisely than other NF models and therefore could be closer to some optimal value of loss function than NRF and NRF\_EL since the beginning. Therefore they are more likely to reach their optimal performance earlier.
 
 We can see only small differences in accuracy values with varying number of estimators. With increasing number of estimators the accuracy values usually also increase, but a number of epochs is more distinguishing factor. 
 
-Another situation occurs in the case of Diabetes dataset, as illustrated in the Figure \ref{figures:estimators_epochs_diabetes}. This is the case of RF model performing well in the comparison with other models.
+Different situation occurs in the case of Diabetes dataset, as illustrated in the Figure \ref{figures:estimators_epochs_diabetes}. This is the case of RF model performing well in the comparison with other models.
 
 In this case arises quite an opposite situation than in the previous case on Vehicle dataset. With increasing number of training epochs is accuracy of NF models decreasing. All NF models except of NRF\_EL outperform RF with any number of estimators in the given range already after 5 epochs of training. They also reach their maximum accuracy in the given range of epochs. With higher number of epochs the accuracy decreases, eventually ending up with a worse model than initial RF. It could be caused by the problem of overfitting, which will be examined later. Especially in the case of NRF\_DW and NRF\_EL\_DW, the accuracy is decreasing quickly. In the case of NRF\_EL, the accuracy acquires its maximum value at approximately 20 epochs and then is slowly decreasing. It is beneficial to use early stopping\footnote{Early stopping is a method that check accuracy or error rate on validation dataset after each epoch and stops the training if the performance of the model stops improving.} technique during training NF models to avoid this problem. Moreover, single NN model follows the same pattern of decreasing accuracy with increasing number of epochs as NF models, which suggests that neural networks in this case converge quickly to optimal solution and with increasing number of epochs overfit to the problem. One noticeable fact is that performance of NF models degradates slower than single NN model, which may be caused by the benefit of ensemble voting (or averaging) of NF.
 
 \subsubsection{Maximum depth of trees in RF}
+\label{public:max_depth}
 
-Another examined hyperparameter of NF is a number of neurons in the first and second hidden layer of the individual neural networks. This number is fully controlled by the depth of the corresponding tree. We will examine the influence of maximum depth of trees in RF (which is set before the training of RF) on performance of NF. Especially for overgrown trees there is a significant risk of overfitting either in the case of the decision tree or subsequently in the case of transformed neural network, which will be tested. We also add number of training epochs of NF as another variable.
+Another examined hyperparameter of NF is a number of neurons in the first and second hidden layer of the individual neural networks. This number is fully controlled by the depth of the corresponding tree. We will examine the influence of maximum depth of trees in RF (which is set before the training of RF) on performance of NF. Especially for overgrown trees there is a significant risk of overfitting either in the case of the decision tree or subsequently in the case of transformed neural network, which will be tested. We also add number of training epochs of NF as another variable. RF and subsequent NF have 20 estimators. Other hyperparameters of all models remain same as defined in Table \ref{table::public_models}.
 
-We only present graphs created on Diabetes dataset for NRF\_DW and NRF models, because for NF models with extra added layer the trend has turned out to be same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
+We only present graphs created on Diabetes dataset for NRF\_DW and NRF, because for NF models with extra added layer the trend has turned out to be same. We added also values of Cross Entropy loss function on testing datasets in order to demonstrate overfitting. Accuracy and values of loss function depending on the maximum depth and number of epochs is depicted in the Figure \ref{figures:depth_epochs}.
 
 It can be seen in the graphs that NRF\_DW model is much more prone to overfitting than NRF model, which is logical, since NRF\_DW model simulate RF behaviour better already before training with backpropagation. This applies especially to larger maximum depths (starting from maximum depth equals 6), where we can register fast decrease in accuracy and increase in loss function with increasing number of training epochs. In the case of NRF this decrease is not that vigorous and straightforward, but for larger depths is still visible.
 
 In the Figure \ref{figures:depth_epochs_reg} are illustrated same models with regularization constant increased to $\lambda = 10$, which intensifies the influence of regularization term in the loss function. We can see that this modification prevent the models from the significant decrease of accuracy especially for the larger numbers of epochs, but in majority of depth values the maximum reached accuracy among those two variants remains favourable in the first case from the Figure \ref{figures:depth_epochs}. Still the differences are very small.
 
 \subsubsection{Transition parameters $\beta_1$ and $\beta_2$}
+\label{public:trans_params}
 
-Transition parameters $\beta_1$ and $\beta_2$ control the degree of transition of RF to NF. The higher both values are, the better approximation of RF is obtained by NF. Under certain circumstances it could be advantegous to increase those parameters and approximate RF accurately, especially when RF produces competitive results. Accuracy depending on both transition parameters is depicted for Vehicle dataset resp. Diabetes dataset in the Figure \ref{figures:beta_epochs} resp. Figure \ref{figures:beta_epochs_dia}.
+Transition parameters $\beta_1$ and $\beta_2$ (defined in \autoref{competitive_models}) control the degree of transition of RF to NF. The higher both values are, the better approximation of RF is obtained by NF. Under certain circumstances it could be advantegous to increase those parameters and approximate RF accurately, especially when RF produces competitive results. Both RF and NF have 20 estimators and other hyperparameters except of transition parameters remain same as defined in Table \ref{table::public_models}. Accuracy depending on both transition parameters is depicted for Vehicle dataset resp. Diabetes dataset in the Figure \ref{figures:beta_epochs} resp. Figure \ref{figures:beta_epochs_dia}.
 
 In the case of Vehicle dataset we can observe that it is not beneficial to increase $\beta_1$ and $\beta_2$ since the highest reached accuracy belongs to the point $\beta_1 = 1$ and $\beta_2 = 1$ among all NF models. Since RF model performs badly in comparison with other models, this suggests that copying this RF model makes the subsequent NF model performs worse than it could when $\beta_1$ and $\beta_2$ are kept low and NF model is more relaxed. Increasing both values simultaneously causes deterioration of the results almost monotonically.
 
-The situation is different in the case of Diabetes dataset in the Figure \ref{figures:beta_epochs_dia}. In the contrast with the Vehicle dataset, we may observe some pairs of $\beta_1$ and $\beta_2$ other than (1,1) that are more beneficial in terms of higher accuracy. Even points (12,12) perform more favourably in the most cases of NF models than point (1,1). This suggests that taking advantage of simulating well-performing RF model more accurately is the step towards better performance of NF.
+The situation is different in the case of Diabetes dataset in the Figure \ref{figures:beta_epochs_dia}. In the contrast with the Vehicle dataset, we may observe some pairs of $\beta_1$ and $\beta_2$ other than [1;1] that are more beneficial in terms of higher accuracy. Even points [12;12] perform more favourably in the most cases of NF models than point [1;1]. This suggests that taking advantage of simulating well-performing RF model more accurately is the step towards better performance of NF.
 
 Be aware of a problem of choosing transition parameters too high since it could negatively affect optimization process of neural networks. For high transition parameters the tanh functions approximate threshold functions too precisely and therefore the neurons in the first and second hidden layer could suffer from early saturation\footnote{The state of saturation in the terms of neural networks refers to the neuron which mainly outputs values close to the asymptotical endings (for tanh function it would be $\pm1$) \cite{saturation}. Since the gradient in this range is close to 0, it is unlikely that the current value of neuron is going to change significantly in the following iterations.}. Consequently, this could make the learning process of neural networks more difficult.
 
-\subsubsection{Max. considered features in the split}
+\subsubsection{Number of features considered in the split}
+\label{public:features}
 
-We also examined maximum number of considered features in the split of RF and its influence on the performance of NF. Standardly we leave this hyperparameter on the value $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ represents number of features in the dataset. We tested the NF performance for values of max. considered features set to 0.2, 0.4, 0.6, 0.8 and 1, where each number symbolizes the fraction of considered features with respect to $d$. Number of estimators has been set to 20.
+We also examined number of features considered in the split of RF and its influence on the performance of NF. Standardly we leave this hyperparameter on the value $\lfloor\sqrt{d}\rfloor$, where $d \in \mathbb{N}$ represents number of features in the dataset. We tested the NF performance for values of max. considered features set to 0.2, 0.4, 0.6, 0.8 and 1, where each number symbolizes the fraction of considered features with respect to $d$. Number of estimators has been set to 20 and we add maximum depth as another variable. Other hyperparameters remain same as defined in Table \ref{table::public_models}.
 
-So far we can claim from the performed experiments on Vehicle dataset and Diabetes dataset, the effect of this hyperparameter is not very significant and differences between various settings of this hyperparameter are negligible.
+So far we can claim from the performed experiments on Vehicle dataset and Diabetes dataset, the effect of this hyperparameter is not very significant and differences between various settings of this hyperparameter are negligible. We present the visualizations for Vehicle dataset in the Figure \ref{figures:features}.
 
 \subsubsection{Summary of the previous observations}
 
@@ -1424,7 +1438,7 @@ In this part we shortly sum up the provisional experiments with NF and RF hyperp
 
 We saw that the sensitivity of learning rate has been slightly lower in the case of NF models than in the case of single NN. This could be due to the ensemble nature of NF with variety of single specific NN estimators, each differently sensitive to the current learning rate value. Overall sensitivity of NF model to the learning rate is then "averaged" over single NN estimators and therefore could be reduced in comparison with only single NN. Note that this comparison has been done for other parameters fixed and the sensitivity to the learning rate could correlate with other hyperparameters too, mainly with the transition parameters $\beta_1$ and $\beta_2$. So the most suitable learning rate should be picked after some grid search on the validation dataset with other hyperparameters set beforehand.
 
-Following observations based on varying number of training epochs and other hyperparameters, such as maximum depth or number of estimators, offered another interesting perspective. Especially the NF models initialized with RF consisting of trees with large depth are more prone to overfitting then in the case of lower depths, so it should be beneficial to prevent overfitting by employing techniques such as early stopping or adding a regularization term to the loss function (L2-regularization for instance). The differences between results of NF models with varying number of estimators were small, slightly favourable in the case of larger number of estimators, as corresponds to the logical intuition.
+Following observations based on varying number of training epochs and other hyperparameters, such as maximum depth or number of estimators, offered another interesting perspective. Especially the NF models initialized with RF consisting of trees with large depth are more prone to overfitting then in the case of lower depths, so it should be beneficial to prevent overfitting by employing techniques such as early stopping or adding a regularization term to the loss function (L2 regularization for instance). The differences between results of NF models with varying number of estimators were small, slightly favourable in the case of larger number of estimators, as corresponds to the logical intuition.
 
 As another hyperparameters were investigated the transition parameters $\beta_1$ and $\beta_2$. It turned out that in the case of poor-performing RF it is beneficial to leave both values low (for instance $\beta_1 = 1$ and $\beta_2 = 1$) and start with relaxed NF that do not simulate that RF accurately. On the other hand, when operating with well-performing RF with competitive results, it could reach more favourable performance when simulating RF more accurately by increasing both transition parameters. This issue will be also studied in the next chapter.
 
@@ -1436,25 +1450,101 @@ This section comprises experiments on artificially created data in 2D, where we 
 
 We conducted the experiments by generating a various datasets, each one of different shape and trend. Moreover, we investigate datasets of different random noise and test the ability of classifiers to find the correct decision boundary and not to overfit on noise data, as tend to do especially overgrown RF models.
 
-Each dataset was split to the training and testing set with ratio of 6:4 and the decision boundary was drawn on the input space. It is difficult and not straightforward to aggregate decision boundaries of several NFs and visualize it while preserving correct interpretability, especially when classifying into more than two labels. Suppose that we trained 4 independent NF classifiers on 3-class dataset (classes are denoted simply as 0,1,2) and decisions of NFs are subsequently [0,0,1,2] in that point. Also suppose that each class occupies different color (defined as a vector (R,G,B,$\alpha$), where R,G,B denote typical red,green,blue triplet and $\alpha$ denotes transparency level). If we pick the most frequent decision (or average the decision probabilities) and draw the point with the color of the most favourable class, then the result corresponds to the decision of an ensemble method consisting of several NFs and that is not what we desire to illustrate. Also we cannot depict all decisions in the picture, since the combination of 3 colors could result in an uninformative colors that does not capture the trend. For 2-class case, it is possible to illustrate the frequency of decisions by adopting the color gradient between two colors, but since we work also with 3-class datasets, we will not present the results separately in a different way for 2-class datasets.
+Each dataset was split to the training and testing set with ratio of 6:4 and the decision boundary was drawn on the input space. It is difficult and not straightforward to aggregate decision boundaries of several NFs and visualize it while preserving correct interpretability, especially when classifying into more than two labels. We demonstrate the example addressing this issue. Suppose that we trained 4 independent NF classifiers on 3-class dataset (classes are denoted simply as 0,1,2) and decisions of NFs are subsequently [0,0,1,2] in that point. Also suppose that each class occupies different color (defined as a vector (R,G,B,$\alpha$), where R,G,B denote typical red,green,blue triplet and $\alpha$ denotes transparency level). If we pick the most frequent decision (or average the decision probabilities) and draw the point with the color of the most favourable class, then the result corresponds to the decision of an ensemble method consisting of several NFs and that is not what we desire to illustrate. Also we cannot depict all decisions in the picture, since the combination of 3 colors could result in an uninformative colors that does not capture the trend.
+
+For 2-class case, it is possible to illustrate the frequency of decisions by adopting the color gradient between two colors, but since we work also with 3-class datasets, we will not present the results separately in a different way for 2-class datasets.
 
 Instead, the decision boundaries and their tendencies are for individual NFs demonstrated on multiple datasets, each of varying size, and for varying hyperparameters of NFs. In each studied case, the single NF is trained on one training set, which remains same for all presented models. As the hyperparameters change, we can see the evolution of decision boundaries of different NFs and their inclinations. We also present a single value of accuracy on testing set for all models only for quick comparison, but since this corresponds to only one realization, it should not be decisive in the final comparison of models. The comparison is more stable and reliable when comparing visually the decision boundaries (it is possible in 2D) in general and comparing their generalization ability.
 
 \subsection{Number of epochs}
+\label{toy:epochs}
 
-In this part we investigate the effect of varying number of training epochs on evolution of individual decision boundaries. Decision boundaries are drawn on 3 types of artificial datasets, each type is also depicted for different sizes, specifically for 50 and 200 instances. RF model used for NF initialization has 10 estimators, maximum depth of individual trees is set to 6 and number of features considered in the split is set to 1 (since $d = 2$ in this case). Transition parameters $\beta_1$ and $\beta_2$ of NF models are set to 1 and we use Adam as optimization algorithm (parameters of Adam and other hyperparameters of NF models are same as in the \autoref{experiments}). NF models are compared with single NN model of same hyperparameters as defined in the \autoref{experiments} and also with RF model used for initialization of all NF models.
+In this part we investigate the effect of varying number of training epochs on evolution of individual decision boundaries. Decision boundaries are depicted on 3 types of artificial datasets, each type of 50 and 200 instances.
 
-All illustrations are depicted in the Figure \ref{figures:epochs_toy1}, Figure \ref{figures:epochs_toy2} and Figure \ref{figures:epochs_toy3}. We can see that in the cases of 50 input instances the NRF\_DW and NRF\_EL\_DW models manages to tune finely already after 5 epochs of training, whereas NRF and NRF\_EL do not adapt very reliably and their decision boundary is very far from ideal separation (for 5 to 30 training epochs). For larger number of training epochs NRF\_EL could establish decision boundaries competitively with other models, but NRF model could not. NRF model even struggle to learn competitive separation in the case of 200 input instances and can catch up slower than other models, approximately around 30 training epochs. Eventually for higher number of input instances the NRF model could perform competitively with other models.
+\begingroup
+\begin{table}[h!]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{MODEL}&\textbf{HYPERPARAMETERS} \\ \hline
+    RF & \thead{Number of estimators = 10 \\
+     Maximum depth = 6 \\
+     Num. of features used for split = 1} \\ \hline
+     NN & \thead{Mini-batch size = 10 \\
+     Learning rate $\eta = 0.01$ \\
+     Number of neurons in $1^{\text{st}}$ hidd. layer = 60\\
+     Number of neurons in $2^{\text{nd}}$ hidd. layer = 60} \\ \hline
+     NRF &  \thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.002$ \\
+    Initial random forest = RF \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\} \\ \hline
+    NRF\_DW & \thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.0035$ \\
+        Initial random forest = RF \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
+    NRF\_EL & \thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.005$ \\
+        Initial random forest = RF \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
+    NRF\_EL\_DW &\thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.0045$ \\
+        Initial random forest = RF \\
+    Transition parameters $\beta_1 = 1$, $\beta_2 = 1$\\}\\ \hline
+    \end{tabular}
+    \caption{Choice of hyperparameters.}
+    \label{table::toy_hyperparam_epochs}
+\end{table}
+\endgroup
+
+Choices of hyperparameters are described in the Table \ref{table::toy_hyperparam_epochs}. We use Adam with parameters $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$ as optimization algorithm among NN and all NF models. Regularization parameter $\lambda$ is set to 0. All other settings are same as defined in \autoref{overall_public_results}.
+
+All illustrations are depicted in the Figure \ref{figures:epochs_toy1}, Figure \ref{figures:epochs_toy2} and Figure \ref{figures:epochs_toy3}. We can see that in the cases of 50 input instances the NRF\_DW and NRF\_EL\_DW models manage to tune finely already after 5 epochs of training, whereas NRF and NRF\_EL do not adapt very reliably and their decision boundary is very far from ideal separation (for 5 to 30 training epochs). For larger number of training epochs NRF\_EL established decision boundaries competitively with other models, but NRF model did not. NRF model even struggle to learn competitive separation in the case of 200 input instances and can catch up slower than other models, approximately around 30 training epochs. Eventually for higher number of input instances the NRF model could perform competitively with other models.
 
 Also we can highlight the striking resemblance of decision boundaries of NRF\_DW and \\NRF\_EL\_DW in all cases and even for every single number of training epochs. This proves the concept since both models are deterministic and they target to simulate RF, therefore they should share some similarities. 
 
 This experiments suggests that models simulating the RF (NRF\_DW and NRF\_EL\_DW) share some similarities and could learn faster than other NF models. Moreover, they can adapt better to the problems with less training inputs.
 
 \subsection{Transition parameters $\beta_1$ and $\beta_2$}
+\label{toy:transition}
 
 This part comprises experiments based on varying transition parameters $\beta_1$ and $\beta_2$, which control the accuracy of transition of RF to the corresponding NF. We will keep these parameters simultaneously on the same values and increase them at the same time, since increasing of both values results in more accurate simulation of RF. We use $\beta$ to denote both values $\beta_1$ and $\beta_2$ simultaneously, thus $\beta = \beta_1 = \beta_2$.
 
-We use same RF model for initialization of all NF models. NF models are trained for 25 training epochs and other hyperparameters of NF models and RF remain same as defined in the previous part. We show decision boundaries on 3 different types of datasets, each consisting of 50 and 200 instances.
+\begingroup
+\begin{table}[h!]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{MODEL}&\textbf{HYPERPARAMETERS} \\ \hline
+    RF & \thead{Number of estimators = 10 \\
+     Maximum depth = 6 \\
+     Num. of features used for split = 1} \\ \hline
+     NRF &  \thead{Number of epochs = 25 \\
+     Mini-batch size = 10\\
+    Learning rate $\eta = 0.002$ \\
+    Initial random forest = RF } \\ \hline
+    NRF\_DW & \thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0035$ \\
+        Initial random forest = RF }\\ \hline
+    NRF\_EL & \thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.005$ \\
+        Initial random forest = RF}\\ \hline
+    NRF\_EL\_DW &\thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0045$ \\
+        Initial random forest = RF}\\ \hline
+    \end{tabular}
+    \caption{Choice of hyperparameters.}
+    \label{table::toy_hyperparam_transition}
+\end{table}
+\endgroup
+
+Choices of hyperparameters are presented in the Table \ref{table::toy_hyperparam_transition}. Regularization parameter $\lambda$ is set to 0. All other settings are same as defined in \autoref{overall_public_results}. We show decision boundaries on 3 different types of datasets, each consisting of 50 and 200 instances.
 
 The illustrations of decision boundaries depending on $\beta$ are depicted in the Figure \ref{figures:betas_toy1}, Figure \ref{figures:betas_toy2} and Figure \ref{figures:betas_toy3}. We can see that in case of 50 data inputs the NRF model could not tune its decision boundary sufficiently even after 25 training epochs (for all $\beta$s), which further confirms that this model is not suitable when working with low number of training inputs. For 200 instances is NRF model able to catch up and produce competitive decision boundaries with other models.
 
@@ -1465,8 +1555,57 @@ When $\beta$ is increasing, we can see that the decision boundaries of NF models
 We see that all NF models with higher values of $\beta_1$ and $\beta_2$ simulate initial RF quite precisely. For lower values of $\beta$ is resemblance less visible and the decision boundaries of NF models look more similar to the NN decision boundary, as could be seen for instance in the Figure \ref{figures:epochs_toy3}, where both transition parameters are set to 1.
 
 \subsection{Noise in data}
+\label{toy:noise}
 
-In this part we investigate the influence of noise in data on NF decisions. We conduct these experiments in two variants, the first for $\beta = \beta_1 = \beta_2 = 1$ and the second for $\beta = \beta_1 = \beta_2 = 50$. We fix the size of dataset to 100 and all NF models are trained for 25 training epochs. All other hyperparameters of NF, RF and NN remain same as in the previous experiments. The noise is randomly generated from the normal distribution and takes on values ranging from 0.1 to 0.5. Each value denotes standard deviation of normal distribution that generates noise.
+In this part we investigate the influence of noise in data on NF decisions. 
+
+\begingroup
+\begin{table}[h!]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{MODEL}&\textbf{HYPERPARAMETERS} \\ \hline
+    RF & \thead{Number of estimators = 10 \\
+     Maximum depth = 6 \\
+     Num. of features used for split = 1} \\ \hline
+     NN & \thead{Number of epochs = 25 \\
+     Mini-batch size = 10 \\
+     Learning rate $\eta = 0.01$ \\
+     Number of neurons in $1^{\text{st}}$ hidd. layer = 60\\
+     Number of neurons in $2^{\text{nd}}$ hidd. layer = 60} \\ \hline
+     NRF &  \thead{Number of epochs = 25 \\
+     Mini-batch size = 10\\
+    Learning rate $\eta = 0.002$ \\
+    Initial random forest = RF \\
+    1) Transition parameter $\beta_1 = 1$ and $\beta_2 = 1$\\
+    2) Transition parameter $\beta_1 = 50$ and $\beta_2 = 50$} \\ \hline
+    NRF\_DW & \thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0035$ \\
+        Initial random forest = RF \\
+         1) Transition parameter $\beta_1 = 1$ and $\beta_2 = 1$\\
+    2) Transition parameter $\beta_1 = 50$ and $\beta_2 = 50$}\\ \hline
+    NRF\_EL & \thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.005$ \\
+Initial random forest = RF \\
+ 1) Transition parameter $\beta_1 = 1$ and $\beta_2 = 1$\\
+    2) Transition parameter $\beta_1 = 50$ and $\beta_2 = 50$}\\ \hline
+    NRF\_EL\_DW &\thead{Number of epochs = 25 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0045$ \\
+        Initial random forest = RF \\
+         1) Transition parameter $\beta_1 = 1$ and $\beta_2 = 1$\\
+    2) Transition parameter $\beta_1 = 50$ and $\beta_2 = 50$}\\ \hline
+    \end{tabular}
+    \caption{Choice of hyperparameters.}
+    \label{table::toy_hyperparam_noise}
+\end{table}
+\endgroup
+
+The choices of hyperparameters are presented in the Figure \ref{table::toy_hyperparam_noise}. We conduct these experiments in two variants, the first for $\beta = \beta_1 = \beta_2 = 1$ and the second for $\beta = \beta_1 = \beta_2 = 50$. We fix the size of dataset to 100. Regularization parameter $\lambda$ is set to 0. All other settings of NF, RF and NN remain same as defined in \autoref{overall_public_results}. The noise is randomly generated from the normal distribution and takes on values ranging from 0.1 to 0.5. Each value denotes standard deviation of normal distribution that generates noise.
 
 If noise occurs among data, the RF model in general tends to overfitting on this noise, especially when the individual trees are overgrown (large depth) and unpruned. We depict the dependence of decision boundaries on the noise in the Figure \ref{figures:noise_toy}.
 
@@ -1474,15 +1613,42 @@ We can see that in the case of $\beta = 1$ all NF models establish a fine separa
 
 A different situation arises when we increase both transition parameters to $\beta = \beta_1 = \beta_2 = 50$. Then we could see a significant signs of overfitting among all NF models, especially in the case of NRF\_DW and NRF\_EL\_DW, which simulate the RF accurately and thus share similar properties as RF. This problem should be resolved by decreasing the transition parameters or adopting some regularization techniques, as will be briefly investigated in the next part.
 
-\subsection{Overfitting and regularization}
+\subsection{Overfitting}
+\label{toy:overfitting}
 
 When initializing NF models with RF consisting of a number of overgrown trees, there exists a significant risk that RF overfits the data and therefore even a subsequent NF model could be prone to overfitting as well, especially if the transition parameters are larger than 1. One way to avoid this problem is to decrease the transition parameters or add a regularization term to the loss function, where the overfitting should be controlled by modifying the regularization parameter $\lambda$.
 
-We demonstrate the benefit of using L2-regularization term in the case of NRF\_DW and NRF\_EL\_DW models initialized with overtrained RF suffering from overfitting. It is done on artificially created dataset consisting of 100 instances and divided into 2 classes as depicted in the Figure \ref{figures:toy_reg}. Transition parameters are set to $\beta_1 = \beta_2 = 10$. The results were obtained after 2 subsequent 5-fold cross validations (10 iterations in total) and are presented in the Figure \ref{figures:toy_reg}. Apparently, adding the regularization term is helpful in this case, resulting in an increase of accuracy among both NRF\_DW and NRF\_EL\_DW models. Unfortunately, the most suitable value of regularization constant cannot be stated generally and depends on specific data and model. Therefore it should be picked after a grid search and cross validation.
+We demonstrate the benefit of using L2 regularization term in the case of NRF\_DW and NRF\_EL\_DW models initialized with RF suffering from overfitting. 
 
-\subsection{Commentary on the space and time complexity}
+\begingroup
+\begin{table}[h!]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|}
+    \hline
+   \textbf{MODEL}&\textbf{HYPERPARAMETERS} \\ \hline
+    RF & \thead{Number of estimators = 2 \\
+     Maximum depth = 20 \\
+     Num. of features used for split = 2} \\ \hline
+    NRF\_DW & \thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0035$ \\
+        Initial random forest = RF \\
+         Transition parameter $\beta_1 = 10$ and $\beta_2 = 10$\\
+   }\\ \hline
+    NRF\_EL\_DW &\thead{Number of epochs = 30 \\
+    Mini-batch size = 10\\
+    Learning rate $\eta = 0.0045$ \\
+        Initial random forest = RF \\
+         Transition parameter $\beta_1 = 10$ and $\beta_2 = 10$}\\ \hline
+    \end{tabular}
+    \caption{Choice of hyperparameters.}
+    \label{table::toy_hyperparam_overfitting}
+\end{table}
+\endgroup
 
-One paragraph, mention parallelization - time complexity is same as a single NN if trained on a sufficient number of CPUs. It could be further accelerated by GPU. Viděl jsem, že se v článcích příliš neřeší time complexita neuronek, ale můžeme uvést nějakou O() notaci. Nepřijde mi to ale příliš zajímavé, možná můžeme uvést jen odkaz na článek, kde je odvozena complexita jedné neuronky, každý si pak může dosadit tam. Co se týče space complexity, tam bychom museli odvodit, co všechno si musí neuronka pamatovat, aby se mohla natrénovat , tzn. všechny váhy a biasy + všechny potřebné mezivýpočty backpropu + hyperparametry - opět podle mě ne příliš zajímavá informace, řešeno v nekonečně mnoha článcích nejspíše. A je to možná na delší odvozování
+It is done on artificially created dataset consisting of 100 instances and divided into 2 classes as depicted in the Figure \ref{figures:toy_reg}. Choices of hyperparameters of researched models are presented in the Table \ref{table::toy_hyperparam_overfitting}. All other settings remain same as defined in \autoref{overall_public_results}. The results were obtained after 2 subsequent 5-fold cross validations (10 iterations in total) and are presented in the Figure \ref{figures:toy_reg}. Apparently, adding the regularization term is helpful in this case, resulting in an increase of accuracy among both NRF\_DW and NRF\_EL\_DW models. Unfortunately, the most suitable value of regularization constant cannot be stated generally and depends on specific data and model, so it should be picked after a grid search.
 
 \section{LUCAS dataset experiments}
 
@@ -1505,18 +1671,47 @@ Overall we have 1133 records with any form of pharmacotherapy in the first line 
 Unfortunately, according to the non-disclosure agreement we cannot describe the dataset in full detail, so at least we provide a shallow description. The dataset consists of 21 features, which were picked from the diagnostic and personal data of individual patients. There are 6 numerical features including for instance height and weight of patients, number of years of smoking, etc. Other 15 features are categorical which comprise symptoms, details of diagnosis, tumor type, tumor stage, etc. All categorical features were one-hot encoded, resulting together with numerical features in 91 final features. Finally, all features were standardized (normalized to mean value equal 0 and standard deviation equal 1).
 
 \subsection{Models and evaluation}
+\begingroup
+\begin{table}[h!]
+    \centering
+    %\small\addtolength{\tabcolsep}{-5pt}
+    \small\addtolength{\tabcolsep}{-5pt}
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{MODEL}&\textbf{HYPERPARAMETERS} \\ \hline
+    LR & - \\ \hline
+    RF & \thead{Number of estimators = 30 \\
+     Maximum depth = 6 \\
+     Num. of features used for split = 9} \\ \hline
+     NN & \thead{Mini-batch size = 10 \\
+     Learning rate $\eta = 0.01$ \\
+     Number of neurons in $1^{\text{st}}$ hidd. layer = 150\\
+     Number of neurons in $2^{\text{nd}}$ hidd. layer = 150} \\ \hline
+    NRF\_DW & \thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.002$ \\
+        Initial random forest = RF \\
+         Transition parameter $\beta_1 = 10$ and $\beta_2 = 10$\\
+   }\\ \hline
+    NRF\_EL\_DW &\thead{Mini-batch size = 10\\
+    Learning rate $\eta = 0.0025$ \\
+        Initial random forest = RF \\
+         Transition parameter $\beta_1 = 10$ and $\beta_2 = 10$}\\ \hline
+    \end{tabular}
+    \caption{Choice of hyperparameters.}
+    \label{table::real_params}
+\end{table}
+\endgroup
 
-Since our classification task corresponds to the binary classification on imbalanced dataset, we evaluate the performance mainly with respect to the precision and recall of the positive class. Moreover, we present the comparison of individual models with respect to the Precision - Recall (PR) curves and also according to the average precision (AP) score as defined in the Chapter [Evaluation]. Eventually, we present macro-average of F1-score and accuracy as well. We conducted 2 subsequent 5-fold cross validations (10 iterations in total) and we present final results in the form "mean$\pm$std", similarly as in the public experiments. To all individual iterations of single training - testing pairs correspond one PR curve and we visualize all iterations in one graph for each classification model. Additionally, we draw one PR curve corresponding to the concatenation of correct labels and predictions from all iterations. Since there is no natural and straightforward way (such as averaging) to combine PR curves from individual iterations into one, this PR curve serves as "aggregation" of individual PR curves and it is highlighted in the corresponding graphs. From now, we will refer to this PR curve as aggregation PR curve. All individual PR curves have also their AP (average precision score) and at aggregation PR curve we present mean value of individual APs and standard deviation of these APs (but not AP of aggregation PR curve, since this is hardly intepretable and we want it to represent the overall performance only visually).
+\subsubsection{Evaluation}
+Since our classification task corresponds to the binary classification on imbalanced dataset, we evaluate the performance mainly with respect to the precision and recall of the positive class. Moreover, we present the comparison of individual models with respect to the Precision-Recall (PR) curves and also according to the average precision (AP) score as defined in \autoref{evaluation}. Eventually, we present macro-average of F1-score and accuracy as well. We conducted 2 subsequent 5-fold cross validations (10 iterations in total) and we present final results in the form "mean$\pm$std", similarly as in the public experiments. To all individual iterations of single training - testing pairs correspond one PR curve and we visualize all iterations in one graph for each classification model. Additionally, we draw aggregation PR curves as defined in \autoref{evaluation}. We do not measure AP of aggregation PR curve and instead we present mean and standard deviation of individual AP values.
 
-We employ two NF models - NRF\_DW and NRF\_EL\_DW and compare their performance with Logistic Regression classifier, single NN and the RF used for initialization of NF models. We use same logistic regression model with L2 regularization as in the public experiments. Single NN has two hidden layers, each consisting of 150 neurons with ReLU activation functions and the softmax in the output layer. We use Cross Entropy as the loss function and Adam as optimization algorithm. All other hyperparameters remain same as defined for single NN in the public experiments.
+\subsubsection{Models}
 
-RF consists of 30 decision trees, maximum depth is set to 6 and the number of features considered in the split is set to $\lfloor \sqrt{d} \rfloor$, where $d \in \mathbb{N}$ denotes number of features. We employ entropy as impurity function in information gain criterion.
+We employ two NF models - NRF\_DW and NRF\_EL\_DW and compare their performance with logistic regression (LR) classifier, single NN and the RF used for initialization of NF models. We use same logistic regression model with L2 regularization as in \autoref{overall_public_results}. In case of NF models and single NN we employ early stopping technique to limit overfitting. It tracks the loss function for 10 subsequent epochs starting from each new epoch and if there is no occurrence of decrease, the training process is terminated. All other settings of all models remain same as defined in \autoref{overall_public_results}. The testing fold in each iteration of cross validation was randomly divided into two halves, one used as validation dataset for early stopping and the rest for testing. Regularization parameter $\lambda$ is set to 0.
 
-NF models were initialized with RF model described above, with transition parameters set to $\beta_1 = 10$ and $\beta_2 = 10$. Learning rate for NRF\_DW is set to 0.002 and for NRF\_EL\_DW to 0.0025. We use Cross Entropy as loss function and Adam as optimization algorithm with same hyperparameters as single NN model. This time we omit adding the regularization term to the loss function and instead we employ early stopping technique (we use it also in the case of single NN model). This technique monitors the loss function on validation dataset (different from the testing dataset) after each epoch. It tracks the loss function for 10 subsequent epochs from each new epoch and if there is no occurrence of decrease, the training process is terminated. 
-
-The testing fold in each iteration of cross validation was randomly divided into two halves, one used as validation dataset for early stopping and the rest for testing.
 
 \subsection{Results}
+\label{real:results}
 
 The results of individual models are presented in the Table \ref{table::real_dataset} (original values multiplied by 100).
 
@@ -1543,13 +1738,20 @@ The results of individual models are presented in the Table \ref{table::real_dat
 \end{table}
 \endgroup
 
-We can see that except of NN model all other classification models performed quite similarly on this dataset with respect to all researched evaluation metrics. Considering overall performance, NRF\_DW and NRF\_EL\_DW reached slightly better results than other models (mainly higher F1-score on the positive class), especially surpassing and enhancing the initialization RF model. This RF model was quite well simulated since the beginning by NF models due to high transition parameters. It turned out that this was a suitable choice, since the results with lower transition parameters ($\beta_1 = 1$ and $\beta_2 = 1$) were not that favourable. Macro-average of F1-score for NRF\_DW was $74.1 \pm 6.2$ and for NRF\_EL\_DW was $74.0 \pm 5.7$. This mild decrease suggests that this classification task suits better for the RF model than NN, which is further supported by unsatisfying results of single NN model in comparison with other models. Therefore it was beneficial to simulate the behaviour of RF model by NF models and eventually surpassing its performance.
+We can see that except of NN model all other classification models performed quite similarly on this dataset with respect to all researched evaluation metrics. Considering overall performance, NRF\_DW and NRF\_EL\_DW reached slightly better results than other models (mainly higher F1-score on the positive class), especially surpassing and enhancing the initialization RF model. It turned out that simulating of RF model by adjusting transition parameters to high values was a suitable choice, since the results with lower transition parameters ($\beta_1 = 1$ and $\beta_2 = 1$) were not that favourable. For $\beta_1 = 1$ and $\beta_2 = 1$ macro-average of F1-score for NRF\_DW was $74.1 \pm 6.2$ and for NRF\_EL\_DW was $74.0 \pm 5.7$. This mild decrease suggests that this classification task suits better for the RF model than NN, which is further supported by unsatisfying results of single NN model in comparison with other models. Therefore it was beneficial to simulate the behaviour of RF model by increasing transition parameters.
 
-We may notice that in the case of positive class, the standard deviations of all results are high. This variance could be caused mainly by the low number of testing instances of positive class (approximately only 16 positive testing instances per one training - testing run). Therefore it may be more beneficial to compare the models also on the level of individual training - testing runs and not only by mean values, since this could lead to biased interpretation. Building on this motivation, we present also PR curves with the corresponding average precision scores (AP) for all training - testing runs (10 iterations in total) and also one aggregation PR curve as defined above. All PR curves alongside the aggregation PR curve are visualized in one graph for each classification model. PR curves are presented in the Figure \ref{figures:pr_curves}.
+We may notice that in the case of positive class, the standard deviations of all results are high. This variance could be caused mainly by the low number of testing instances of positive class (approximately only 16 positive testing instances per one training - testing run). Therefore we compare the models also on the level of individual training - testing runs and not only by mean values, since this could lead to biased interpretation. We present PR curves with the corresponding average precision scores (AP) for all training - testing runs (10 iterations in total) and also one aggregation PR curve in the Figure \ref{figures:pr_curves}.
 
-If we compare individual runs, we can see that in most cases NRF\_DW and NRF\_EL\_DW models reached higher AP values in comparison with other models. Also we can notice the resemblance of the PR curves corresponding to the NF models and the PR curves corresponding to the initialization RF model, which is also the result of high transition parameters. In the summary graph in the Figure \ref{figures:pr_curves} is visible that aggregation PR curves of NRF\_DW, NRF\_EL\_DW and RF are similar in shape as well.
+If we compare individual runs, we can see that in most cases NRF\_DW and NRF\_EL\_DW models reached higher AP values in comparison with other models. Also we can notice the resemblance of the PR curves corresponding to the NF models and the PR curves corresponding to the initialization RF model, which is also the result of high transition parameters. In the summary graph in the Figure \ref{fig:summary} is visible that aggregation PR curves of NRF\_DW, NRF\_EL\_DW and RF are similar in shape as well.
 
 In the conducted experiments of binary classification on LUCAS dataset were only slight differences between individual models, but NF models showed the most favourable performance. On the contrary, the NN model could not achieve a competitive performance with other models, which could stand as a warning and the reason to increase the transition parameters in our NF models, rather preferring the RF model nature.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{summary_pr.png}
+    \caption{Visualizations of individual aggregation PR curves. The AP values correspond to the "mean$\pm$std" of all iterations.}
+    \label{fig:summary}
+\end{figure}
 
 
 
@@ -1587,7 +1789,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \centering
     \includegraphics[width=0.6\textwidth]{NN_learning_rate_acc_rough.png}}
 
-    \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
+    \caption{The effect of varying learning rate on Vehicle dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations. The experiment is described on page \pageref{public:learning_rate}.}
 \label{learning_rates}
 \end{figure}
 \vfill
@@ -1618,7 +1820,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=0.6\textwidth]{NN_learning_rate_acc_rough_dia.png}}
-    \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations.}
+    \caption{The effect of varying learning rate on Diabetes dataset. Blue line illustrates mean value and orange lines symbolizes standard deviation. Dimmed gray lines are single realizations. The experiment is described on page \pageref{public:learning_rate}.}
 \label{figures:learning_rates_diabetes}
 \end{figure}
 \vfill
@@ -1654,7 +1856,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \centering
     \includegraphics[width=0.6\textwidth]{NN_epochs_estimators_acc.png}}
     }
-    \caption{Dependence of accuracy on number of estimators and number of training epochs on Vehicle dataset.}
+    \caption{Dependence of accuracy on number of estimators and number of training epochs on Vehicle dataset. The experiment is described on page \pageref{public:number_epochs}.}
 \label{figures:estimators_epochs_vehicle}
 \end{figure}
 \vfill
@@ -1691,7 +1893,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \centering
     \includegraphics[width=0.6\textwidth]{NN_epochs_estimators_acc_dia.png}}
     }
-    \caption{Dependence of accuracy on number of estimators and number of training epochs on Diabetes dataset.}
+    \caption{Dependence of accuracy on number of estimators and number of training epochs on Diabetes dataset. The experiment is described on page \pageref{public:number_epochs}.}
 \label{figures:estimators_epochs_diabetes}
 \end{figure}
 \vfill
@@ -1722,7 +1924,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=0.65\textwidth]{RF_epochs_depth_acc_dia.png}}
-    \caption{Dependence of accuracy and loss function on maximum depth of the decision trees in RF and number of training epochs. This experiment is performed on Diabetes dataset.}
+    \caption{Dependence of accuracy and loss function on maximum depth of the decision trees in RF and number of training epochs. This experiment is performed on Diabetes dataset. The experiment is described on page \pageref{public:max_depth}.}
 \label{figures:depth_epochs}
 \end{figure}
 \vfill
@@ -1749,7 +1951,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \includegraphics[width=0.65\textwidth]{NRF_epochs_depth_loss_reg_dia_reg.png}}
     }
 
-    \caption{Same models as in the Figure \ref{figures:depth_epochs} with regularization constant set to $\lambda = 10$.}
+    \caption{Same models as in the Figure \ref{figures:depth_epochs} with regularization constant set to $\lambda = 10$. The experiment is described on page \pageref{public:max_depth}.}
 \label{figures:depth_epochs_reg}
 \end{figure}
 \vfill
@@ -1780,7 +1982,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=0.6\textwidth]{RF_beta1_beta2_acc.png}}
-    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Vehicle dataset.}
+    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Vehicle dataset. The experiment is described on page \pageref{public:trans_params}.}
 \label{figures:beta_epochs}
 \end{figure}
 \vfill
@@ -1811,8 +2013,39 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=0.6\textwidth]{RF_beta1_beta2_acc_dia.png}}
-    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Diabetes dataset.}
+    \caption{Dependence of accuracy on varying transition parameters $\beta_1$ and $\beta_2$ on Diabetes dataset. The experiment is described on page \pageref{public:trans_params}.}
 \label{figures:beta_epochs_dia}
+\end{figure}
+\vfill
+
+\vfill
+\begin{figure}[h!]
+\centering
+\makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.60\textwidth]{NRF_DW_depth_maxFeatures_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_identity_depth_maxFeatures_acc.png}}
+    }
+    \hspace{0mm}
+    \\[-1.5ex]
+    \makebox[\textwidth][c]{
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_depth_maxFeatures_acc.png}}
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{NRF_EL_DW_depth_maxFeatures_acc.png}}
+    }
+        \hspace{0mm}
+        \\[-0.8ex]
+\subfloat{
+    \centering
+    \includegraphics[width=0.6\textwidth]{RF_depth_maxFeatures_acc.png}}
+    \caption{Dependence of accuracy on varying number of features used in split on Vehicle dataset. The experiment is described on page \pageref{public:features}.}
+\label{figures:features}
 \end{figure}
 \vfill
 
@@ -1830,7 +2063,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{epochs_1_samples200.png}}}
-    \caption{Type 1. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+    \caption{Type 1. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner. The experiment is described on page \pageref{toy:epochs}.}
 \label{figures:epochs_toy1}
 \end{figure}
 %\restoregeometry
@@ -1850,7 +2083,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{epochs_2_samples200.png}}}
-    \caption{Type 2. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+    \caption{Type 2. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner. The experiment is described on page \pageref{toy:epochs}.}
 \label{figures:epochs_toy2}
 \end{figure}
 %\restoregeometry
@@ -1870,7 +2103,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{epochs_3_samples200.png}}}
-    \caption{Type 3. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner.}
+    \caption{Type 3. Decision boundaries based on varying number of training epochs. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner. The experiment is described on page \pageref{toy:epochs}.}
 \label{figures:epochs_toy3}
 \end{figure}
 %\restoregeometry
@@ -1891,7 +2124,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{betas1_samples200.png}}}
-    \caption{Type 1. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+    \caption{Type 1. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner. The experiment is described on page \pageref{toy:transition}.}
 \label{figures:betas_toy1}
 \end{figure}
 %\restoregeometry
@@ -1911,7 +2144,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{betas2_samples200.png}}}
-    \caption{Type 2. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner.}
+    \caption{Type 2. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the right-bottom corner. The experiment is described on page \pageref{toy:transition}.}
 \label{figures:betas_toy2}
 \end{figure}
 %\restoregeometry
@@ -1930,7 +2163,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{betas3_samples200.png}}}
-    \caption{Type 3. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner.}
+    \caption{Type 3. Decision boundaries based on varying transition parameters, where  $\beta = \beta_1 = \beta_2$. The sizes of datasets are 50 and 200 in the top-bottom manner. The accuracy on the testing subset is in the left-bottom corner. The experiment is described on page \pageref{toy:transition}.}
 \label{figures:betas_toy3}
 \end{figure}
 %\restoregeometry
@@ -1950,7 +2183,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 \subfloat{
     \centering
     \includegraphics[width=\textwidth]{noise31_samples100_beta50.png}}}
-    \caption{Decision boundaries based on occurrence of noise in data. The effect of noise is illustrated on dataset with 100 instances. In the upper figure is $\beta_1 = \beta_2 = 1$ among all NRF models. In the bottom figure is $\beta_1 = \beta_2 = 50$. The accuracy on the testing subset is in the right-bottom corner.}
+    \caption{Decision boundaries based on occurrence of noise in data. The effect of noise is illustrated on dataset with 100 instances. In the upper figure is $\beta_1 = \beta_2 = 1$ among all NRF models. In the bottom figure is $\beta_1 = \beta_2 = 50$. The accuracy on the testing subset is in the right-bottom corner. The experiment is described on page \pageref{toy:noise}.}
 \label{figures:noise_toy}
 \end{figure}
 %\restoregeometry
@@ -1966,7 +2199,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \subfloat{
     \centering
     \includegraphics[width=0.5\textwidth]{toy_reg_100samples.png}}}
-    \caption{Accuracy depending on the regularization constant $\lambda$. In the left figure are depicted input data (100 instances) as two circles distorted by noise. The results are presented for RF, NRF\_DW and NRF\_EL\_DW in the form "mean $\pm$ std" after 2 subsequent 5-fold cross validations. The transition parameters $\beta_1$ and $\beta_2$ are set to 10.}
+    \caption{Accuracy depending on the regularization constant $\lambda$. In the left figure are depicted input data (100 instances) as two circles distorted by noise. The results are presented for RF, NRF\_DW and NRF\_EL\_DW in the form "mean $\pm$ std" after 2 subsequent 5-fold cross validations. The transition parameters $\beta_1$ and $\beta_2$ are set to 10. The experiment is described on page \pageref{toy:overfitting}.}
 \label{figures:toy_reg}
 \end{figure}
 %\restoregeometry
@@ -2003,7 +2236,7 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \centering
     \includegraphics[width=0.6\textwidth]{summary_pr.png}}
     }
-    \caption{PR curves on LUCAS dataset. Each graph contains PR curves of individual training - testing runs with AP values and one highlighted aggregation PR curve with mean AP value and standard deviation of all iterations. In the summary are visualized aggregation PR curves together.}
+    \caption{PR curves on LUCAS dataset. Each graph contains PR curves of individual training - testing runs with AP values and one highlighted aggregation PR curve with mean AP value and standard deviation of all iterations. In the summary are visualized aggregation PR curves together. The experiment is described on page \pageref{real:results}.}
 \label{figures:pr_curves}
 \end{figure}
 \vfill
