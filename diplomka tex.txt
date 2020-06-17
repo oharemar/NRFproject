@@ -38,16 +38,30 @@
 
 \chapter{Classification}
 
-K-fold cross validation: First, the dataset is divided into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length). \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.
+\section{Terminology}
 
-\section{State-of-the-art classification models}
-\subsection{Logistic regression}
-\subsection{Support vector machines (SVM)}
+In this thesis we focus mainly on the task of classification, which embodies the procedure of assigning one or more labels to the observations of studied area. Individual labels represent different \textit{classes}, which group observations with common features. We distinguish two main categories of classification - \textit{binary} and \textit{multiclass} classification. In the binary case we discriminate 2 classes, which are generally denoted as 1 and 0 for work purposes. They could represent either positive or negative case. Specifically, we could distinguish for example \textit{rain} vs \textit{no rain}, \textit{ill} vs \textit{healthy}, \textit{declined} vs \textit{granted} and so on. In the multiclass case we discriminate several different classes (binary classification is a special case of multiclass classification).
+
+Classification can be included among \textit{supervised learning}, which belongs to the main machine learning paradigms:
+
+\begin{enumerate}
+    \item \textbf{Supervised learning}: This paradigm comprises machine learning task of learning a function that maps input value to output value based on delivered input-output evidence. The input observations are usually vectors lying within input space $\mathbb{X} \subset \mathbb{R}^d$, where $d \in \mathbb{N}$ denotes dimension. $\mathbb{X}$ is often referred to as \textit{feature} space and $d$ corresponds to number of features. Vectors belonging to feature space will be referred to as \textit{instances} (instance of feature space). Each feature usually represents some property of the instance. They can be either \textit{numerical}, such as weight or age, or \textit{categorical}, such as gender or marital status. Sometimes we work also with features that does not provide such straightforward interpretation as previously mentioned cases. These features are usually produced artificially by special preprocessing techniques, e.g. dimensionality reduction \cite{data_reduction}, data compression, etc.
+    
+    In the case of classification, we must deliver set of labeled instances to the machine learning model, which then learns a function that maps instances to labels (finite set of discrete values). This model could be used afterwards on the previously unseen instances from the same feature space. If the labels are continuous, we talk about \textit{regression} instead of classification.
+    
+    \item \textbf{Unsupervised learning}: Unlike the supervised learning, this paradigm does not work with previously labeled evidence. Algorithms belonging to this group look for patterns and structures among set of unlabeled instances from feature space. Typical representative of this group are \textit{clustering} algorithms \cite{clustering}, which create labeled groups among previously unlabeled data.
+    
+    \item \textbf{Reinforcement learning}: This paradigm comprises group of machine learning algorithms, whose learning is based on feedback. In other words, the algorithm monitors surroundings and performs actions in order to maximize some predefined reward. It does not require labeled inputs as in the case of supervised learning methods.
+\end{enumerate}
+
+Before we train the classification model (to learn mapping function), we usually divide available set of instances into training subset and testing subset (occasionally extra validation subset). Then training subset is used to train the classification model and testing subset is used to evaluate its performance. Validation subsets are often used to tune the parameters of model (if necessary). When we do not explicitly supply the training and testing subset, the standard way is to randomly split the set of instances multiple times and each time choose one subset as training set and the other one as testing set. The example of this procedure is \textit{K-fold cross validation}. This procedure divides dataset into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length) and then \textit{K}-1 parts are used as training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times so in each iteration the different combination of training and testing set is applied.
+
+The evaluation of model performance is crucial part of classification and will be discussed precisely in the following section.
 
 \section{Evaluation}
 \label{evaluation}
 
-This section is focused on the summary and description of the evaluation metrics used in the experimental part, alongside the properties of each metric and suitable application. This section includes only metrics that are applied in the testing phase. The correct choice of evaluation is the main and crucial task in the case of searching for optimal classification model. In practice, there exist numerous evaluation methods applied frequently to many classification tasks, each fits better in different cases. Before we choose set of evaluation metrics, we must be aware of the processed data and classification model to set our evaluation correctly. Also the purpose and future application scope of our model is significant. If this foremost analysis of the data and model is neglected or done wrong, we could end up choosing bad-shaped evaluation techniques and therefore misinterpret the performance of our model.
+This section is focused on the summary and description of evaluation metrics used in the experimental part, alongside the properties of each metric and suitable application. This section includes only metrics that are applied in the testing phase. The correct choice of evaluation is the main and crucial task in the case of searching for optimal classification model. In practice, there exist numerous evaluation methods applied frequently to many classification tasks, each fits better in different cases. Before we choose set of evaluation metrics, we must be aware of the processed data and classification model to set our evaluation correctly. Also the purpose and future application scope of our model is significant. If this foremost analysis of the data and model is neglected or done wrong, we could end up choosing bad-shaped evaluation techniques and therefore misinterpret the performance of our model.
 
 In the literature could be found significant amount of studies addressing the choice of evaluation metrics in the case of either binary classification \cite{evaluation1,evaluation2} or multi-class classification \cite{multieval1,multieval2}.
 
@@ -880,7 +894,7 @@ We distinguish the representatives of this group based on different regularizati
     \text{Update rule}\hspace{0.2cm}\text{:}\hspace{0.2cm} &w^{(k+1)} = w^{(k)}- \eta\frac{\lambda}{n}\text{sgn}(w^{(k)}) - \eta\frac{\partial \Lambda_0}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \nonumber \hspace{0.2cm},
 \end{align}
 
-where $n = |\mathbb{X}|$, $\Lambda_0$ denotes original loss function and $\Lambda$ denotes loss function after addition of regularization term. The effect of regularization term is controlled by the magnitude of regularization parameter $\lambda \geq 0$. The larger $\lambda$ is, the larger penalty is put on weights and vice versa. Both variants penalizes large weights in a slightly different way. The difference is perfectly visible from the individual update rules of weights for Gradient Descent (or SGD) in \eqref{L2reg} respectively \eqref{L1reg}. We can see that in the case of L2 regularization the weights are gradually decreased proportionally to the magnitude of the corresponding weight, whereas in the case of L1 regularization the weights are modified by value of constant magnitude. This means that L2 regularization tends to shrink larger weights more than L1. L2 regularization is sometimes referred to as a \textit{weight decay}.
+where $n = |\mathbb{X}|$, $\Lambda_0$ denotes original loss function and $\Lambda$ denotes loss function after addition of regularization term. The effect of regularization term is controlled by the magnitude of regularization parameter $\lambda \geq 0$. The larger $\lambda$ is, the larger penalty is put on weights and vice versa. Both variants penalize large weights in a slightly different way. The difference is perfectly visible from the individual update rules of weights for Gradient Descent (or SGD) in \eqref{L2reg} respectively \eqref{L1reg}. We can see that in the case of L2 regularization the weights are gradually decreased proportionally to the magnitude of the corresponding weight, whereas in the case of L1 regularization the weights are modified by value of constant magnitude. This means that L2 regularization tends to shrink larger weights more than L1. L2 regularization is sometimes referred to as a \textit{weight decay}.
 
 In the experimental part we adopt mainly L2 regularization as a regularization technique. It could be also used in adaptive optimization algorithms, such as Adam. Generally accepted approach is to replace gradient $\nabla \Lambda_0$ with $\nabla \Lambda$ for initializing corresponding terms (e.g. equations \eqref{mean} and \eqref{variance}), as we did also in the case of SGD. There has been some criticism to this approach related to the adaptive algorithms \cite{adam_criticism}, which led to some proposals and improvements, but they are beyond the scope of this thesis and we will not mention them. In our experiments we use replacement of gradients as suggested above.
 
@@ -1278,9 +1292,8 @@ Models in Table \ref{table::public_models} are color-coded into three different 
 
 The green area comprises RF models. We adopted three variations with different number of estimators. All decision trees were trained with entire training dataset and we use entropy as the impurity function in the information gain criterion. We use implementation from Scikit learn.
 
-The orange area includes all NF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NF (differences between results obtained by voting or averaging were negligible). We use our own implementation of NF models in Python.
+The orange area includes all NF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NF models were built from RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer have been set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in NF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from NF (differences between results obtained by voting or averaging were negligible).
 
-Datasets used in the experiments are summarized in Table \ref{table::public_datasets}.
 \begingroup
 \begin{table}[h!]
     \centering
@@ -1305,7 +1318,7 @@ Datasets used in the experiments are summarized in Table \ref{table::public_data
 \end{table}
 \endgroup
 
-All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined $\forall j,l \in \{1,...,m\}$ as 
+We use our own implementation of NF models in Python. Datasets used in the experiments are summarized in Table \ref{table::public_datasets}. All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined $\forall j,l \in \{1,...,m\}$ as 
 \begin{equation}
     [\zeta(k_j)]_l = \begin{cases}
     1, & j = l \\
@@ -2373,6 +2386,10 @@ DOI: 10.3233/IDA-130592
 \bibitem{adam_criticism}https://openreview.net/pdf?id=rk6qdGgCZ
 
 \bibitem{dropout} https://papers.nips.cc/paper/4878-understanding-dropout.pdf
+
+\bibitem{data_reduction}ISBN: 978-0-387-30768-8
+
+\bibitem{clustering}Rokach L., Maimon O. (2005) Clustering Methods. In: Maimon O., Rokach L. (eds) Data Mining and Knowledge Discovery Handbook. Springer, Boston, MA ISBN: 978-0-387-24435-8 .
 
 \end{thebibliography}
 
