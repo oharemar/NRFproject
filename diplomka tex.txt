@@ -89,10 +89,10 @@
 
 %\begin{lyxlist}{MMMMMMMMM}
 \begin{lyxlist}{MMMMMMMMM}
-\begin{singlespace}
+%\begin{singlespace}
 \item [{Author:}] \textbf{Bc. Martin Oharek}
 \item [{Supervisor:}] \textbf{Ing. Marek Bukáček}
-\item [{Academic year:}] 2019/2020\end{singlespace}
+\item [{Academic year:}] 2019/2020%\end{singlespace}
 
 \end{lyxlist}
 \newpage{}
@@ -129,9 +129,7 @@
 
 \noindent \emph{\Large{}Poděkování:}{\Large \par}
 
-\noindent Rád bych poděkoval svému školiteli Ing. Lukáši Machlicovi, Ph.D za jeho ochotu a vedení a také za cenné rady a připomínky k této práci. Dále bych chtěl poděkovat společnosti Cisco Systems, s.r.o. za poskytnutí zázemí pro vznik této práce.\vspace{0.25cm}
-
-\noindent Tato práce vznikla za podpory projektů CERIT Scientific Cloud (LM2015085) a CESNET (LM2015042) financovaných z programu MŠMT Projekty velkých infrastruktur pro VaVaI.
+\noindent Rád bych poděkoval svému školiteli Ing. Marku Bukáčkovi za jeho ochotu a vedení a také za cenné rady a připomínky k této práci. Dále bych chtěl poděkovat své rodině a také své přítelkyni Adéle za jejich trpělivost a podporu. V neposlední řadě bych také rád poděkoval Mgr. Věře Viertlové a Mgr. Žanetě Voldánové za připomínky k jazykové korektuře.
 
 \vfill
 
@@ -152,16 +150,16 @@ jsem všechnu použitou literaturu.
 
 ~\newpage{}
 
-\begin{onehalfspace}
+%\begin{onehalfspace}
 \noindent \emph{Název práce:}
 
-\noindent \textbf{Klasifikace částečně anotovaných dat do více tříd za pomoci rozhodovacích lesů}
-\end{onehalfspace}
+\noindent \textbf{Stochastické metody propojující neuronové sítě s náhodnými lesy a jejich využití v analýze medicínských dat}
+%\end{onehalfspace}
 
 \bigskip{}
 
 
-\noindent \emph{Autor:} Martin Oharek
+\noindent \emph{Autor:} Bc. Martin Oharek
 
 \bigskip{}
 
@@ -174,46 +172,46 @@ jsem všechnu použitou literaturu.
 \bigskip{}
 
 
-\noindent \emph{Druh práce:} Bakalářská práce
+\noindent \emph{Druh práce:} Diplomová práce
 
 \bigskip{}
 
 
-\noindent \emph{Vedoucí práce:} Ing. Lukáš Machlica, Ph.D, Cisco Systems, s.r.o.
+\noindent \emph{Supervisor:} Ing. Marek Bukáček
 
 \bigskip{}
 
 
-\noindent \emph{Abstrakt:} Tato práce se zabývá klasifikací částečně anotovaných a nevyvážených dat. Typickým příkladem částečně anotovaných dat jsou údaje z proxy-logů charakterizující síťový provoz. Je vyvíjena snaha klasifikovat tyto údaje a rozlišovat mezi neoznačeným legitimním provozem spolu s případy, které se nepodařilo zařadit (negativní) a označeným nelegitimním (malware) provozem (pozitivní). Přirozeně je případů legitimního provozu více než nelegitimního a vzniká nevyváženost, která způsobuje problémy při klasifikaci. K účelu klasifikace jsme využívali náhodné rozhodovací lesy, které se ukazují býti vhodnou metodou pro náš případ. V práci jsme natrénovali rozhodovací les a testovali kvalitu výsledků klasifikace na datech z proxy-logů poskytnutých společností Cisco Systems, s.r.o. Také byly navrhnuty a testovány další metody a algoritmy ke zlepšení kvality klasifikace. Výsledky zveřejněné na konci práce ukazují, že takové metody výrazně napomáhají ke zlepšení klasifikace.
+\noindent \emph{Abstrakt:} Tato práce se zabývá možnou kombinací náhodných rozhodovacích lesů a neuronových sítí, která by dala vzniknout hybridním klasifikátorům s velkým klasifikačním potenciálem, využívajících předností obou těchto základních modelů. V práci jsou navrženy čtyři hybridní klasifikátory, obecně nazývány jako náhodné neuronové lesy, které jsou vytvořeny na základě transformace rozhodovacího stromu na ekvivalentní dopřednou neuronovou síť. Všechny teoretické náležitosti jsou v práci důkladně popsány a schopnost klasifikace náhodných neuronových lesů je testována na velkém množství klasifikačních úloh. Důležitou součástí je také analýza parametrů náhodných neuronových lesů a zkoumání jejich vlivu na kvalitu klasifikace. Závěry jsou podpořeny četnými experimenty na veřejných datových sadách a také na uměle vytvořených testovacích sadách. Náhodné neuronové lesy jsou také testovány na reálné datové sadě zahrnující medicínské záznamy získávané projektem LUCAS. Výstupy experimentů naznačily lepší klasifikační schopnost náhodných neuronových lesů než u jiných testovaných modelů.
 \bigskip{}
 
 
-\noindent \emph{Klíčová slova:} důležitost příznaků, klasifikace, malware, rozhodovací lesy, nevyvážená data, shlukování
+\noindent \emph{Klíčová slova:} klasifikace, náhodný neuronový les, náhodný rozhodovací les, neuronová síť
 
 \vfill{}
 ~
 
-\selectlanguage{american}%
-\begin{onehalfspace}
+%\selectlanguage{american}%
+
 \noindent \emph{Title:}
 
-\noindent \textbf{Decision forests and multi-class classification of partially labeled data}
-\end{onehalfspace}
+\noindent \textbf{Stochastic methods combining neural networks with random forests and their applications to medical data analysis}
+
 
 \bigskip{}
 
 
-\noindent \emph{Author:} Martin Oharek
+\noindent \emph{Author:} Bc. Martin Oharek
 
 \bigskip{}
 
 
-\noindent \emph{Abstract:} This thesis focuses on the task of classification of partially labeled and imbalanced data. A typical instances of partially labeled data are details extracted from proxy-logs. Such data contain information about network traffic (network flow). The data from network traffic were provided by Cisco Systems, Inc. and they divide into labeled malicious objects (positive) and unlabeled legitimate operation (negative). Generally, such dataset includes much more negative instances than positive instances and it leads to imbalance and causes problems of correct classification. In order to classify these data the random decision forest was applied. The data were exploited to train the decision forest and test its performance afterwards. The different algorithms and methods were proposed and examined to improve the performance of the random forest. The results published at the end of the thesis approve our approaches and show better outcomes in comparison with the baseline forest.
+\noindent \emph{Abstract:} This thesis is focused on potential stochastic combination of the random forest classifiers and feedforward neural networks into the hybrid classifiers, that can benefit from the valuable properties of these two popular machine learning algorithms and thus can possess a strong classification ability. We propose four different hybrid classifiers, generally called neural random forests, which are created on the basis of transformation of a single decision tree into an equivalent feedforward neural network. We provide a substantial theoretical background of related domains and verify the classification power of neural random forests on numerous classification tasks. Moreover, we analyze the effect of neural random forest parameters on the overall performance and support the conclusions by evaluating and comparing the performance on public and toy datasets. Additionally, the performance is tested on the real-world dataset, consisting of the data from the medical environment collected by LUCAS project. The vast majority of experiments suggested the superiority of proposed neural random forest models among all tested models.
 
 \bigskip{}
 
 
-\noindent \emph{Key words:} classification, clustering, decision forests, feature importance, imbalanced data, malware
+\noindent \emph{Key words:} classification, neural network, neural random forest, random forest
 %\selectlanguage{czech}%
 \newpage{}
 
