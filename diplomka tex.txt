@@ -4,6 +4,7 @@
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{array}
+\usepackage{babel}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{adjustbox}
@@ -22,7 +23,18 @@
 \usepackage{subfig}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
+\clubpenalty=9500 % avoid first lines of paragraph on a new page
 
+% completely avoid widows (last lines of paragraph on a new page)
+\widowpenalty=9500
+
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
 
 \title{MASTER'S THESIS}
 \author{Bc. Martin Oharek }
@@ -30,15 +42,194 @@
 
 \begin{document}
 
-\maketitle
+\def\documentdate{7. July 2018}
+
+%%\def\documentdate{\today}
+
+\pagestyle{empty}
+{\centering
+
+\noindent %
+\begin{minipage}[c]{3cm}%
+\noindent \begin{center}
+\includegraphics[width=3cm,height=3cm,keepaspectratio]{cvut}
+\par\end{center}%
+\end{minipage}%
+\begin{minipage}[c]{0.6\linewidth}%
+\begin{center}
+\textsc{\large{}CZECH TECHNICAL UNIVERSITY \\IN PRAGUE}{\large{}}\vspace{0.3cm}\\
+{\large{}Faculty of Nuclear Sciences and Physical Engineering}
+\par\end{center}%
+\end{minipage}%
+\begin{minipage}[c]{3cm}%
+\noindent \begin{center}
+\includegraphics[width=3cm,height=3cm,keepaspectratio]{fjfi}
+\par\end{center}%
+\end{minipage}
+
+\vspace{3cm}
+
+%\selectlanguage{american}%
+\textbf{\huge{}Stochastic methods combining neural networks with random forests and their applications to medical data analysis}{\huge \par}
+
+\vspace{1cm}
+
+\textbf{\huge{}Stochastické metody propojující neuronové sítě s náhodnými lesy a jejich využití v analýze medicínských dat}{\huge \par}
+
+
+%\selectlanguage{czech}%
+\vspace{2cm}
+
+
+{\large{}Masters's thesis}{\large \par}
+
+}
+
+\vfill{}
+
+%\begin{lyxlist}{MMMMMMMMM}
+\begin{lyxlist}{MMMMMMMMM}
+\begin{singlespace}
+\item [{Author:}] \textbf{Bc. Martin Oharek}
+\item [{Supervisor:}] \textbf{Ing. Marek Bukáček}
+\item [{Academic year:}] 2019/2020\end{singlespace}
+
+\end{lyxlist}
+\newpage{}
+
+~\newpage{}
+
+~
+
+\vfill{}
+
+
+\begin{center}
+- Zadání práce -
+\par\end{center}
+
+\vfill{}
+
+
+~\newpage{}
+
+~
+
+\vfill{}
+
+
+\begin{center}
+- Zadání práce (zadní strana) -
+\par\end{center}
+
+\vfill{}
+
+
+~\newpage{}
+
+\noindent \emph{\Large{}Poděkování:}{\Large \par}
+
+\noindent Rád bych poděkoval svému školiteli Ing. Lukáši Machlicovi, Ph.D za jeho ochotu a vedení a také za cenné rady a připomínky k této práci. Dále bych chtěl poděkovat společnosti Cisco Systems, s.r.o. za poskytnutí zázemí pro vznik této práce.\vspace{0.25cm}
+
+\noindent Tato práce vznikla za podpory projektů CERIT Scientific Cloud (LM2015085) a CESNET (LM2015042) financovaných z programu MŠMT Projekty velkých infrastruktur pro VaVaI.
+
+\vfill
+
+\noindent \emph{\Large{}Čestné prohlášení:}{\Large \par}
+
+\noindent Prohlašuji, že jsem tuto práci vypracoval samostatně a uvedl
+jsem všechnu použitou literaturu.
+
+\bigskip{}
+
+
+\noindent V Praze dne \documentdate\hfill{}Martin Oharek
+
+\vspace{2cm}
+
+
+\newpage{}
+
+~\newpage{}
+
+\begin{onehalfspace}
+\noindent \emph{Název práce:}
+
+\noindent \textbf{Klasifikace částečně anotovaných dat do více tříd za pomoci rozhodovacích lesů}
+\end{onehalfspace}
+
+\bigskip{}
+
+
+\noindent \emph{Autor:} Martin Oharek
+
+\bigskip{}
+
+
+\noindent \emph{Obor:} Matematické inženýrství\bigskip{}
+
+
+\noindent \emph{Zaměření:} Matematické modelování
+
+\bigskip{}
+
+
+\noindent \emph{Druh práce:} Bakalářská práce
+
+\bigskip{}
+
+
+\noindent \emph{Vedoucí práce:} Ing. Lukáš Machlica, Ph.D, Cisco Systems, s.r.o.
+
+\bigskip{}
+
+
+\noindent \emph{Abstrakt:} Tato práce se zabývá klasifikací částečně anotovaných a nevyvážených dat. Typickým příkladem částečně anotovaných dat jsou údaje z proxy-logů charakterizující síťový provoz. Je vyvíjena snaha klasifikovat tyto údaje a rozlišovat mezi neoznačeným legitimním provozem spolu s případy, které se nepodařilo zařadit (negativní) a označeným nelegitimním (malware) provozem (pozitivní). Přirozeně je případů legitimního provozu více než nelegitimního a vzniká nevyváženost, která způsobuje problémy při klasifikaci. K účelu klasifikace jsme využívali náhodné rozhodovací lesy, které se ukazují býti vhodnou metodou pro náš případ. V práci jsme natrénovali rozhodovací les a testovali kvalitu výsledků klasifikace na datech z proxy-logů poskytnutých společností Cisco Systems, s.r.o. Také byly navrhnuty a testovány další metody a algoritmy ke zlepšení kvality klasifikace. Výsledky zveřejněné na konci práce ukazují, že takové metody výrazně napomáhají ke zlepšení klasifikace.
+\bigskip{}
+
+
+\noindent \emph{Klíčová slova:} důležitost příznaků, klasifikace, malware, rozhodovací lesy, nevyvážená data, shlukování
+
+\vfill{}
+~
+
+\selectlanguage{american}%
+\begin{onehalfspace}
+\noindent \emph{Title:}
+
+\noindent \textbf{Decision forests and multi-class classification of partially labeled data}
+\end{onehalfspace}
+
+\bigskip{}
+
+
+\noindent \emph{Author:} Martin Oharek
+
+\bigskip{}
+
+
+\noindent \emph{Abstract:} This thesis focuses on the task of classification of partially labeled and imbalanced data. A typical instances of partially labeled data are details extracted from proxy-logs. Such data contain information about network traffic (network flow). The data from network traffic were provided by Cisco Systems, Inc. and they divide into labeled malicious objects (positive) and unlabeled legitimate operation (negative). Generally, such dataset includes much more negative instances than positive instances and it leads to imbalance and causes problems of correct classification. In order to classify these data the random decision forest was applied. The data were exploited to train the decision forest and test its performance afterwards. The different algorithms and methods were proposed and examined to improve the performance of the random forest. The results published at the end of the thesis approve our approaches and show better outcomes in comparison with the baseline forest.
+
+\bigskip{}
+
+
+\noindent \emph{Key words:} classification, clustering, decision forests, feature importance, imbalanced data, malware
+%\selectlanguage{czech}%
+\newpage{}
+
+~\newpage{}
+
+\pagestyle{plain}
 
 \tableofcontents
+
+\newpage{}
 
 \chapter{Introduction}
 
 This thesis focuses mainly on the exploitation of two popular machine learning algorithms in the classification task, random forest and feedforward neural network classifiers. The greatest emphasis is put especially on designing hybrid classifiers called neural random forests, alongside a detailed theoretical derivation of individual models, a verification of functionality and thorough analysis and comparison of the performance.
 
-Neural random forests combine several beneficial properties of random forests and neural networks, which allow them to produce competitive results and often surpass the performance of their predecessing models. Even though the complexity of the neural random forest is principally higher than in the case of single random forest or neural network, the computation time of the training stage can be significantly reduced by applying parallelization techniques and acceleration on GPUs.
+Neural random forests combine several beneficial properties of random forests and neural networks, which allow them to produce competitive results and often surpass the performance of their predecessing models. Their classification ability is verified and tested in many experimental tasks, including the application on the real dataset and comparison with other competitive models.
 
 Main contributions of this thesis are:
 
@@ -1792,8 +1983,17 @@ In the conducted experiments of binary classification on LUCAS dataset were only
     \label{fig:summary}
 \end{figure}
 
+\chapter{Conclusion}
 
+This thesis focused mainly on the research of relationship between random forest and feedforward neural network classifiers in terms of transformation of a single decision tree into the neural network. Moreover, we proposed and developed four different hybrid classifiers belonging to the group of neural random forests.
 
+We compared the performance of all proposed models to each other and also to the performance of initialization random forest, a single neural network and logistic regression. Firstly, the performance has been tested on several public datasets. All NF models reported favourable performance in comparison with other competitive models with respect to various evaluation metrics. The most favourable performance reported NRF\_DW and NRF\_EL\_DW models among all models. We also investigated the effect of neural random forest parameters on the performance and inclination to overfitting. Interestingly, we found a correlation between initialization random forest and neural random forest, when the transition parameters $\beta_1$ and $\beta_2$ are sufficiently high.
+
+Certain similarities between random forests and neural random forests have been detected especially in the case of NRF\_DW and NRF\_EL\_DW models. This is further supported by illustrations of decision boundaries on 2D toy datasets, where we can see a strong resemblance between decision boundary of random forest and neural random forest, when the transition parameters are increased. Also, NRF\_DW and NRF\_EL\_DW models needed fewer number of training epochs to converge to a reasonable solution than concurrent models NRF and NRF\_EL, especially in the case of datasets with less data instances.
+
+Finally, we tested the performance of NRF\_DW and NRF\_EL\_DW models on the real dataset, consisting of data obtained by LUCAS project. This dataset has 91 features and 1133 instances divided into 2 classes, which represent different kinds of treatment. There is a significant imbalance between the number of positive instances and the number of negative instances. Even in this case the performance of neural random forest models was more favourable than the performance of other competitive models. This case also higlighted the benefit of increasing the transition parameters, since the random forest model produced better results than a single neural network.
+
+Neural random forests showed a good classification ability with an ambition to overcome other classic models. Even though the time and space complexity is higher than in the case of initialization random forest or a single neural network of similar architecture as individual estimators, the training time can be significantly reduced by usage of parallelization and possibly acceleration on graphical computational units (GPU). If the machine possesses a sufficient number of computational units, the training time of an entire ensemble equals roughly to the training time of a single decision tree and a single feedforward neural network, which makes neural random forests well-applicable even in the case of large datasets. 
 
 
 
