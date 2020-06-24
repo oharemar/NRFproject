@@ -18,6 +18,7 @@
 \usepackage{color, colortbl}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{microtype} %% tohle kdyžtak oddělat
 \usepackage{makecell}
 %\usepackage{subcaption}
 \usepackage{subfig}
@@ -27,6 +28,8 @@
 
 % completely avoid widows (last lines of paragraph on a new page)
 \widowpenalty=9500
+\begin{document}
+
 
 \newenvironment{lyxlist}[1]
 {\begin{list}{}
@@ -39,8 +42,6 @@
 \title{MASTER'S THESIS}
 \author{Bc. Martin Oharek }
 \date{December 2019}
-
-\begin{document}
 
 \def\documentdate{7. July 2018}
 
@@ -182,7 +183,7 @@ jsem všechnu použitou literaturu.
 \bigskip{}
 
 
-\noindent \emph{Abstrakt:} Tato práce se zabývá možnou kombinací náhodných rozhodovacích lesů a neuronových sítí, která by dala vzniknout hybridním klasifikátorům s velkým klasifikačním potenciálem, využívajících předností obou těchto základních modelů. V práci jsou navrženy čtyři hybridní klasifikátory, obecně nazývány jako náhodné neuronové lesy, které jsou vytvořeny na základě transformace rozhodovacího stromu na ekvivalentní dopřednou neuronovou síť. Všechny teoretické náležitosti jsou v práci důkladně popsány a schopnost klasifikace náhodných neuronových lesů je testována na velkém množství klasifikačních úloh. Důležitou součástí je také analýza parametrů náhodných neuronových lesů a zkoumání jejich vlivu na kvalitu klasifikace. Závěry jsou podpořeny četnými experimenty na veřejných datových sadách a také na uměle vytvořených testovacích sadách. Náhodné neuronové lesy jsou také testovány na reálné datové sadě zahrnující medicínské záznamy získávané projektem LUCAS. Výstupy experimentů naznačily lepší klasifikační schopnost náhodných neuronových lesů než u jiných testovaných modelů.
+\noindent \emph{Abstrakt:} Tato práce se zabývá možnou kombinací náhodných rozhodovacích lesů a neuronových sítí, která by dala vzniknout hybridním klasifikátorům s velkým klasifikačním potenciálem, využívajících předností obou těchto základních modelů. V práci jsou navrženy čtyři hybridní klasifikátory, obecně nazývány jako náhodné neuronové lesy, které jsou vytvořeny na základě transformace rozhodovacího stromu na ekvivalentní dopřednou neuronovou síť. Všechny teoretické náležitosti jsou v práci důkladně popsány a schopnost klasifikace náhodných neuronových lesů je testována na velkém množství klasifikačních úloh. Důležitou součástí je také analýza parametrů náhodných neuronových lesů a zkoumání jejich vlivu na kvalitu klasifikace. Závěry jsou podpořeny experimentálně jak na veřejných datových sadách, tak na uměle vytvořených testovacích sadách. Náhodné neuronové lesy jsou také testovány na reálné datové sadě zahrnující medicínské záznamy získávané projektem LUCAS. Výstupy experimentů naznačily lepší klasifikační schopnost náhodných neuronových lesů než u jiných testovaných modelů.
 \bigskip{}
 
 
@@ -206,7 +207,7 @@ jsem všechnu použitou literaturu.
 \bigskip{}
 
 
-\noindent \emph{Abstract:} This thesis is focused on potential stochastic combination of the random forest classifiers and feedforward neural networks into the hybrid classifiers, that can benefit from the valuable properties of these two popular machine learning algorithms and thus can possess a strong classification ability. We propose four different hybrid classifiers, generally called neural random forests, which are created on the basis of transformation of a single decision tree into an equivalent feedforward neural network. We provide a substantial theoretical background of related domains and verify the classification power of neural random forests on numerous classification tasks. Moreover, we analyze the effect of neural random forest parameters on the overall performance and support the conclusions by evaluating and comparing the performance on public and toy datasets. Additionally, the performance is tested on the real-world dataset, consisting of the data from the medical environment collected by LUCAS project. The vast majority of experiments suggested the superiority of proposed neural random forest models among all tested models.
+\noindent \emph{Abstract:} This thesis is focused on potential combination of the random forest classifiers and feedforward neural networks into the hybrid classifiers, that could benefit from the valuable properties of these two popular machine learning algorithms and thus could possess a strong classification ability. We propose four different hybrid classifiers, generally called neural random forests, which are created on the basis of transformation of a single decision tree into an equivalent feedforward neural network. We provide a substantial theoretical background of related domains and verify the classification power of neural random forests on numerous classification tasks. Moreover, we analyze the effect of neural random forest parameters on the overall performance and support the conclusions by evaluating and comparing the performance on public and toy datasets. Additionally, the performance is tested on the real-world dataset, consisting of the medical data collected by LUCAS project. The vast majority of experiments suggested the superiority of proposed neural random forest models among all tested models.
 
 \bigskip{}
 
@@ -225,9 +226,13 @@ jsem všechnu použitou literaturu.
 
 \chapter{Introduction}
 
-This thesis focuses mainly on the exploitation of two popular machine learning algorithms in the classification task, random forest and feedforward neural network classifiers. The greatest emphasis is put especially on designing hybrid classifiers called neural random forests, alongside a detailed theoretical derivation of individual models, a verification of functionality and thorough analysis and comparison of the performance.
+Random forests and neural networks belong to the most popular machine learning algorithms already for several decades. They both have a broadband application to numerous classification and regression tasks, producing a state-of-the-art performance. Neural networks are able to successfully approximate even a very complex, non-linear functions. The main disadvantage of neural network is especially a large number of parameters to set and tune. On the contrary, the random forest classifiers have much less parameters and still are able to perform at least competitively.
 
-Neural random forests combine several beneficial properties of random forests and neural networks, which allow them to produce competitive results and often surpass the performance of their predecessing models. Their classification ability is verified and tested in many experimental tasks, including the application on the real dataset and comparison with other competitive models.
+In the last couple of years the attempts to combine these two models have been carried out in order to create hybrid classifiers which could exploit the advantages of both algorithms (such as to preserve the perfect learning ability) and compensate or reduce the effect of disadvantages (such as to decrease the number of parameters). We can mention paper \cite{konkurence}, that describes the way of using the structure of the decision tree and initiates the architecture of the neural network alike. Afterwards, the backpropagation algorithm and gradient-based optimization methods are used to adjust the parameters, which is considered as a better alternative to the simple decision tree splits, eventually producing more complex decision boundaries. Another approach is presented in paper \cite{konkurence2}, which redefines the regular split functions of the decision tree and tune their parameters via a deep neural network. 
+
+Our approach is motivated by the theory presented in \cite{NRF}. It defines the transformation of a single regression tree into an equally performing neural network. Unfortunately, we cannot equivalently convert this approach to the classification case. Therefore we propose an alternative for a classification case and design four different architectures that can be applied to transform a decision tree classifier into a neural network. The greatest emphasis is put especially on transforming a random forest classifier into an ensemble of neural networks. This model is called neural random forest.
+
+Neural random forests combine several beneficial properties of random forests and neural networks, which allow them to produce competitive results and often surpass the performance of their predecessing models. We provide a detailed theoretical derivation of individual models, a verification of functionality and thorough analysis and comparison of the performance. Their classification ability is tested in many experimental tasks, including the application on the real dataset and comparison with other competitive models.
 
 Main contributions of this thesis are:
 
@@ -2614,6 +2619,11 @@ DOI: 10.3233/IDA-130592
 \bibitem{data_reduction}ISBN: 978-0-387-30768-8
 
 \bibitem{clustering}Rokach L., Maimon O. (2005) Clustering Methods. In: Maimon O., Rokach L. (eds) Data Mining and Knowledge Discovery Handbook. Springer, Boston, MA ISBN: 978-0-387-24435-8 .
+
+\bibitem{konkurence}Suhang Wang, Charu Aggarwal, and Huan Liu. 2018. Random-Forest-Inspired Neural Networks. ACM Trans. Intell. Syst. Technol. 9, 6, Article 69 (November 2018), 25 pages. DOI:https://doi.org/10.1145/3232230
+
+\bibitem{konkurence2}https://www.ijcai.org/Proceedings/16/Papers/628.pdf
+
 
 \end{thebibliography}
 
