@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
-\usepackage[toc,page]{appendix} % kdyžtak oddělat
+\usepackage[toc]{appendix} % kdyžtak oddělat
 \usepackage{hf-tikz}%kdyžtak oddělat
 \usepackage[shortlabels]{enumitem}%kdyžtak oddělat
 \usepackage{array}
@@ -33,6 +33,9 @@
 
 % completely avoid widows (last lines of paragraph on a new page)
 \widowpenalty=9500
+
+ 
+
 \begin{document}
 
 
@@ -2017,11 +2020,167 @@ Finally, we tested the performance of NRF\_DW and NRF\_EL\_DW models on the real
 Neural random forests showed a good classification ability with an ambition to overcome other classic models. Even though the time and space complexity is higher than in the case of initialization random forest or a single neural network of similar architecture as individual estimators, the training time can be significantly reduced by usage of parallelization and possibly acceleration on graphical processing units (GPU). If the machine possesses a sufficient number of computational units, the training time of an entire ensemble equals roughly to the training time of a single decision tree and a single feedforward neural network, which makes neural random forests well-applicable even in the case of large datasets. 
 
 
+\begin{thebibliography}{}
+\bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
 
-\chapter{Figures}
-\label{figures}
+\bibitem{evaluation1}G. Canbek, S. Sagiroglu, T. T. Temizel and N. Baykal, "Binary classification performance measures/metrics: A comprehensive visualized roadmap to gain new insights," 2017 International Conference on Computer Science and Engineering (UBMK), Antalya, 2017, pp. 821-826
 
-\pagestyle{empty}
+\bibitem{evaluation2}Koyejo, O. \& Natarajan, Nagarajan \& Ravikumar, P. \& Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
+
+\bibitem{multieval1}Hossin, Mohammad \& M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
+
+\bibitem{multieval2} Branco, Paula \& Torgo, Luís & Ribeiro, Rita. (2017). Relevance-Based Evaluation Metrics for Multi-class Imbalanced Domains. Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics). 698-710. 10.1007/978-3-319-57454-7\_54. 
+
+\bibitem{imbalance}Chawla, Nitesh. (2005). Data Mining for Imbalanced Datasets: An Overview. 10.1007/0-387-25465-X\_40. 
+
+\bibitem{bakalarka}bakalarka
+
+\bibitem{imbalance_data}HE, H. a E. A. GARCIA. Learning from Imbalanced Data. IEEE Transactions on Knowledge and Data Engineering. 2009, (9), 1264-1284.
+
+\bibitem{imbalance3} Akosa, J.S. (2017). Predictive Accuracy : A Misleading Performance Measure for Highly Imbalanced Data.
+
+\bibitem{random_forest_intrusion}Random Forest Modeling for Network Intrusion Detection System
+Citation DataProcedia Computer Science, ISSN: 1877-0509, Vol: 89, Page: 213-217 , 2016
+
+\bibitem{computer_vision} Random Forest and computer vision
+http://pages.iai.uni-bonn.de/frintrop\_simone//BVW13/BVW-gall.pdf
+
+\bibitem{bioinf}R. D´ıaz-Uriarte and S. Alvarez de Andr´es. Gene selection and classification of
+microarray data using random forest. BMC Bioinformatics, 7:1–13, 2006.
+
+\bibitem{text_rec}Bernard, Simon \& Heutte, Laurent \& Adam, Sébastien. (2007). Using Random Forests for Handwritten Digit Recognition. Proceedings of the International Conference on Document Analysis and Recognition, ICDAR. 2. 1043-1047. 10.1109/ICDAR.2007.4377074. 
+
+\bibitem{rf_overfit}Ali, Jehad \& Khan, Rehanullah \& Ahmad, Nasir \& Maqsood, Imran. (2012). Random Forests and Decision Trees. International Journal of Computer Science Issues(IJCSI). 9. 
+
+\bibitem{rf_imp}PARR, Terence, Kerem TURGUTLU, Christopher CSISZAR a Jeremy HOWARD. Beware Default Random Forest Importances. Explained.ai [online]. 2018 [cit. 2018-05-15]. Dostupné z: http://explained.ai/rf-importance/index.html
+
+\bibitem{rf_main}A. Criminisi, J. Shotton, and E. Konukoglu, Decision Forests: A Unified Framework for Classification, Regression, Density Estimation, Manifold Learning and Semi-Supervised Learning. Foundations and Trends in Computer Graphics and Computer Vision, Now Publishers Inc., 2012, 81-227.
+\bibitem{c45}C4.5 algorithm and Multivariate Decision Trees
+Thales Sehn Korting
+
+\bibitem{cart}
+Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression
+Tree Wadsworth \& Brooks/Cole Advanced Books \& Software, Pacific Californi
+
+\bibitem{id3}Xiaohu, Wang & Lele, Wang \& Nianfeng, Li. (2012). An Application of Decision Tree Based on ID3. Physics Procedia. 25. 1017-1021. 10.1016/j.phpro.2012.03.193. 
+
+\bibitem{pruning}Zhou, Xinlei \& Yan, Dasen. (2019). Model tree pruning. International Journal of Machine Learning and Cybernetics. 10.1007/s13042-019-00930-9. 
+
+\bibitem{pruning2}Esposito, Floriana \& Malerba, Donato \& Semeraro, Giovanni \& Kay, John. (1997). A Comparative Analysis of Methods for Pruning Decision Trees. Pattern Analysis and Machine Intelligence, IEEE Transactions on. 19. 476 - 491. 10.1109/34.589207. 
+
+\bibitem{ensemble}Ensemble Methods in Machine Learning
+Thomas G Dietterich
+Oregon State University Corvallis Oregon USA
+tgdcsorstedu WWW home page httpwwwcsorstedutgd
+
+\bibitem{variance_rf} http://www.math.mcgill.ca/yyang/resources/doc/randomforest.pdf
+
+\bibitem{adaboost} Coadou, Yann. (2013). Boosted Decision Trees and Applications. EPJ Web of Conferences. 55. 02004-. 10.1051/epjconf/20135502004. 
+
+\bibitem{adaboost2}
+
+\bibitem{culloch}W.S. McCulloch and W. Pitts. A logical calculus of the ideas immanent
+in nervous activity. Bulletin of Mathematical Biology, 5(4):115–133, 1943.
+
+\bibitem{perceptron}M. Minsky and S. Papert. Perceptrons. MIT Press, Cambridge, Mass,
+1969.
+
+\bibitem{werbos} P. J. Werbos. Beyond Regression: New Tools for Prediction and Analysis
+in the Behavioral Sciences. PhD thesis, Harvard University, 1974.
+
+\bibitem{backprop-cit}D. Rumelhart, G. Hinton, and R. Williams. Learning representations by
+back-propagating errors. Nature, 323:533–536, October 1986
+
+\bibitem{perceptron-nonsep}http://www.dkriesel.com/\_media/science/neuronalenetze-en-zeta2-2col-dkrieselcom.pdf
+
+\bibitem{nn-application}Hordri, Nur \& Yuhaniz, Siti \& Shamsuddin, Siti Mariyam. (2016). Deep Learning and Its Applications: A Review. 
+
+\bibitem{feedforward} http://static.latexstudio.net/article/2018/0912/neuralnetworksanddeeplearning.pdf
+
+\bibitem{cybenko}Cybenko, G. (1989) "Approximations by superpositions of sigmoidal functions", Mathematics of Control, Signals, and Systems, 2(4), 303–314. doi:10.1007/BF02551274
+
+\bibitem{resnet}https://arxiv.org/pdf/1909.04653.pdf
+
+\bibitem{actfunc}https://arxiv.org/pdf/1811.03378.pdf
+
+\bibitem{tanh_prefer}B. Karlik and A. Vehbi, “Performance Analysis of Various Activation Functions in Generalized MLP Architectures of Neural Networks,”
+International Journal of Artificial Intelligence and Expert Systems (IJAE), vol. 1, no. 4, pp. 111–122, 2011. [Online]. Available:
+http://www.cscjournals.org/library/manuscriptinfo.php
+
+\bibitem{relu}https://www.cs.toronto.edu/~fritz/absps/reluICML.pdf
+
+\bibitem{leaky}https://arxiv.org/pdf/1804.02763.pdf
+
+\bibitem{grad}https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
+
+\bibitem{backprop}http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf citováno 30.3.2020
+
+\bibitem{numpy}https://numpy.org/
+
+\bibitem{adam_weightdecay}https://openreview.net/pdf?id=rk6qdGgCZ
+
+\bibitem{scikit} Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
+
+\bibitem{keras} Keras. Chollet, Francois and others. 2015. \url{https://keras.io}
+
+\bibitem{saturation}Bosman, Anna \& Engelbrecht, Andries. (2015). Measuring Saturation in Neural Networks. 10.1109/SSCI.2015.202. 
+
+\bibitem{lucas} www.lucascz.cz (cited 14.5.2020)
+
+\bibitem{roc} https://doi.org/10.1016/j.patrec.2005.10.010
+
+\bibitem{roc_analysis} ROC analysis of classifiers in machine learning: A survey
+May 2013Intelligent Data Analysis 17(3):531-558
+DOI: 10.3233/IDA-130592
+
+\bibitem{pr_roc_diff} https://www.biostat.wisc.edu/~page/rocpr.pdf
+
+\bibitem{adam}https://arxiv.org/pdf/1609.04747.pdf
+
+\bibitem{adam2}Diederik P. Kingma and Jimmy Lei Ba. Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, pages 1–13, 2015.
+
+\bibitem{adam3}https://arxiv.org/pdf/1412.6980.pdf
+
+\bibitem{learn_slow}Golik, Pavel & Doetsch, Patrick & Ney, Hermann. (2013). Cross-Entropy vs. Squared Error Training: a Theoretical and Experimental Comparison. Proceedings of the Annual Conference of the International Speech Communication Association, INTERSPEECH. 1756-1760. 
+
+\bibitem{note_backprop}https://www.ics.uci.edu/~pjsadows/notes.pdf
+
+\bibitem{loss_func}https://arxiv.org/pdf/1702.05659.pdf
+
+\bibitem{regularization}https://pdfs.semanticscholar.org/0e9f/88e8f47b7a1b73d9090f0da3f0e5c2bec9aa.pdf
+
+\bibitem{adam_criticism}https://openreview.net/pdf?id=rk6qdGgCZ
+
+\bibitem{dropout} https://papers.nips.cc/paper/4878-understanding-dropout.pdf
+
+\bibitem{data_reduction}ISBN: 978-0-387-30768-8
+
+\bibitem{clustering}Rokach L., Maimon O. (2005) Clustering Methods. In: Maimon O., Rokach L. (eds) Data Mining and Knowledge Discovery Handbook. Springer, Boston, MA ISBN: 978-0-387-24435-8 .
+
+\bibitem{konkurence}Suhang Wang, Charu Aggarwal, and Huan Liu. 2018. Random-Forest-Inspired Neural Networks. ACM Trans. Intell. Syst. Technol. 9, 6, Article 69 (November 2018), 25 pages. DOI:https://doi.org/10.1145/3232230
+
+\bibitem{konkurence2}https://www.ijcai.org/Proceedings/16/Papers/628.pdf
+
+\bibitem{logregression}Maher Maalouf, 2011. "Logistic regression in data analysis: an overview," International Journal of Data Analysis Techniques and Strategies, Inderscience Enterprises Ltd, vol. 3(3), pages 281-299.
+
+\bibitem{svm}AWAD, Mariette a Rahul KHANNA. Support Vector Machines for Classification. AWAD, Mariette a Rahul KHANNA. Efficient Learning Machines [online]. Berkeley, CA: Apress, 2015, 2015-04-27, s. 39-66 [cit. 2020-06-26]. DOI: 10.1007/978-1-4302-5990-9\_3. ISBN 978-1-4302-5989-3. Available at: http://link.springer.com/10.1007/978-1-4302-5990-9\_3
+
+
+\end{thebibliography}
+%\chapter{Figures}
+%\label{figures}
+\newpage
+\appendix
+\renewcommand\thefigure{A\arabic{figure}}
+\setcounter{figure}{0}
+\thispagestyle{fancy}
+\fancyhf{}
+%\thispagestyle{fancy}
+%\pagestyle{appendix}
+\lhead{\huge{\textbf{Appendix A}}}
+\rhead{\thepage}
+%\pagenumbering{gobble}
+%\pagestyle{empty}
 \vfill
 \begin{figure}[h!]
 \centering
@@ -2053,6 +2212,11 @@ Neural random forests showed a good classification ability with an ambition to o
 \label{learning_rates}
 \end{figure}
 \vfill
+\newpage
+\clearpage
+\fancyhf{}
+\pagestyle{fancy}
+\rhead{\thepage}
 
 \vfill
 \begin{figure}[h!]
@@ -2500,162 +2664,13 @@ Neural random forests showed a good classification ability with an ambition to o
 \label{figures:pr_curves}
 \end{figure}
 \vfill
-
-\begin{thebibliography}{}
-\bibitem{NRF} Neural Random Forest. Gerard Biau, Erwan Scornet, Johannes Welbl
-
-\bibitem{evaluation1}G. Canbek, S. Sagiroglu, T. T. Temizel and N. Baykal, "Binary classification performance measures/metrics: A comprehensive visualized roadmap to gain new insights," 2017 International Conference on Computer Science and Engineering (UBMK), Antalya, 2017, pp. 821-826
-
-\bibitem{evaluation2}Koyejo, O. \& Natarajan, Nagarajan \& Ravikumar, P. \& Dhillon, I.S.. (2014). Consistent binary classification with generalized performance metrics. Advances in Neural Information Processing Systems. 3. 2744-2752. 
-
-\bibitem{multieval1}Hossin, Mohammad \& M.N, Sulaiman. (2015). A Review on Evaluation Metrics for Data Classification Evaluations. International Journal of Data Mining \& Knowledge Management Process. 5. 01-11. 10.5121/ijdkp.2015.5201. 
-
-\bibitem{multieval2} Branco, Paula \& Torgo, Luís & Ribeiro, Rita. (2017). Relevance-Based Evaluation Metrics for Multi-class Imbalanced Domains. Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics). 698-710. 10.1007/978-3-319-57454-7\_54. 
-
-\bibitem{imbalance}Chawla, Nitesh. (2005). Data Mining for Imbalanced Datasets: An Overview. 10.1007/0-387-25465-X\_40. 
-
-\bibitem{bakalarka}bakalarka
-
-\bibitem{imbalance_data}HE, H. a E. A. GARCIA. Learning from Imbalanced Data. IEEE Transactions on Knowledge and Data Engineering. 2009, (9), 1264-1284.
-
-\bibitem{imbalance3} Akosa, J.S. (2017). Predictive Accuracy : A Misleading Performance Measure for Highly Imbalanced Data.
-
-\bibitem{random_forest_intrusion}Random Forest Modeling for Network Intrusion Detection System
-Citation DataProcedia Computer Science, ISSN: 1877-0509, Vol: 89, Page: 213-217 , 2016
-
-\bibitem{computer_vision} Random Forest and computer vision
-http://pages.iai.uni-bonn.de/frintrop\_simone//BVW13/BVW-gall.pdf
-
-\bibitem{bioinf}R. D´ıaz-Uriarte and S. Alvarez de Andr´es. Gene selection and classification of
-microarray data using random forest. BMC Bioinformatics, 7:1–13, 2006.
-
-\bibitem{text_rec}Bernard, Simon \& Heutte, Laurent \& Adam, Sébastien. (2007). Using Random Forests for Handwritten Digit Recognition. Proceedings of the International Conference on Document Analysis and Recognition, ICDAR. 2. 1043-1047. 10.1109/ICDAR.2007.4377074. 
-
-\bibitem{rf_overfit}Ali, Jehad \& Khan, Rehanullah \& Ahmad, Nasir \& Maqsood, Imran. (2012). Random Forests and Decision Trees. International Journal of Computer Science Issues(IJCSI). 9. 
-
-\bibitem{rf_imp}PARR, Terence, Kerem TURGUTLU, Christopher CSISZAR a Jeremy HOWARD. Beware Default Random Forest Importances. Explained.ai [online]. 2018 [cit. 2018-05-15]. Dostupné z: http://explained.ai/rf-importance/index.html
-
-\bibitem{rf_main}A. Criminisi, J. Shotton, and E. Konukoglu, Decision Forests: A Unified Framework for Classification, Regression, Density Estimation, Manifold Learning and Semi-Supervised Learning. Foundations and Trends in Computer Graphics and Computer Vision, Now Publishers Inc., 2012, 81-227.
-\bibitem{c45}C4.5 algorithm and Multivariate Decision Trees
-Thales Sehn Korting
-
-\bibitem{cart}
-Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression
-Tree Wadsworth \& Brooks/Cole Advanced Books \& Software, Pacific Californi
-
-\bibitem{id3}Xiaohu, Wang & Lele, Wang \& Nianfeng, Li. (2012). An Application of Decision Tree Based on ID3. Physics Procedia. 25. 1017-1021. 10.1016/j.phpro.2012.03.193. 
-
-\bibitem{pruning}Zhou, Xinlei \& Yan, Dasen. (2019). Model tree pruning. International Journal of Machine Learning and Cybernetics. 10.1007/s13042-019-00930-9. 
-
-\bibitem{pruning2}Esposito, Floriana \& Malerba, Donato \& Semeraro, Giovanni \& Kay, John. (1997). A Comparative Analysis of Methods for Pruning Decision Trees. Pattern Analysis and Machine Intelligence, IEEE Transactions on. 19. 476 - 491. 10.1109/34.589207. 
-
-\bibitem{ensemble}Ensemble Methods in Machine Learning
-Thomas G Dietterich
-Oregon State University Corvallis Oregon USA
-tgdcsorstedu WWW home page httpwwwcsorstedutgd
-
-\bibitem{variance_rf} http://www.math.mcgill.ca/yyang/resources/doc/randomforest.pdf
-
-\bibitem{adaboost} Coadou, Yann. (2013). Boosted Decision Trees and Applications. EPJ Web of Conferences. 55. 02004-. 10.1051/epjconf/20135502004. 
-
-\bibitem{adaboost2}
-
-\bibitem{culloch}W.S. McCulloch and W. Pitts. A logical calculus of the ideas immanent
-in nervous activity. Bulletin of Mathematical Biology, 5(4):115–133, 1943.
-
-\bibitem{perceptron}M. Minsky and S. Papert. Perceptrons. MIT Press, Cambridge, Mass,
-1969.
-
-\bibitem{werbos} P. J. Werbos. Beyond Regression: New Tools for Prediction and Analysis
-in the Behavioral Sciences. PhD thesis, Harvard University, 1974.
-
-\bibitem{backprop-cit}D. Rumelhart, G. Hinton, and R. Williams. Learning representations by
-back-propagating errors. Nature, 323:533–536, October 1986
-
-\bibitem{perceptron-nonsep}http://www.dkriesel.com/\_media/science/neuronalenetze-en-zeta2-2col-dkrieselcom.pdf
-
-\bibitem{nn-application}Hordri, Nur \& Yuhaniz, Siti \& Shamsuddin, Siti Mariyam. (2016). Deep Learning and Its Applications: A Review. 
-
-\bibitem{feedforward} http://static.latexstudio.net/article/2018/0912/neuralnetworksanddeeplearning.pdf
-
-\bibitem{cybenko}Cybenko, G. (1989) "Approximations by superpositions of sigmoidal functions", Mathematics of Control, Signals, and Systems, 2(4), 303–314. doi:10.1007/BF02551274
-
-\bibitem{resnet}https://arxiv.org/pdf/1909.04653.pdf
-
-\bibitem{actfunc}https://arxiv.org/pdf/1811.03378.pdf
-
-\bibitem{tanh_prefer}B. Karlik and A. Vehbi, “Performance Analysis of Various Activation Functions in Generalized MLP Architectures of Neural Networks,”
-International Journal of Artificial Intelligence and Expert Systems (IJAE), vol. 1, no. 4, pp. 111–122, 2011. [Online]. Available:
-http://www.cscjournals.org/library/manuscriptinfo.php
-
-\bibitem{relu}https://www.cs.toronto.edu/~fritz/absps/reluICML.pdf
-
-\bibitem{leaky}https://arxiv.org/pdf/1804.02763.pdf
-
-\bibitem{grad}https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
-
-\bibitem{backprop}http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf citováno 30.3.2020
-
-\bibitem{numpy}https://numpy.org/
-
-\bibitem{adam_weightdecay}https://openreview.net/pdf?id=rk6qdGgCZ
-
-\bibitem{scikit} Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011.
-
-\bibitem{keras} Keras. Chollet, Francois and others. 2015. \url{https://keras.io}
-
-\bibitem{saturation}Bosman, Anna \& Engelbrecht, Andries. (2015). Measuring Saturation in Neural Networks. 10.1109/SSCI.2015.202. 
-
-\bibitem{lucas} www.lucascz.cz (cited 14.5.2020)
-
-\bibitem{roc} https://doi.org/10.1016/j.patrec.2005.10.010
-
-\bibitem{roc_analysis} ROC analysis of classifiers in machine learning: A survey
-May 2013Intelligent Data Analysis 17(3):531-558
-DOI: 10.3233/IDA-130592
-
-\bibitem{pr_roc_diff} https://www.biostat.wisc.edu/~page/rocpr.pdf
-
-\bibitem{adam}https://arxiv.org/pdf/1609.04747.pdf
-
-\bibitem{adam2}Diederik P. Kingma and Jimmy Lei Ba. Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, pages 1–13, 2015.
-
-\bibitem{adam3}https://arxiv.org/pdf/1412.6980.pdf
-
-\bibitem{learn_slow}Golik, Pavel & Doetsch, Patrick & Ney, Hermann. (2013). Cross-Entropy vs. Squared Error Training: a Theoretical and Experimental Comparison. Proceedings of the Annual Conference of the International Speech Communication Association, INTERSPEECH. 1756-1760. 
-
-\bibitem{note_backprop}https://www.ics.uci.edu/~pjsadows/notes.pdf
-
-\bibitem{loss_func}https://arxiv.org/pdf/1702.05659.pdf
-
-\bibitem{regularization}https://pdfs.semanticscholar.org/0e9f/88e8f47b7a1b73d9090f0da3f0e5c2bec9aa.pdf
-
-\bibitem{adam_criticism}https://openreview.net/pdf?id=rk6qdGgCZ
-
-\bibitem{dropout} https://papers.nips.cc/paper/4878-understanding-dropout.pdf
-
-\bibitem{data_reduction}ISBN: 978-0-387-30768-8
-
-\bibitem{clustering}Rokach L., Maimon O. (2005) Clustering Methods. In: Maimon O., Rokach L. (eds) Data Mining and Knowledge Discovery Handbook. Springer, Boston, MA ISBN: 978-0-387-24435-8 .
-
-\bibitem{konkurence}Suhang Wang, Charu Aggarwal, and Huan Liu. 2018. Random-Forest-Inspired Neural Networks. ACM Trans. Intell. Syst. Technol. 9, 6, Article 69 (November 2018), 25 pages. DOI:https://doi.org/10.1145/3232230
-
-\bibitem{konkurence2}https://www.ijcai.org/Proceedings/16/Papers/628.pdf
-
-\bibitem{logregression}Maher Maalouf, 2011. "Logistic regression in data analysis: an overview," International Journal of Data Analysis Techniques and Strategies, Inderscience Enterprises Ltd, vol. 3(3), pages 281-299.
-
-\bibitem{svm}AWAD, Mariette a Rahul KHANNA. Support Vector Machines for Classification. AWAD, Mariette a Rahul KHANNA. Efficient Learning Machines [online]. Berkeley, CA: Apress, 2015, 2015-04-27, s. 39-66 [cit. 2020-06-26]. DOI: 10.1007/978-1-4302-5990-9\_3. ISBN 978-1-4302-5989-3. Available at: http://link.springer.com/10.1007/978-1-4302-5990-9\_3
-
-
-\end{thebibliography}
-
 \newpage
+\clearpage
+\fancyhf{}
 \pagestyle{fancy}
-\chead{\huge{\textbf{Appendix B}}}
-%\begin{flushleft}
-%\huge{\textbf{Appendix B}}    
-%\end{flushleft}
-%\addcontentsline{toc}{toc}{Appendix B}
+\lhead{\huge{\textbf{Appendix B}}}
+\rhead{\thepage}
+
 \subsubsection{Proof 1:}
 \label{proof1}
 
@@ -2735,10 +2750,6 @@ DOI: 10.3233/IDA-130592
     \item The matrix is upper triangular, so the result is obtained by the multiplication of diagonal entries.
 \end{enumerate}
 \endgroup
-
-
-
-
 
 
 
