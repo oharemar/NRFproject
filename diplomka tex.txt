@@ -3,10 +3,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
 \usepackage{graphicx}
+\usepackage[toc,page]{appendix} % kdyžtak oddělat
 \usepackage{hf-tikz}%kdyžtak oddělat
 \usepackage[shortlabels]{enumitem}%kdyžtak oddělat
 \usepackage{array}
 \usepackage{mathtools}
+\usepackage{fancyhdr}% pro appendixy, kdyžtak odstranit
 \usepackage{babel}
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -263,7 +265,7 @@ The conclusion of the thesis is presented in chapter 8.
 
 \section{Terminology}
 
-In this thesis we focus mainly on the task of classification, which embodies the procedure of assigning one or more labels to the observations of studied area. Individual labels represent different \textit{classes}, which group observations with common features. We distinguish two main categories of classification - \textit{binary} and \textit{multiclass} classification. In the binary case we discriminate 2 classes, which are generally denoted as 1 and 0 for work purposes. They could represent either a positive or a negative case. Specifically, we could distinguish for example \textit{rain} vs \textit{no rain}, \textit{ill} vs \textit{healthy}, \textit{declined} vs \textit{granted} and so on. In the multiclass case we discriminate several different classes (binary classification is a special case of multiclass classification).
+In this thesis we focus mainly on the task of classification, which embodies the procedure of assigning one or more labels to the observations of studied area. Individual labels represent different \textit{classes}, which group observations with common features. We distinguish two main categories of classification - \textit{binary} and \textit{multiclass} classification. In the binary case we discriminate 2 classes, which are generally denoted as 1 and 0 for work purposes. They could represent either a positive or a negative case. Specifically, we could distinguish for example \textit{rain} vs \textit{no rain}, \textit{ill} vs \textit{healthy}, \textit{declined} vs \textit{granted} and so on. In the multiclass case we discriminate several different classes (binary classification is a special case of multiclass classification). In this thesis we focus exclusively on the classification of instances to only one class (only one label is predicted). There is also a multi-label classification, which can assign multiple labels to an instance, but we do not use this type of classification.
 
 Classification can be included among \textit{supervised learning}, which belongs to the main machine learning paradigms:
 
@@ -277,7 +279,9 @@ Classification can be included among \textit{supervised learning}, which belongs
     \item \textbf{Reinforcement learning}: This paradigm comprises a group of machine learning algorithms, whose learning is based on feedback. In other words, the algorithm monitors surroundings and performs actions in order to maximize predefined reward. It does not require labelled inputs as in the case of supervised learning methods.
 \end{enumerate}
 
-Before we train the classification model (to learn the mapping function), we usually divide the available set of instances into the training subset and the testing subset (occasionally an extra validation subset). Then, the training subset is used to train the classification model and the testing subset is used to evaluate its performance. Validation subsets are often used to tune the parameters of the model (if necessary). When we do not explicitly supply the training and testing subsets, the standard way is to randomly split the set of instances multiple times and each time choose one subset as a training set and the other one as a testing set. The example of this procedure is \textit{K-fold cross validation}. This procedure divides the dataset into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length) and then the \textit{K}-1 parts are used as the training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times, so in each iteration a different combination of training and testing set is applied.
+Before we train the classification model (to learn the mapping function), we usually divide the available set of instances into the training subset and the testing subset (occasionally an extra validation subset). Then, the training subset is used to train the classification model and the testing subset is used to evaluate its performance. Validation subsets are often used to tune the parameters of the model (if necessary). When we do not explicitly supply the training and testing subsets, the standard way is to randomly split the set of instances multiple times and each time choose one subset as a training set and the other one as a testing set. The example of this procedure is \textit{K-fold cross validation}. This procedure divides the dataset into \textit{K}$\in \mathbb{N}$ disjunct parts (usually of the same length) and then the \textit{K}-1 parts are used as the training set and the remaining part is used for testing. In the next iteration, another \textit{K}-1 parts are picked for training and the rest for testing. This procedure is repeated for \textit{K} times, so in each iteration a different combination of training and testing set is applied. Then, the evaluation results are usually averaged across all iterations of the procedure.
+
+Speaking of the classification and machine learning in general, we must mention also two related problems associated with the training of classification models. The first one is called \textit{underfitting}. This problem often arises, when the complexity (usually measured by a number of parameters of the model) of our model is too low. Simply put, the model is too easy. In this case the model is unable to fit sufficiently the training data, which causes a significant testing error on the testing dataset. We say that the model has high bias and low variance. On the contrary, the \textit{overfitting} problem arises, when the complexity of our model is too big and the model is too complicated. In this case, the performance on the training dataset is perfect, but the performance on the testing dataset is poor. Overfitted models tend to approximate the training data too accurately, which substantially degradates their generalization ability. We say that the model has low bias and big variance. Both problems are undesirable and degradate the performance of our model.
 
 The evaluation of model performance is a crucial part of classification and will be discussed in the following section.
 
@@ -288,9 +292,9 @@ This section is focused on the summary and description of evaluation metrics use
 
 In the literature we can find a significant amount of studies addressing the choice of evaluation metrics in the case of either binary classification \cite{evaluation1,evaluation2} or multi-class classification \cite{multieval1,multieval2}.
 
-The classification models in this thesis are tested on multiple datasets, both binary and multi-class classification oriented. Consequently, there is not any particular property that could discriminate correct (the most correct) setting of evaluation methods in general, unless we study each dataset separately, which is not the purpose of this thesis at all. We only desire to compare the classification performance quality of neural random forest mainly to the performance of regular random forests and provide evidence of superiority of neural random forests. Therefore we select subset of worldwide-accepted, well-functional evaluation techniques, summarize them and describe them separately. A combination of these metrics provides sufficient evaluation to form a conclusion.
+The classification models in this thesis are tested on multiple datasets, both binary and multi-class classification oriented. Consequently, there is not any particular property that could discriminate correct (the most correct) setting of evaluation methods in general, unless we study each dataset separately, which is not the purpose of this thesis at all. We only desire to compare the classification performance of neural random forests mainly to the performance of regular random forests and provide evidence of superiority of neural random forests. Therefore we select subset of worldwide-accepted, well-functional evaluation techniques, summarize them and describe them separately. A combination of these metrics provides sufficient evaluation to form a conclusion.
 
-Firstly, we define important notation that is referenced in the upcoming descriptions. This applies generally to the multi-class classification with arbitrary number of classes (labels). The set of all classes is denoted as $\mathbb{C}$.
+Firstly, we define an important notation that is referenced in the upcoming descriptions. This applies generally to the multi-class classification with arbitrary number of classes. The set of all classes is denoted as $\mathbb{C}$.
 
 \begin{definition}
 \textit{Positive} class $c \in \mathbb{C}$ is such a label that is in the current scope of interest. Other classes $d \neq c$, $d \in \mathbb{C}$, are called \textit{negative} classes.
@@ -321,25 +325,25 @@ To clarify \ref{definition_pos_neg}, if we test the  classification performance 
 Accuracy is probably the most frequently applied evaluation metric in the machine learning society, which provides quick and simple evaluation of the classification performance. The outcome of this metric is the ratio between the number of correctly classified instances and the number of all instances. It is usually a single value per classifier (not specific to individual classes) and it is defined as
 
 \begin{equation}
-    Accuracy = \frac{\text{number of correctly classified instances}}{\text{number of all instances}} \hspace{0.2cm}
+    accuracy = \frac{\text{number of correctly classified instances}}{\text{number of all instances}} \hspace{0.2cm}
 \end{equation}
 
 Altough accuracy can simply provide an evaluation of the quality of classification, it possesses some significant drawbacks \cite{multieval1} and therefore relying only on this metric in final evaluation is dangerous. It does not take into account membership of instances to either positive or negative classes. Serious problem arises especially when processing imbalanced data \cite{imbalance}, which is the case of many real-world applications (fraud and malware detection \cite{bakalarka} etc.).
 
-For instance, imagine data distributed into two classes, class 0 with 98\% occurrence and class 1 with only 2\% occurrence. This dataset is clearly significantly imbalanced. Moreover, we put higher preference on correctly classifying minority class 1 (e.g. consider class 1 as malware type communication and class 0 as arbitrary safe network communication, it could be basically anything rare vs. normal). Also define naive classifier to constantly classifying any instance as class 0. In this case, accuracy of this model is $Acc = 98\%$, which is very high. Based only on this value, the classification performance of our naive model is perfect. But claiming that this model is good is wrong, since it completely fails in classifying minority class, which has the highest priority. So even that accuracy is very high, the model itself is absolutely useless.
+For instance, imagine data distributed into two classes, class 0 with 98\% occurrence and class 1 with only 2\% occurrence. This dataset is clearly significantly imbalanced. Moreover, we put higher preference on correctly classifying minority class 1 (e.g. consider class 1 as malware type communication and class 0 as arbitrary safe network communication, it could be basically anything rare vs. normal). We also define a naive classifier to constantly classifying any instance as class 0. In this case, accuracy of this model is $Acc = 98\%$, which is very high. Based only on this value, the classification performance of our naive model is almost perfect. But claiming that this model is good is wrong, since it completely fails in classifying minority class, which has the highest priority. So even that accuracy is very high, the model itself is absolutely useless.
 
 \subsubsection{Precision}
 
 Another evaluation metric is called precision and is class-sensitive. In the contrast to the accuracy, it is computed for any particular class $c \in \mathbb{C}$ as
 \begin{equation}
-    Precision(c) = \frac{\text{TP}(c)}{\text{TP}(c)+\text{FP}(c)}
+    precision(c) = \frac{\text{TP}(c)}{\text{TP}(c)+\text{FP}(c)}
 \end{equation}
 
 It expresses the ratio between correctly predicted positive instances and all instances predicted as positive. In other words, it shows how precise is our classification model in predicting positive class.
 
 This metric is also dependent on the rate of imbalance among current data. Let's suppose adding negative instances to the dataset. Then 
 
-$$\text{FP}^{\text{less}}(c) \leq \text{FP}^{\text{more}}(c) \implies Precision^{\text{less}}(c) \geq Precision^{\text{more}}(c)$$
+$$\text{FP}^{\text{before}}(c) \leq \text{FP}^{\text{after}}(c) \implies precision^{\text{before}}(c) \geq precision^{\text{after}}(c)$$
 
 So even if our classifier predicts all positive instances correctly, the precision tends to decrease with increasing number of negative instances.
 
@@ -348,7 +352,7 @@ So even if our classifier predicts all positive instances correctly, the precisi
 This metric is computed for class $c \in \mathbb{C}$ as
 
 \begin{equation}
-    Recall(c) = \frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)}
+    recall(c) = \frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)}
 \end{equation}
 
 Recall expresses ratio between number of correctly classified positive instances and number of all positive instances. Clearly, this metric does not depend on the rate of imbalance in our data and therefore is suitable choice for evaluation on imbalance datasets.
@@ -360,7 +364,7 @@ In many applications of classification on imbalance datasets is put a strong req
 F-measure metric combines precision and recall into single value as
 
 \begin{equation}
-    F_\beta(c) = \frac{(1+\beta^2)\cdot Precision(c) \cdot Recall(c)}{\beta^2 \cdot Precision(c) + Recall(c)}\hspace{0.5cm} ,
+    F_\beta(c) = \frac{(1+\beta^2)\cdot precision(c) \cdot recall(c)}{\beta^2 \cdot precision(c) + recall(c)}\hspace{0.5cm} ,
 \end{equation}
 where $c \in \mathbb{C}$ and $\beta$ is a coefficient which serves to adjust relative importance between precision and recall (often $\beta = 1$). For $\beta = 1$ it expresses harmonic mean of precision and recall. As $\beta \rightarrow 0$ the formula considers only precision and as $\beta \rightarrow \infty$ the formula considers only recall. Generally, $\beta < 1$ favors precision and $\beta > 1$ favors recall. It depends on a specific application to choose $\beta$ appropriately. For $\beta = 1$ we refer to the corresponding F-measure as F1-score.
 
@@ -372,7 +376,7 @@ G-measure is computed as
     G(c) = \sqrt{\frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)} \cdot \frac{\text{TN}(c)}{\text{TN}(c) + \text{FP}(c)}} \hspace{0.5cm},
     \label{g-meas}
 \end{equation}
-where $c \in \mathbb{C}$. The left factor in multiplication under the square root in \eqref{g-meas} is called \textit{Sensitivity} or \textit{true positive rate} (same as recall) and the right factor is called \textit{Specificity} or \textit{true negative rate}.
+where $c \in \mathbb{C}$. The left factor in multiplication under the square root in \eqref{g-meas} is called \textit{sensitivity} or \textit{true positive rate} (same as recall) and the right factor is called \textit{specificity} or \textit{true negative rate}.
 
 Optimization of this metric secures good balance between classification performance on both minority and majority classes. In the case of imbalance, even if the classification performance on negative instances is perfect, G-measure would end significantly low if classification of positive instances is poor \cite{imbalance3}. This is valuable property which makes this metric well-applicable to evaluation of the classification model on imbalanced data.
 
@@ -381,29 +385,31 @@ Optimization of this metric secures good balance between classification performa
 For arbitrary (class-sensitive) evaluation metric $f(\cdot)$ is macro/weighted average defined as
 
 \begin{equation}
-    MacroAvg(f) = \frac{\sum_{l=1}^{M}f(c_l)}{M}
+    macroAvg(f) = \frac{\sum_{l=1}^{M}f(c_l)}{M}
 \end{equation}
 \begin{equation}
-    WeightedAvg(f) = \frac{\sum_{l=1}^{M}n_l \cdot f(c_l)}{\sum_{l=1}^{M}n_l} \hspace{0.5cm},
+    weightedAvg(f) = \frac{\sum_{l=1}^{M}n_l \cdot f(c_l)}{\sum_{l=1}^{M}n_l} \hspace{0.5cm},
 \end{equation}
 where $c_l, l \in \{1,2,...,M\}$ is $l$-th class, $n_l$ is count of (testing) instances belonging to $c_l$ and $M$ is total number of classes.
 
 It is also worth to mention \textbf{micro average} of precision and recall, which is defined as
 
 \begin{equation}
-    MicroAvg(Precision) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FP}(c_l))}
+    microAvg(precision) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FP}(c_l))}
+    \label{micPrec}
 \end{equation}
 
 \begin{equation}
-    MicroAvg(Recall) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FN}(c_l))}
+    microAvg(recall) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FN}(c_l))}
+    \label{micRe}
 \end{equation}
 
-$MicroAvg(Precision)$ computes basically fraction of the sum of all correctly predicted instances and sum of all correctly and incorrectly predicted instances, which is the sum of all instances. Therefore it expresses same value as accuracy of the model. Furthermore, since $\sum_{l=1}^{M}\text{FN}(c_l) = \sum_{l=1}^{M}\text{FP}(c_l)$, both values are equal. Note that this applies to the classification problems where predicting 
+$microAvg(precision)$ computes basically fraction of the sum of all correctly predicted instances and sum of all correctly and incorrectly predicted instances, which is the sum of all instances. Therefore it expresses same value as accuracy of the model. Furthermore, since $\sum_{l=1}^{M}\text{FN}(c_l) = \sum_{l=1}^{M}\text{FP}(c_l)$, both values \eqref{micPrec} and \eqref{micRe} are equal. Note that this may not apply in the case of multi-label classification.
 
 
 \subsubsection{ROC curve}
 
-ROC (receiver operator characteristics) curve \cite{roc} is a popular graphical technique used for comparison of performance of classifiers mainly in the case of binary classification tasks. It is a two dimensional visualization depicting the true positive rate (TPR) on the vertical axis and the false positive rate (FPR) on the horizontal axis for all meaningful decision thresholds. In the binary settings (negative class 0 and positive class 1), TPR and FPR are defined as
+ROC (receiver operating characteristics) curve \cite{roc} is a popular graphical technique used for comparison of performance of classifiers mainly in the case of binary classification tasks. It is a two dimensional visualization depicting the true positive rate (TPR) on the vertical axis and the false positive rate (FPR) on the horizontal axis for all meaningful decision thresholds. In the binary settings (negative class 0 and positive class 1), TPR and FPR are defined as
 
 \begin{align}
     \text{TPR} &= \frac{\text{TP}}{\text{TP} + \text{FN}} \\
@@ -416,55 +422,55 @@ Each threshold represents the decision boundary between negative and positive cl
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{roc_prezentace.png}
-\caption{This graph depicts examples of ROC curves. In the blue is visualized ROC curve of Random Forest classifier. In the red is visualized ROC curve of random classifier and in the orange is ROC curve of perfect classifier.}
+\caption{This graph depicts examples of ROC curves. In the blue is visualized ROC curve of random forest classifier. In the red is visualized ROC curve of random classifier and in the orange is ROC curve of perfect classifier.}
 \label{fig:roc}
 \end{figure}
 
 By meaningful thresholds are considered values that define different TP, FP, TN and FN combinations, which determine FPR and TPR pairs. Imagine a model classifying 5 instances belonging to 2 different classes (class 0 and class 1) labelled as 0,0,1,1,0. The model outputted probabilities of positive class for these instances as 0.1, 0.6, 0.8, 0.4, 0.1. Then if we choose the decision threshold as 0.2, we obtain TP=2, FP=1, TN=2, FN=0. But same values are obtained also if the decision threshold is set to 0.3, therefore both choices of the decision threshold result in the same FPR and TPR pair. Thus only one threshold is used and the other is redundant. One possible procedure of picking the thresholds would be first to select the unique prediction scores (probabilities), then sort them by size, add the limit values below respectively above the lowest respectively the highest value and finally select one value in each outlined interval.
 
-The example of ROC curves is depicted in the Figure \ref{fig:roc}. Imagine purely random classifier assigning positive class probability randomly (drawn from uniform distribution between 0 and 1) to each instance. Then its ROC curve corresponds to the line connecting points [0,0] and [1,1] (red ROC curve in the Figure \ref{fig:roc}) \cite{roc_analysis}. This can be correctly proven by means of probability, but we can intuitively imagine that each instance is predicted with the positive class probability of 0.5 and therefore there are only two possible thresholds (below and above 0.5), which corresponds to the [0,0] and [1,1] points in ROC space, because once is everything classified as negative and once as positive. Classifiers with a similar ROC curve shape as this straight diagonal line perform similarly as random guessing, which is not very good. On the contrary, a perfect classifier assigning always 1 to positive instances and 0 to negative instances has same shape as the orange ROC curve in the Figure \ref{fig:roc}. This represents the best possible performance that may be depicted in the ROC space. It is generally considered that the closer the classifier is in ROC space to the ideal point [0,1], the better performance it has.
+The example of ROC curves is depicted in the Figure \ref{fig:roc}. Imagine purely random classifier assigning positive class probability randomly (drawn from uniform distribution between 0 and 1) to each instance. Then its ROC curve corresponds to the line connecting points [0;0] and [1;1] (red ROC curve in the Figure \ref{fig:roc}) \cite{roc_analysis}. This can be correctly proven by means of probability, but we can intuitively imagine that each instance is predicted with the positive class probability of 0.5 and therefore there are only two possible thresholds (below and above 0.5), which corresponds to the [0;0] and [1;1] points in ROC space, because once is everything classified as negative and once as positive. Classifiers with a similar ROC curve shape as this straight diagonal line perform similarly as random guessing, which is not very good. On the contrary, a perfect classifier assigning always 1 to positive instances and 0 to negative instances has same shape as the orange ROC curve in the Figure \ref{fig:roc}. This represents the best possible performance that may be depicted in the ROC space. It is generally considered that the closer the classifier is in ROC space to the ideal point [0;1], the better performance it has.
 
 Apparently it could be difficult to compare some curves only visually. Another popular technique to evaluate performance of classifiers is to aggregate ROC curve into single value by computing the area under the ROC curve (AUC) \cite{roc}. Since the ROC curves are closed in the square with the unit side, the maximum value of AUC is 1 and the minimum value is 0. AUC of the random classifier is 0.5 and AUC of the perfect classifier is 1. Usually higher AUC values characterize better performance. AUC value could be also statistically interpreted as the probability that the classifier will give higher score to the randomly chosen positive instance than to the randomly chosen negative instance \cite{roc}. Disadvantage of this method is that even very different ROC curves could reach same AUC values.
 
-\subsubsection{Precision-Recall curve}
+\subsubsection{Precision-recall curve}
 
-The Precision-Recall (PR) curve also graphically visualizes the performance of classification models. It depicts Recall of positive class on the horizontal axis and Precision of positive class on the vertical axis for varying thresholds. It is usually more informative in the case of strongly imbalanced datasets than ROC, where ROC curves could significantly overestimate the performance.
+The precision-recall (PR) curve also graphically visualizes the performance of classification models. It depicts recall of positive class on the horizontal axis and precision of positive class on the vertical axis for varying thresholds. It is usually more informative in the case of strongly imbalanced datasets than ROC, where ROC curves could significantly overestimate the performance.
 
-We can demonstrate this issue on the example: consider dataset of 10 positive instances and 1000 negative instances and the classifier which predicts everything correctly except of 100 negative instances, which are predicted as positive. Then TP = 10, FP = 100, TN = 900, FN = 0. Therefore TPR = 1 and $\text{FPR} \approx 0.1$, which reaches almost ideal point [0,1] in ROC space. But Precision of the positive class is only approximately 0.01, which is very poor. So even if the classifier reached almost ideal point in ROC space, in the PR space could be very far from it (ideal point in PR space is [1,1]).
+We can demonstrate this issue on the example: consider dataset of 10 positive instances and 1000 negative instances and the classifier which predicts everything correctly except of 100 negative instances, which are predicted as positive. Then TP = 10, FP = 100, TN = 900, FN = 0. Therefore TPR = 1 and $\text{FPR} \approx 0.1$, which reaches almost ideal point [0;1] in ROC space. But precision of the positive class is only approximately 0.01, which is very poor. So even if the classifier reached almost ideal point in ROC space, in the PR space could be very far from it (ideal point in PR space is [1;1]).
 
-There are some technical properties of PR curves, especially estimating the first and the last point of the graph. The first point corresponds to the case when everything is predicted as negative. Therefore there are no positive predictions and Precision is undefined (denominator is zero). This issue is usually handled by fixing the first point or estimating it from the second point. It is done in the way that the curve starts at the vertical axis. On the contrary, the last point could be determined accurately, because it corresponds to the case of predicting everything as positive. Therefore Recall is 1 and Precision equals $\text{P}/(\text{P}+\text{N})$, where P denotes number of all positive instances and N denotes number of all negative instances.
+There are some technical properties of PR curves, especially regarding the estimate of the first and the last point of the graph. The first point corresponds to the case when everything is predicted as negative. Therefore there are no positive predictions and precision is undefined (denominator is zero). This issue is usually handled by fixing the first point or estimating it from the second point. It is done in the way that the curve starts at the vertical axis. On the contrary, the last point could be determined accurately, because it corresponds to the case of predicting everything as positive. Therefore recall is 1 and precision equals $\text{P}/(\text{P}+\text{N})$, where P denotes number of all positive instances and N denotes number of all negative instances.
 
-The PR curves in our experiments start at the [0,1] point on the vertical axis. Also only first point reaching Recall = 1 (point with the highest Precision and Recall = 1) is visualized and other points with the same Recall are omitted, since they do not add any useful information to the graph. The example of the PR curve is depicted in the Figure \ref{fig:pr}.
+The PR curves in our experiments start at the [0;1] point on the vertical axis. Also only first point reaching recall = 1 (point with the highest precision and recall = 1) is visualized and other points with the same recall are omitted, since they do not add any useful information to the graph. The example of the PR curve is depicted in the Figure \ref{fig:pr}.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{pr_example.png}
-\caption{This graph depicts examples of PR curves. In the blue is visualized PR curve of Random Forest classifier. In the red is visualized PR curve of random classifier and in the orange is PR curve of perfect classifier.}
+\caption{This graph depicts examples of PR curves. In the blue is visualized PR curve of random forest classifier. In the red is visualized PR curve of random classifier and in the orange is PR curve of perfect classifier.}
 \label{fig:pr}
 \end{figure}
 
-PR curve of the random classifier corresponds to the straight line connecting points [0,1] and [1,$\text{P}/(\text{P}+\text{N})$], whereas PR curve of the perfect classifier corresponds to the straight line connecting points [0,1] and [1,1] (the line connecting points [1,1] and [1,$\text{P}/(\text{P}+\text{N})$] is omitted).
+PR curve of the random classifier corresponds to the straight line connecting points [0;1] and [1;$\text{P}/(\text{P}+\text{N})$], whereas PR curve of the perfect classifier corresponds to the straight line connecting points [0;1] and [1;1] (the line connecting points [1;1] and [1;$\text{P}/(\text{P}+\text{N})$] is omitted).
 
-We also compare individual PR curves by a single value (similarly as in the case of ROC curves), but instead of AUC we adopt \textit{Average Precision score} (AP) that is computed as the weighted sum of all Precision values obtained for each threshold. It is defined as
+We also compare individual PR curves by a single value (similarly as in the case of ROC curves), but instead of AUC we adopt \textit{average precision score} (AP) that is computed as the weighted sum of all precision values obtained for each threshold. It is defined as
 
 \begin{equation}
-    \text{AP} = \sum_{k}(\text{Recall}^{(k)} - \text{Recall}^{(k-1)})\text{Precision}^{(k)} \hspace{0.2cm},
+    \text{AP} = \sum_{k}(\text{recall}^{(k)} - \text{recall}^{(k-1)})\cdot \text{precision}^{(k)} \hspace{0.2cm},
 \end{equation}
-where $\text{Recall}^{(k)}$ denotes Recall value at $k$-th threshold and analogously for Precision. AP value will be used to compare individual PR curves in the experimental part. It is a preferred choice over AUC since \cite{pr_roc_diff} suggests that AUC may produce over-optimistic evaluation of performance. Generally higher AP values mean better performance.
+where $\text{recall}^{(k)}$ denotes recall value at $k$-th threshold and analogously for precision. AP value will be used to compare individual PR curves in the experimental part. It is a preferred choice over AUC since \cite{pr_roc_diff} suggests that AUC may produce over-optimistic evaluation of performance. Generally higher AP values mean better performance.
 
 In \cite{pr_roc_diff} is also proven that ROC and PR curves are closely related, specifically that curve dominates in ROC space if and only if it dominates in PR space (there is one-to-one relationship).
 
 We also define a special PR curve, which summarizes overall performance of classifier among several independent simulations. It is created simply by concatenation of individual labels and corresponding prediction scores from all simulations and then visualizing PR curve of this entire union. We refer to this curve as \textit{aggregation PR curve} and use it in the experimental part.
 
-Both ROC and PR curves can be adapted to the multi-class environment. It is usually done by applying one-vs-all scheme (setting of one class as positive and other classes as negative) and then visualizing individual curves. We applied them only on binary classification in the experimental part, hence we will not describe the multi-class case in this thesis.
+Both ROC and PR curves can be adapted to the multiclass environment. It is usually done by applying one-vs-all scheme (setting of one class as positive and other classes as negative) and then visualizing individual curves. We applied them only on binary classification in the experimental part, hence we will not describe the multiclass case in this thesis.
 
 
-\chapter{Random Forest}
+\chapter{Random forest}
 
-Random Forest algorithm is a popular machine learning method used primarily on the classification and regression tasks. Its functionality is based on collecting predictions from several independent classifiers (ensemble of decision trees) and merging their outcomes into final prediction. It belongs to the group of supervised learning algorithms. In this thesis is usage of random forests restricted only to the classification tasks, so the theoretical part of this section will be limited only to the random forests used for classification. Main goal is to find a decision function $f: \mathbb{X} \rightarrow \mathbb{R}$, where $X \subset \mathbb{R}^d$ is the input space in the $d$-dimensional real-valued space, which outputs the response (class, label).
+Random forest algorithm is a popular machine learning method used primarily on the classification and regression tasks. Its functionality is based on collecting predictions from several independent classifiers (ensemble of decision trees) and merging their outcomes into final prediction. It belongs to the group of supervised learning algorithms. In this thesis is usage of random forests restricted only to the classification tasks, so the theoretical part of this section will be limited only to the random forests used for classification.
 
-Random Forest nowadays is a widespread method exploited frequently in various domains, such as computer vision \cite{computer_vision}, text classification \cite{text_rec}, bioinformatics \cite{bioinf}, network threat detection \cite{random_forest_intrusion} etc. The individual classifiers - decision trees - could be also used as a clustering algorithm [ref Egypt článek].
-Popularity of random forests is gained due to excellent generalization and application to wide-ranged spectrum of classification tasks with registering competitive classification quality in comparison with other state-of-the-art methods, such as logistic regression, support vector machines, neural networks etc. Also the method itself is in its basics quite simple and therefore is fast, easy implementable and could be analyzed and interpreted with instant gain of variable importances \cite{rf_imp}.
+Random forest nowadays is a widespread method exploited frequently in various domains, such as computer vision \cite{computer_vision}, text classification \cite{text_rec}, bioinformatics \cite{bioinf}, network threat detection \cite{random_forest_intrusion} etc. The individual classifiers - decision trees - could be also used as a clustering algorithm [ref Egypt článek].
+Popularity of random forests is gained due to excellent generalization and application to wide-ranged spectrum of classification tasks with registering competitive classification quality in comparison with other state-of-the-art methods, such as logistic regression \cite{logregression}, support vector machine \cite{svm}, neural networks etc. Also the method itself is in its basics quite simple and therefore is fast, easy implementable and could be analyzed and interpreted with instant gain of variable importances \cite{rf_imp}.
 
 Unlike the neural networks, it has far less parameters to tune and is better-applicable to small-sample sized datasets. With the usage of randomization, bagging, bootstrapping and other techniques based on randomness, random forests overcome easily problems of overfitting as well \cite{rf_overfit}.
 
@@ -482,26 +488,27 @@ As was mentioned previously, random forest consists of independent classifiers c
 \centering
 \includegraphics[width=\textwidth]{dec_tree_graph.png}
 \end{minipage}
-\caption{In the left part of the figure is illustrated decision tree with depth = 2. The first circle in red color is called root node. Two beige circles in the intermediate layer are inner nodes and green rectangles are leaf nodes, where probabilities of individual classes are stored . Each input vector $\boldsymbol{x} = (x_1,x_2) \in \mathbb{R}^2$ starts from the root node and traverses down the tree by applying subsequent split criterions in nodes until it reaches the leaf node. In the right figure is visualized segregation of input space by the hyperplanes (defined in root node and inner nodes of the decision tree) parallel to the axes (black lines).}
+\caption{In the left part of the figure is illustrated decision tree with depth = 2. The first circle in red color is called root node. Two beige circles in the intermediate layer are inner nodes and green rectangles are leaf nodes, where probabilities of individual classes are stored . Each input instance $\boldsymbol{x} = (x_1,x_2)^T \in \mathbb{R}^2$ starts from the root node and traverses down the tree by applying subsequent split criterions in nodes until it reaches the leaf node. In the right figure is visualized segregation of input space by the hyperplanes (defined in root node and inner nodes of the decision tree) parallel to the axes (black lines).}
 \label{fig:dec_tree}
 \end{figure}
 
-In this work we focus only on binary trees, which means, that every node has always 2 child nodes (following nodes in the hierarchical structure of the tree). The process of applying decision tree to obtain final prediction is basically described in Figure \ref{fig:dec_tree}. Beginning from the root node, the input vector $\boldsymbol{x} \in \mathbb{R}^d$ from $d$-dimensional input space is iteratively tested by the split functions associated with every single node in hierarchical order and based on the result is further sent either to the left or right child (the split functions usually define hyperplanes in the input space). This process is repeated until the vector reaches final node (leaf node). In the leaf node are stored classification predictions, which are eventually extracted.
+In this work we focus only on binary trees, which means, that every node has always 2 child nodes (following nodes in the hierarchical structure of the tree). The process of applying decision tree to obtain final prediction is basically described in Figure \ref{fig:dec_tree}. Beginning from the root node, the input instance $\boldsymbol{x} \in \mathbb{R}^d$ from $d$-dimensional input space is iteratively tested by the split functions associated with every single node in hierarchical order and based on the result is further sent either to the left or right child (the split functions usually define hyperplanes in the input space). This process is repeated until the instance reaches the final node (leaf node). In the leaf node are stored classification predictions, which are eventually extracted.
 
 The work with decision tree could be divided into two major parts:
 
 \begin{enumerate}
-    \item \textbf{Training stage}: In this stage the entire decision tree is built from the scratch on the basis of predefined criterions and properties. To perform this phase, the \textbf{training dataset} has to be adopted and used. It is usually selected as a subset of the complete data that are available. Magnitude of the training dataset depends on the complexity and application of our model (e.g. if the best model is selected and compared with other models, it should be sufficient to use less data or if the model is prepared for the production, it is desirable to use as much data as possible) and on the complexity of the problem. There does not exist any general consensus that dictates how large should training dataset be. It often depends on the personal preferences and experience and of course on the following evaluation results.
+    \item \textbf{Training stage}: In this stage the entire decision tree is built from the scratch on the basis of predefined criterions and properties. To perform this phase, the \textbf{training dataset} has to be adopted and used. It is usually selected as a subset of the complete data that are available. Magnitude of the training dataset depends on the complexity and application of our model (e.g. if we are about to compare different models, it should be sufficient to use less data, or if we  prepare the model for the production application, it is desirable to use as much data as possible) and on the complexity of the problem. There does not exist any general consensus that dictates how large should training dataset be. It often depends on the personal preferences and experience and of course on the following evaluation results.
     
     \item \textbf{Testing/application stage}: After training is the decision tree directly applicable and therefore could be either tested with various evaluation methods or applied in practice. The usage of decision tree itself is very straightforward and was already described. We will focus on description of merging the individual results from the ensemble of decision trees and obtaining final predictions.
 \end{enumerate}
+
 Now will be provided mathematical details of the both stages.
 
 \subsection{Training stage}
 
-Consider training dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of instances in the training dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
+Consider dataset $\mathbb{X} = \{\boldsymbol{x}_1,...\boldsymbol{x}_N\}$, where $\boldsymbol{x}_k \in \mathbb{R}^d$ and $k \in \{1,...,N\}$, where $N$ is total number of instances in the dataset and $d$ is the feature space dimension. The goal of the training stage is to establish proper decision tree structure and find suitable split functions in every node that provides the best class segregation. Splitting continues until some of the predefined stopping criterions are met.
 
-Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire training dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
+Training begins always from the root node. Starting with the training set $\mathbb{M}$ chosen for the current decision tree (could be entire dataset or its subset), it is interatively splits in each node to the two disjunct subsets $\mathbb{M}_1$ and $\mathbb{M}_2$, where $\mathbb{M}_1,\mathbb{M}_2 \subset \mathbb{M}, \mathbb{M}_1 \cup \mathbb{M}_2 = \mathbb{M}$. $\mathbb{M}_1$ corresponds to the subset of $\mathbb{M}$ sent to the left child and $\mathbb{M}_2$ to the right child. Splitting in each node is done via split functions. The shape of the split functions associated to the nodes is defined in advance. Generally it could be expressed as the binary function
 
 \begin{equation}
     s(\boldsymbol{x},\boldsymbol{\theta}) = \begin{cases}
@@ -510,7 +517,7 @@ Training begins always from the root node. Starting with the training set $\math
     \end{cases}
 \end{equation}
 
-The parameters of the split functions are the input vector $\boldsymbol{x}$ and parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
+The parameters of the split functions are the input instance $\boldsymbol{x}$ and parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
 
 In the practice, widely used choice of the split function is \cite{rf_main}
 
@@ -522,7 +529,7 @@ In the practice, widely used choice of the split function is \cite{rf_main}
     \label{split_func}
 \end{equation}
 
-Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)$, where $i \in \{1,...,d\}$ represents one feature from the $d$-dimensional feature space and $\tau \in \mathbb{R}$ is a threshold. Together, equation $x_i = \tau$ embodies hyperplane parallel with one axis and split function divides vectors into two groups based on their relative position with respect to this hyperplane. With regard to the fact, that our proposed transformation of the decision tree to the corresponding neural network is build on usage of this special split function \eqref{split_func}, we will not focus on the other types of split functions in this thesis.
+Parameter vector in this case is $\boldsymbol{\theta} = (i,\tau)^T$, where $i \in \{1,...,d\}$ represents one feature from the $d$-dimensional feature space and $\tau \in \mathbb{R}$ is a threshold. Together, equation $x_i = \tau$ embodies hyperplane parallel with one axis. The split function divides instances into two groups based on their relative position with respect to this hyperplane. With regard to the fact, that our proposed transformation of the decision tree to the corresponding neural network is build on usage of this special split function \eqref{split_func}, we will not focus on the other types of split functions in this thesis.
 
 In each iteration, algorithm seeks for the best split, ie. for the parameters of the split function that provides this split. It is achieved by optimizing pre-specified split criterion, which expresses measure of (non)impurity in the corresponding node. By impurity is meant that if node contains instances belonging only to one class, the impurity is 0, whereas it is increased if instances of multiple classes are present in the node.
 
@@ -554,10 +561,10 @@ There are plenty of possibilities to choose split criterion that suits our probl
     \label{inf_gain}
 \end{equation}
 
-$H(\mathbb{M})$ is arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$ represent the subsets of $\mathbb{M}$ proceeding to the left or right child. In parentheses is emphasized, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node are obtained final parameters $i^*, \tau^*$, that are stored and used in the testing stage. Thus parameters of the split function of the $j$-th node are acquired as
+$H(\mathbb{M})$ is arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$, represent the subsets of $\mathbb{M}$ proceeding to the left or right child. In parentheses is emphasized, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node are obtained final parameters $i^*, \tau^*$, that are stored and used in the testing stage. Thus parameters of the split function of the $j$-th node are acquired as
 
 \begin{equation}
-    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*) = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
+    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*)^T = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
 \end{equation}
 where $\mathbb{M}_j \subset \mathbb{M}$ is the subset of $\mathbb{M}$ in the $j$-th node.
 
@@ -569,7 +576,7 @@ Basic simulation of finding the best split is visualized in the Figure \ref{fig:
 \caption{In the Figure are illustrated two cases of different splits.}
 \label{fig:split_example}
 \end{figure}
-Values of information gain (IG) for different impurity functions are (Figure \ref{fig:split_example}):
+
 \begin{table}[h]
     \centering
     \begin{tabular}{|c|c|c|}
@@ -577,7 +584,7 @@ Values of information gain (IG) for different impurity functions are (Figure \re
        &\textbf{Horizontal split} & \textbf{Vertical split} \\ \hline
          IG (Entropy)& 0.34 & \textbf{0.69}\\ \hline
          IG (Gini)& 0.135& \textbf{0.25}\\ \hline
-         IG (Classification Error)&0.20 & \textbf{0.25}\\ \hline
+         IG (Classification error)&0.20 & \textbf{0.25}\\ \hline
     \end{tabular}
     \caption{Values of IG for splits in Figure \ref{fig:split_example}.}
     \label{tab:ig_vals}
@@ -624,7 +631,7 @@ Ensemble methods also significantly benefit from the averaging of results from i
 
 Among popular techniques to create an ensemble of decision trees belong:
 \begin{itemize}
-    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to train the decision tree. Then the ensemble of the decision trees is obtained and the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf}  (variance means, that if the data are randomly split more times and resulting models are compared, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
+    \item \textbf{Bagging}: This technique divide the training datasets into several subsets with replacement (bootstrapping) and each subset is used to train the decision tree. Then the ensemble of the decision trees is obtained and the result from individual decision trees is combined. This technique helps to reduce variance of a single decision tree \cite{variance_rf} (the variance means, that if we compare the models trained on slightly different datasets, they could vary a lot (unlike the linear regression for example, which has generally low variance)).
     \item \textbf{Boosting} This method is based on idea of iterative boosting of weak classifiers into a strong one. In each iteration, the algorithm aims to boost previous-staged classifier by checking of the misclassified instances and attempting to fix these errors. As popular boosting algorithm could be mentioned AdaBoost algorithm \cite{adaboost2}. These methods often tend to overfitting problem \cite{adaboost}.
 \end{itemize}
 
@@ -635,22 +642,22 @@ In the experimental part of this thesis is used entire training dataset for tuni
 As was mentioned previously, from every decision tree could be extracted either probability distribution of classes from the leaf node or directly predicted class label. There are naturally numerous possibilities of merging these results. Unless there is not special requirement on the model, practically are used two ways. If the outputs are discrete class labels, than the voting scheme is applied and the class with maximum votes is taken as final prediction. If the outputs are probability distributions, those values are averaged and the class with maximum probability is taken. Mathematically noted, the final prediction in this case is
 
 \begin{equation}
-    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|T|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
+    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|\mathbb{T}|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
     \label{final_pred}
 \end{equation}
-where $T$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} could be also a weighted average instead, which is applied e.g. if predicting some class is more preferred over predicting others.
+where $\mathbb{T}$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} could be also a weighted average instead, which is applied e.g. if predicting some class is more preferred over predicting others.
 
 
-\chapter{Neural Networks}
-\section{Introduction to Neural Networks (NN)}
+\chapter{Neural network}
+\section{Introduction to neural networks (NN)}
 
 For thousands of years, the people have been pursuing the dream to perfectly simulate human or animal brains and adopt their ability to solve problems on the daily basis. For this purpose, the (artificial) neural network was developed and nowadays is frequently used for solving difficult data modelling tasks, statistical analysis and many others. Its functionality is based on the simplified version of real brain information processing and reasoning, where single processing units of brain - neurons - transfer information to other neurons in predefined structure and get activated based on activity status of other adjacent neurons. In the actual brain, the signal from the neuron is transferred to the connected neuron by the synapse. When the neuron accumulates all coming signals from synapses, then it evaluates this coupled signal and if it exceeds the threshold, the neuron sends signal through synapse (connection) to other neuron. This principle is basically what fuels artificial neural networks today.
 
-The beginnings of the artificial neural network dates to early 1950s, almost simultaneously with development and application of programmable electronic units. In 1943, Warren McCulloch and Walter Pitts introduced models inspired by real brain neurons and adopted threshold switches \cite{culloch}. They provided the evidence that even simple model (network) motivated by this approach could compute almost any logic or arithmetic function. In 1957-1958, Frank Rosenblatt and Charles Wightman et al introduced the first successful neurocomputer, Mark I Perceptron, which could identify 20x20 pixel images of simple patterns. In 1959, Frank Rosenblatt covered different version of the perceptron and formulated and proved the convergence theorem of the perceptron (perceptron will be described later). Then Marvin Minsky and Seymour Papert published mathematic paper that studied perceptron in 1969. The conclusion of this paper pointed to the insufficiency of the single perceptron, which was not able to represent classical boolean XOR or sets that are not linearly separable \cite{perceptron}. This led to the approximately 15-year black-out in the field of the neural network research. In 1974 was introduced learning algorithm called backpropagation of error by Paul Werbos \cite{werbos}. Suprisingly, this algorithm was fully acknowledged approximately ten years later. The backpropagation of error as learning procedure was further developed and expanded in 1986 and widely published by the Parallel Distributed Processing Group \cite{backprop-cit}. In that time, the non-separability could be effectively solved by multilayer perceptrons and previous negative conclusions about perceptrons were disproved right away \cite{perceptron-nonsep}. Since then, the development in the field of neural networks and machine learning in general proceeded intensively and actively continues. It is not even possible to mention all milestones in this thesis. Many different neural networks architectures and training algorithms were tested, resulting in complex deep learning structures able to handle massive amount of unlabelled data. They are sucessfully applied in many challenging tasks as bioinformatics, speech recognition, natural language processing etc \cite{nn-application}.  Special NN called Convolutional Neural Networks (CNN) are frequently used especially in the field of image processing.
+The beginnings of the artificial neural network dates to early 1950s, almost simultaneously with development and application of programmable electronic units. In 1943, Warren McCulloch and Walter Pitts introduced models inspired by real brain neurons and adopted threshold switches \cite{culloch}. They provided the evidence that even simple model (network) motivated by this approach could compute almost any logic or arithmetic function. In 1957-1958, Frank Rosenblatt and Charles Wightman et al introduced the first successful neurocomputer, Mark I Perceptron, which could identify 20x20 pixel images of simple patterns. In 1959, Frank Rosenblatt covered different version of the perceptron and formulated and proved the convergence theorem of the perceptron (perceptron will be described later). Then Marvin Minsky and Seymour Papert published mathematic paper that studied perceptron in 1969. The conclusion of this paper pointed to the insufficiency of the single perceptron, which was not able to represent classical boolean XOR or sets that are not linearly separable \cite{perceptron}. This led to the approximately 15-year black-out in the field of the neural network research. In 1974 was introduced learning algorithm called backpropagation of error by Paul Werbos \cite{werbos}. Suprisingly, this algorithm was fully acknowledged approximately ten years later. The backpropagation of error as learning procedure was further developed and expanded in 1986 and widely published by the Parallel Distributed Processing Group \cite{backprop-cit}. In that time, the non-separability could be effectively solved by multilayer perceptrons and previous negative conclusions about perceptrons were disproved right away \cite{perceptron-nonsep}. Since then, the development in the field of neural networks and machine learning in general proceeded intensively and actively continues. It is not even possible to mention all milestones in this thesis. Many different neural networks architectures and training algorithms were tested, resulting in complex deep learning structures able to handle massive amount of unlabelled data. They are sucessfully applied in many challenging tasks as bioinformatics, speech recognition, natural language processing etc \cite{nn-application}.  Special NN called convolutional neural networks (CNN) are frequently used especially in the field of image processing.
 
 \section{Building blocks of ANN}
 
-In this section will be described main components of artificial neural network. As we mentioned in the introductory section, architecture of neural network consists of the processing units - neurons, and the connections between neurons. General neuron is associated with the so called \textit{propagation function}, \textit{activation function} and \textit{output function}. These functions process internally the input from other neurons and builds the output of neuron. Propagation function firstly considers all inputs to the neuron and output from the propagation function serves as input for the activation function. The activation function transforms this information into activation value of current neuron and this activation values is then transformed by output function and output is sent to by the connection to the following neuron. Entire process is illustrated in the Figure \ref{fig:single_neuron}.
+In this section will be described main components of artificial neural network. As we mentioned in the introductory section, architecture of neural network consists of the processing units - neurons, and the connections between neurons. General neuron is associated with the so called \textit{propagation function}, \textit{activation function} and \textit{output function}. These functions process internally the input from other neurons and builds the output of neuron. Propagation function firstly considers all inputs to the neuron and output from the propagation function serves as input for the activation function. The activation function transforms this information into activation value of current neuron and this activation values is then transformed by output function and output is sent by the connection to the following neuron. Entire process is illustrated in the Figure \ref{fig:single_neuron}.
 
 \begin{figure}[ht]
 \centering
@@ -659,7 +666,7 @@ In this section will be described main components of artificial neural network. 
 \label{fig:single_neuron}
 \end{figure}
 
-As propagation function is almost solely used simple weighted sum of all inputs generally with addition of a constant (called bias). Consider input as vector (if single neuron is connected by the connections from multiple neurons) $\boldsymbol{x} = (x_1,x_2,...,x_k)$, where $k \in \mathbb{N}$ is number of inputs to neuron and $b \in \mathbb{R}$ is a bias and $\boldsymbol{w} = (w_1,...,w_k) \in \mathbb{R}^k$ are connection weights used for weighted sum. Then output $z \in \mathbb{R}$ from propagation function $f: \mathbb{R}^k \rightarrow \mathbb{R}$ is
+As propagation function is almost solely used simple weighted sum of all inputs generally with addition of a constant (called bias). Consider input as vector (if single neuron is connected by the connections from multiple neurons) $\boldsymbol{x} = (x_1,x_2,...,x_k)^T$, where $k \in \mathbb{N}$ is number of inputs to neuron and $b \in \mathbb{R}$ is a bias and $\boldsymbol{w} = (w_1,...,w_k)^T \in \mathbb{R}^k$ are connection weights used for weighted sum. Then output $z \in \mathbb{R}$ from propagation function $f: \mathbb{R}^k \rightarrow \mathbb{R}$ is
 
 \begin{equation}
     z = f(\boldsymbol{x}) = \sum_{i=1}^{k}(w_i \cdot x_i) + b   
@@ -698,7 +705,7 @@ Since we defined a general shape of one processing unit of neural network - neur
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.65\textwidth]{feedforward.png}
-\caption{In the Figure is illustrated general architecture of feedforward neural network. Connections are only between neurons of two consecutive layers. Input (each neuron usually receives value of one feature - neuron $j \in \mathbb{N}$ of the input layer accepts value of $j$-th feature $x_j$ of input vector $\boldsymbol{x}$) of the neural network is inserted to the input layer and the output is extracted from the output layer.}
+\caption{In the Figure is illustrated general architecture of feedforward neural network. Connections are only between neurons of two consecutive layers. Input (each neuron usually receives value of one feature - neuron $j \in \mathbb{N}$ of the input layer accepts value of $j$-th feature $x_j$ of input instance $\boldsymbol{x}$) of the neural network is inserted to the input layer and the output is extracted from the output layer.}
 \label{fig:feedforward}
 \end{figure}
 
@@ -779,7 +786,7 @@ Softmax activation function is frequently used especially in the output layers o
 
 \subsubsection{Rectified Linear Unit (ReLU)}
 
-ReLU activation function was indtroduced in 2010 by Nair and Hinto \cite{relu} and since then belongs to the most popular activation functions worldwide with state-of-the-art results. It is the most widely used activation function in the field of deep learning. ReLU function is visualized in the Figure \ref{fig:relu}
+ReLU activation function was introduced in 2010 by Nair and Hinto \cite{relu} and since then belongs to the most popular activation functions worldwide with state-of-the-art results. It is the most widely used activation function in the field of deep learning. ReLU function is visualized in the Figure \ref{fig:relu}
 
 \begin{figure}[ht]
 \begin{minipage}[b]{0.48\linewidth}
@@ -800,7 +807,7 @@ It is defined for real input $z \in \mathbb{R}$ as
 \begin{equation}
     \text{ReLU}(z) = \max\{0,z\}
 \end{equation}
-For positive values of x it behaves as simple linear function and for negative values the output value remains 0. Its similarity with simple linear functions makes it easy to optimize learning algorithms and therefore is training of ReLU neurons more effective and quicker (it need not count exponentials and divisions). The generalization ability, speed of convergence and often better performance with comparison to the sigmoid and tanh functions cause that ReLU functions are much more often used mainly in the hidden layers than those competitive exponentially-based activation functions \cite{actfunc}. Also ReLU function lacks vanishing gradient drawback, which will be discussed later.
+For positive values of $z$ it behaves as simple linear function and for negative values the output value remains 0. Its similarity with simple linear functions makes it easy to optimize learning algorithms and therefore is training of ReLU neurons more effective and quicker (it need not count exponentials and divisions). The generalization ability, speed of convergence and often better performance with comparison to the sigmoid and tanh functions cause that ReLU functions are much more often used mainly in the hidden layers than those competitive exponentially-based activation functions \cite{actfunc}. Also ReLU function lacks vanishing gradient drawback, which will be discussed later.
 
 ReLU function also suffers from drawbacks, such as easy inclination to overfitting in comparison with the sigmoid function and production of the so called "dead" neurons. It is inflicted when argument of ReLU is negative and ReLU outputs 0. With regard to the fact, that slope of ReLU in the negative part is also 0, it is probable that output of this neuron will stuck on 0 a do not return back. This neuron has no further effect in determining the output and is useless. This problematic will be covered after description of gradient-based learning methods.
 
@@ -811,22 +818,22 @@ Problem of dead neurons could be solved by adoption of the Leaky ReLU activation
     \alpha z & \text{otherwise}
     \end{cases}
 \end{equation}
-Values of parameter $\alpha$ should be small, popular choice is $\alpha = 0,01$. Shape of Leaky ReLU could be seen in the right part of the Figure \ref{fig:relu}.
+Values of parameter $\alpha$ should be small, popular choice is $\alpha = 0.01$. Shape of Leaky ReLU could be seen in the right part of the Figure \ref{fig:relu}.
 
 \section{Training methods}
 
-We already sufficiently define neural networks architecture and the way it works by transferring activation values between neurons. What remains is to describe the algorithms which enable our neural network to learn and adapt to new problems.
+We already sufficiently define neural network architecture and the way it works by transferring activation values between neurons. What remains is to describe the algorithms which enable our neural network to learn and adapt to new problems.
 
-Let us define some notation in order to describe this issue more clearly. The notation is inspired by \cite{feedforward}. We denote correct (desired) output of neural network as $\boldsymbol{y}(\boldsymbol{x})$ for input vector $\boldsymbol{x}$ and real output (estimation) of the neural network as $\hat{\boldsymbol{y}}(\boldsymbol{x})$. The quality of performance is evaluated by the means of minimizing the so called \textit{loss function} (in the literature could be found also as objective function or cost function). We denote general loss function as $\Lambda$. One typical example of loss function is \textit{Mean Squared Error} (MSE), also known as quadratic cost function,which is defined as
+Let us define some notation in order to describe this issue more clearly. The notation is inspired by \cite{feedforward}. We denote correct (desired) output of neural network as $\boldsymbol{y}(\boldsymbol{x})$ for input instance $\boldsymbol{x}$ and real output (estimation) of the neural network as $\hat{\boldsymbol{y}}(\boldsymbol{x})$. The quality of performance is evaluated by the means of minimizing the so called \textit{loss function} (in the literature could be found also as objective function or cost function). We denote general loss function as $\Lambda$. One typical example of loss function is \textit{Mean Squared Error} (MSE), also known as quadratic cost function, which is defined as
 \begin{equation}
     \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \frac{1}{2n} \sum_{i=1}^{n}||\boldsymbol{y}({\boldsymbol{x}}_i)- \hat{\boldsymbol{y}}({\boldsymbol{x}}_i)||^2 \hspace{0.5cm},
     \label{mse}
 \end{equation}
-where $\mathbb{W}$ is a set of all weights, $\mathbb{B}$ is a set of all biases and $\mathbb{X} = \{\boldsymbol{x}_1,...,\boldsymbol{x}_n\}$ is a set of all training vectors, where $n \in \mathbb{N}$ is a number of all training vectors. Norm $||\cdot|| = ||\cdot||_2$ is Euclidean norm. It is evident that estimation $\hat{\boldsymbol{y}}({\boldsymbol{x}})$ depend on $\boldsymbol{x}$ as well as on all weights and biases in the neural network. Later we will mention other frequently used loss functions with better application especially to the task of classification.
+where $\mathbb{W}$ is a set of all weights, $\mathbb{B}$ is a set of all biases and $\mathbb{X} = \{\boldsymbol{x}_1,...,\boldsymbol{x}_n\}$ is a set of all training instances, where $n \in \mathbb{N}$ is a number of all training instances. Norm $||\cdot|| = ||\cdot||_2$ is Euclidean norm. It is evident that estimation $\hat{\boldsymbol{y}}({\boldsymbol{x}})$ depend on $\boldsymbol{x}$ as well as on all weights and biases in the neural network. Later we will mention other frequently used loss functions with better application especially to the task of classification.
 
 Now will be described the most popular algorithm used for finding optimal weights and biases, which optimize the general loss function $\Lambda$ - \textit{gradient descent}.
 
-\subsection{Gradient Descent}
+\subsection{Gradient descent}
 
 Gradient descent algorithm is a popular nonlinear programming technique for a wide range of minimization tasks. It is considered as a benchmark for the minimization of loss functions in the field of neural networks. Let us consider general loss function $\Lambda(\boldsymbol{v})$ depending on vector $\boldsymbol{v}$. Gradient descent constructs the sequence of $\boldsymbol{v}^{(k)}$, that for each $k \in \mathbb{N}$ satisfies the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$ (except when $\boldsymbol{v}^{(k)}$ is optimal). The sequence is constructed as
 \begin{equation}
@@ -865,7 +872,7 @@ To provide more intuitive perspective, gradient descent algorithm iteratively se
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.75\textwidth]{grad2_desc.png}
-\caption{Gradient descent algorithm. In each iteration it finds the direction in which loss function decreases. In this case, the green point is "rolling down" towards the global minimum $(0,0)^T$.}
+\caption{Gradient descent algorithm. In each iteration it finds the direction in which loss function decreases. In this case, the green point is "rolling down" towards the global minimum.}
 \label{fig:grad}
 \end{figure}
 Of course, gradient descent is not universal method which always find global minimum of the arbitrary function. There are some requirements on loss function to ensure functionality. Especially when the loss function is not "nice" as one in the Figure \ref{fig:grad}, it could stuck in the local minimum instead or even do not converge, which also depends on the initial point of algorithm. Theory behind the convergence to global optimum is properly described almost exclusively for (strictly) convex functions \cite{grad}.
@@ -878,7 +885,7 @@ We should concretize the update rule in the case of modifying weights and biases
     b^{(k+1)} &= b^{(k)} - \eta \frac{\partial \Lambda}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
 \end{align}
 
-\subsection{Stochastic Gradient Descent (SGD)}
+\subsection{Stochastic gradient descent (SGD)}
 
 In order to accelerate learning of neural network, \textit{stochastic gradient descent} algorithm was developed \cite{feedforward}. It is based on estimating the gradient of loss function instead of computing it precisely.
 For instance, we show the algorithm in the case of quadratic cost function in \eqref{mse}. It could be rewritten as
@@ -891,7 +898,7 @@ Therefore, gradient of loss function could be written as (we omit the parameters
     \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i}
     \label{good_shape}
 \end{equation}
-Basically, this term is only average of gradients of $\Lambda_{\boldsymbol{x}_i}$ across all training instances. Idea of stochastic gradient descent is to replace averaging across all training instances with averaging only across randomly sampled mini-batch \\ $x_{i_1},...,x_{i_m}$ of size $m < n$, $m \in \mathbb{N}$. We obtain estimate
+Basically, this term is only average of gradients of $\Lambda_{\boldsymbol{x}_i}$ across all training instances. Idea of stochastic gradient descent is to replace averaging across all training instances with averaging only across randomly sampled mini-batch $x_{i_1},...,x_{i_m}$ of size $m < n$, $m \in \mathbb{N}$. We obtain estimate
 \begin{equation}
     \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i} \approx \frac{1}{m}\sum_{l=1}^{m} \nabla \Lambda_{\boldsymbol{x}_{i_l}}
 \end{equation}
@@ -911,7 +918,7 @@ In \eqref{sgd_weight} and \eqref{sgd_bias} could be omitted $\frac{1}{m}$ factor
 \subsection{Other training methods}
 \label{other_training_methods}
 
-Altough gradient descent or SGD are both popular optimization algorithms applied in many optimization tasks (especially in the training phase of neural networks), they are not entirely flawless. In some situations they could report drawbacks which can make a learning procedure much more difficult. Especially in the means of the speed of convergence and stucking in sub-optimal (local) minima. Moreover, the overall sensitivity to the learning rate parameter is in the case of gradient descent and SGD very high, which also affects the convergence and poor choice of learning rate can even lead to divergence.
+Altough gradient descent or SGD are both popular optimization algorithms applied in many optimization tasks (especially in the training phase of neural networks), they are not entirely flawless. In some situations they could report drawbacks which can make a learning procedure much more difficult. Especially in the means of the speed of convergence and stucking in suboptimal (local) minima. Moreover, the overall sensitivity to the learning rate parameter is in the case of gradient descent and SGD very high, which also affects the convergence and poor choice of learning rate can even lead to divergence.
 
 To address these issues, several alternatives to the SGD have been proposed \cite{adam}. They target to accelerate the convergence and reduce oscillations. Some of them also adapt the learning rate parameter at the runtime and thus possess better ability of controlling the direction and amount of change.
 
@@ -978,9 +985,9 @@ where $\phi(\cdot)$ is arbitrary activation function used in neurons of layer $l
 \begin{equation}
     \boldsymbol{z}^l = \mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l
 \end{equation}
-The aim of backpropagation algorithm is to compute $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$ (we will omit arguments of the functions for simplification, all of them are evaluated in the values of current weights, biases and training instance) with respect to arbitrary weight $w$ and bias $b$. These partial derivatives expresses, how much is loss function changed when $w$ or $b$ is changed. Of course, the main goal is to find optimal weights and biases, which corresponds to the local (global) minimum of loss function. Intuitively, we could imagine that in each layer of neural network arises some error (from imperfection of current weights and biases), which cause flaws in the output layer. Furthermore, we could say that even individual neurons produce these errors, which consequently leads to corrupted output. But what we can measure is only deviation of current output (extracted from output layer) of neural network from desired value, because we do not know in advance "correct" output (activation values) of other layers. So briefly, what backpropagation really does is that it \textit{backpropagates} error from the output layer to the previous layers and then from these \textit{error} terms computes corresponding partial derivatives $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
+The aim of backpropagation algorithm is to compute $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$ (we will omit arguments of the functions for simplification, all of them are evaluated in the values of current weights, biases and training instances) with respect to arbitrary weight $w$ and bias $b$. These partial derivatives expresses, how much is loss function changed when $w$ or $b$ is changed. Of course, the main goal is to find optimal weights and biases, which corresponds to the local (global) minimum of loss function. Intuitively, we could imagine that in each layer of neural network arises some error (from imperfection of current weights and biases), which cause flaws in the output layer. Furthermore, we could say that even individual neurons produce these errors, which consequently leads to corrupted output. But what we can measure is only deviation of current output (extracted from output layer) of neural network from desired value, because we do not know in advance "correct" output (activation values) of other layers. So briefly, what backpropagation really does is that it \textit{backpropagates} error from the output layer to the previous layers and then from these error terms computes corresponding partial derivatives $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
 
-We will now define this \textit{error} term heuristically. Output from $j$-th neuron of layer $l$ could be written as $a_j^l = \phi(z_j^l)$. Let's imagine for a moment, that layer $l$ has corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \phi(\hat{z}_j^l) =\phi(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses deviation of argument $z_j^l$ from optimal value. In case that other weights and biases are already optimal, the difference between optimal cost and "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). Deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. Also when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then neuron is very close to optimal state. Therefore, we could define error term as
+We will now define this error term heuristically. Output from $j$-th neuron of layer $l$ could be written as $a_j^l = \phi(z_j^l)$. Let's imagine for a moment, that layer $l$ has corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \phi(\hat{z}_j^l) =\phi(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses deviation of argument $z_j^l$ from optimal value. In case that other weights and biases are already optimal, the difference between optimal cost and "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). Deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. Also when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then neuron is very close to optimal state. Therefore, we could define error term as
 \begin{equation}
     \delta_j^l = \frac{\partial \Lambda}{\partial z_j^l}
 \end{equation}
@@ -1001,7 +1008,7 @@ Since we defined $\delta_j^l$, we now need to find equations for values of real 
     \begin{equation}
             \delta_j^L = \sum_{k=1}^{|\mathbb{C}|}\frac{\partial \Lambda}{\partial a_k^L}\frac{\partial [\boldsymbol{\theta}(\boldsymbol{z}^L)]_k}{\partial z_j^L} \label{BP1_softmax}\hspace{0.2cm},
     \end{equation}
-since $\forall k \in \{1,...,|\mathbb{C}|\}$, the function $\boldsymbol{\theta}(\boldsymbol{z}^L)]_k$ depends on $z_j^L$ where $|\mathbb{C}|$ denotes number of neurons in the output layer, which is same as number of classes (\mathbb{C} denotes a set of all classes).
+since $\forall k \in \{1,...,|\mathbb{C}|\}$, the function $[\boldsymbol{\theta}(\boldsymbol{z}^L)]_k$ depends on $z_j^L$ where $|\mathbb{C}|$ denotes number of neurons in the output layer, which is same as number of classes (\mathbb{C} denotes a set of all classes).
     
     \item \textbf{Equation to backpropagate the error from layer $(l+1)$ to previous layer $l$}
     \begin{equation}
@@ -1117,7 +1124,7 @@ We distinguish the representatives of this group based on different regularizati
     \text{Update rule}\hspace{0.2cm}\text{:}\hspace{0.2cm} &w^{(k+1)} = w^{(k)}- \eta\frac{\lambda}{n}\text{sgn}(w^{(k)}) - \eta\frac{\partial \Lambda_0}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \nonumber \hspace{0.2cm},
 \end{align}
 
-where $n = |\mathbb{X}|$, $\Lambda_0$ denotes original loss function and $\Lambda$ denotes loss function after addition of regularization term. The effect of regularization term is controlled by the magnitude of regularization parameter $\lambda \geq 0$. The larger $\lambda$ is, the larger penalty is put on weights and vice versa. Both variants penalize large weights in a slightly different way. The difference is perfectly visible from the individual update rules of weights for Gradient Descent (or SGD) in \eqref{L2reg} respectively \eqref{L1reg}. We can see that in the case of L2 regularization the weights are gradually decreased proportionally to the magnitude of the corresponding weight, whereas in the case of L1 regularization the weights are modified by value of constant magnitude. This means that L2 regularization tends to shrink larger weights more than L1. L2 regularization is sometimes referred to as a \textit{weight decay}.
+where $n = |\mathbb{X}|$, $\Lambda_0$ denotes original loss function and $\Lambda$ denotes loss function after addition of regularization term. The effect of regularization term is controlled by the magnitude of regularization parameter $\lambda \geq 0$. The larger $\lambda$ is, the larger penalty is put on weights and vice versa. Both variants penalize large weights in a slightly different way. The difference is perfectly visible from the individual update rules of weights for gradient descent (or SGD) in \eqref{L2reg} respectively \eqref{L1reg}. We can see that in the case of L2 regularization the weights are gradually decreased proportionally to the magnitude of the corresponding weight, whereas in the case of L1 regularization the weights are modified by value of constant magnitude. This means that L2 regularization tends to shrink larger weights more than L1. L2 regularization is sometimes referred to as a \textit{weight decay}.
 
 In the experimental part we adopt mainly L2 regularization as a regularization technique. It could be also used in adaptive optimization algorithms, such as Adam. Generally accepted approach is to replace gradient $\nabla \Lambda_0$ with $\nabla \Lambda$ for initializing corresponding terms (e.g. equations \eqref{mean} and \eqref{variance}), as we did also in the case of SGD. There has been some criticism to this approach related to the adaptive algorithms \cite{adam_criticism}, which led to some proposals and improvements, but they are beyond the scope of this thesis and we will not mention them. In our experiments we use replacement of gradients as suggested above.
 
@@ -1127,12 +1134,14 @@ Early stopping is possibly the most natural regularization technique. It basical
 
 \subsubsection{Dropout}
 
-Dropout is a popular regularization technique among neural networks, which has shown state-of-the-art results in many applications. The algorithm basically works as follows: During the training of neural network is randomly dropped half of the neurons (temporarily) in each hidden layer for each mini-batch. Then the forward pass and backward pass is performed through the subnetwork and the weights and biases of the subnetwork are updated \cite{feedforward,dropout}. The dropped neurons are then recovered and the same procedure is repeated for the following mini-batches as training continues. More generally, the neurons could be dropped with probability $p$, but at least one neuron must stay in each hidden layer in order to conduct meaningful updates.
+Dropout is a popular regularization technique among neural networks, which has shown state-of-the-art results in many applications. The algorithm basically works as follows: During the training of neural network is randomly dropped half of the neurons (temporarily) in each hidden layer for each mini-batch. Then the forward pass and backward pass is performed through the subnetwork and the weights and biases of the subnetwork are updated \cite{dropout}. The dropped neurons are then recovered and the same procedure is repeated for the following mini-batches as training continues. More generally, the neurons could be dropped with probability $p$, but at least one neuron must stay in each hidden layer in order to conduct meaningful updates.
 
 For a testing phase is eventually applied entire network with all neurons and (in the case of dropping half of the neurons) we halve all weights of connections outgoing from the hidden neurons since we operate with twice as many hidden neurons as the subnetworks were trained with.
 
-There are not many theoretical researches that would clarify the functionality of this method, but there exists plenty of heuristic explanations. The first possible explanation of functionality is that Dropout basically "average" several different neural networks, and therefore the full network is supposed to have higher generalization ability than single networks. The second one is that this technique reduces influence and dependencies between individual neurons and thus the neurons are forced to learn more robust features rather than relying on outputs of particular neurons \cite{dropout}.
-
+There are not many theoretical researches that would clarify the functionality of this method, but there exists plenty of heuristic explanations. The first possible explanation of functionality is that Dropout basically "average" several different neural networks, and therefore the full network is supposed to have higher generalization ability than single networks. The second one is that this technique reduces influence and dependencies between individual neurons and thus the neurons are forced to learn more robust features rather than relying on outputs of particular neurons.
+\vspace{0.2cm}
+\hrule
+\vspace{0.2cm}
 We mentioned three different regularization techniques frequently used among neural networks and machine learning in general. Other regularization techniques are for instance \textit{dataset augmentation}, \textit{parameter sharing}, etc. The descriptions of other methods could be found in \cite{regularization}. It is also common to combine individual regularization techniques to secure even higher generalization ability, but they must be applied carefully since the regularizers can be more decisive in training than the data itself.
 
 
@@ -1147,8 +1156,9 @@ We mentioned three different regularization techniques frequently used among neu
 
 
 
-\chapter{Decision Tree to Neural Network transformation}
-In this section is provided detailed derivation of the basic neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article \cite{NRF} describing 1 to 1 transformation of arbitrary regression tree (random forest regressor) to the specifically designed neural network (ensemble of neural networks).
+\chapter{Decision tree to neural network transformation}
+\label{tree_transf_net}
+In this section is provided detailed derivation of the neural network architecture, which is further employed in all subsequently proposed models. The main idea is built on the article \cite{NRF} describing one-to-one transformation of an arbitrary regression tree respectively a random forest regressor to the specifically designed neural network respectively an ensemble of neural networks.
 
 Unfortunately, an approach presented in \cite{NRF} is not uniformly convertible to the classification problem. Based on this issue, the  alternative architecture and initial settings are proposed in order to simulate the exact behaviour of corresponding decision tree classifier.
 
@@ -1156,11 +1166,11 @@ This reformulation provides a sensible opportunity to enhance the decision tree 
 
 \section{Architecture and initial settings}
 
-The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. The settings was motivated by \cite{NRF}. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is threshold function
+The initial weights and biases of neurons and architecture of input layer and first two hidden layers will remain same among all proposed models. A sample of such architecture (only input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying decisions of the decision tree depicted in Figure \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layer of network as perceptrons. This means, that activation function is threshold function
 \begin{equation}
     \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.5cm},
 \end{equation}
-where all math operations on vector $\boldsymbol{x}$ are element-wise. Also
+where all math operations on instance $\boldsymbol{x}$ are element-wise. Also
 \begin{equation}
     (\mathbf{1}_{\boldsymbol{x} \geq 0})_i = \begin{cases}
     1, & \text{if}\hspace{0.25cm} x_i \geq 0 \\
@@ -1180,13 +1190,13 @@ where $(\mathbf{1}_{\boldsymbol{x} \geq 0})_i$ is $i$-th element of $\mathbf{1}_
 \centering
 \includegraphics[width=\textwidth]{decision_tree_ilustrace.png}
 \end{minipage}
-\caption{In the left Figure are depicted 3 color-coded classes divided by the decision tree in the right Figure, that are separated by two hyperplanes: \\$x_1 - 2 = 0$ and $x_2 - 1 = 0$. Inner nodes of the decision tree are green colored with corresponding split function next to them, whereas the leaves are red colored. All nodes are numbered.}
+\caption{In the left Figure are depicted 3 color-coded classes divided by the decision tree in the right Figure, that are separated by two hyperplanes: $x_1 - 2 = 0$ and $x_2 - 1 = 0$. Inner nodes of the decision tree are green colored with corresponding split function next to them, whereas the leaves are red colored. All nodes are numbered.}
 \label{fig:dec_ilust}
 \end{figure}
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.65\textwidth]{ilustrace_basic_structure.png}
-\caption{Transformation of the decision tree in Figure \ref{fig:dec_ilust} to the neural network with two hidden layers. The first hidden layer detects the decisions of inner nodes same numbered as in \ref{fig:dec_ilust}. The second hidden layer retrieves leaf membership of input vector same as in the decision tree. Not null connections between neurons are bold higlighted with corresponding weights. Biases are written next to the neurons. All dashed connections indicates null connection (weight equals 0).}
+\caption{Transformation of the decision tree in Figure \ref{fig:dec_ilust} to the neural network with two hidden layers. The first hidden layer detects the decisions of inner nodes same numbered as in \ref{fig:dec_ilust}. The second hidden layer retrieves leaf membership of the input instance same as in the decision tree. Not null connections between neurons are bold higlighted with corresponding weights. Biases are written next to the neurons. All dashed connections indicates null connection (weight equals 0).}
 \label{fig:basic_arch}
 \end{figure}
 
@@ -1194,13 +1204,13 @@ So perceptrons from the first and second hidden layer outputs $+1$ or $-1$. Why 
 
 \subsection{First hidden layer}
 
-The first hidden layer should copy decisions of all inner nodes present in the corresponding decision tree. The first hidden layer has same number of neurons as number of inner nodes. As was explained in the chapter about decision trees and random forests, each inner node $k \in \{1,...,L-1\}$ of the decision tree, where $L-1$ is total number of inner nodes (in fact, if $L-1$ is total number of inner nodes, then $L$ is total number of leaves present in the decision tree), possesses split function with parameters $j_k \in \{1,...,n\}$, which is one dimension in a $n$-dimensional space that is used for split and also $\alpha_{j_k}$, which is a threshold. Let's also define function $s_k$ as 
+The first hidden layer should copy decisions of all inner nodes present in the corresponding decision tree. The first hidden layer has same number of neurons as number of inner nodes in the decision tree. As was explained in the chapter about decision trees and random forests, each inner node $k \in \{1,...,L-1\}$ of the decision tree, where $L-1$ is total number of inner nodes (in fact, if $L-1$ is total number of inner nodes, then $L$ is total number of leaves present in the decision tree), possesses split function with parameters $j_k \in \{1,...,n\}$, which is one dimension in a $n$-dimensional space that is used for split and also $\alpha_{j_k}$, which is a threshold. Let's also define function $s_k$ as 
 \begin{equation}
     s_k(\boldsymbol{x}) = x_{j_k} - \alpha_{j_k}\hspace{0.5cm}.
 \end{equation}
 It is apparent that equation $s_k(\boldsymbol{x}) = 0$ defines a hyperplane in $\mathbb{R}^n$, which splits the space in inner node $k$.
 
-In order to obtain all decisions of inner nodes in the corresponding neurons of our neural network, we initialize weights in neuron $k$ as $(0,..,0,1,0,..,0)^T$ with single 1 in $j_k$-th position and 0 otherwise. Bias is set to $-\alpha_{j_k}$. Hence, output of the first hidden layer is $(\tau(s_1(\boldsymbol{x})),\tau(s_2(\boldsymbol{x})),...,\tau(s_{L-1}(\boldsymbol{x}))$ and it precisely copies decisions of inner nodes, with +1 indicating that input vector belongs to the right side of the hyperplane and -1 otherwise (and +1 if it belongs to the hyperplane). This is also done for the inner nodes outside the path of the input vector. The illustration can be seen in Figure \ref{fig:first_hid_layer}.
+In order to obtain all decisions of inner nodes in the corresponding neurons of our neural network, we initialize weights of connections pointing from the input layer to the first hidden layer in neuron $k$ as $(0,..,0,1,0,..,0)^T$ with single 1 in $j_k$-th position and 0 otherwise. Bias is set to $-\alpha_{j_k}$. Hence, output of the first hidden layer is $(\tau(s_1(\boldsymbol{x})),\tau(s_2(\boldsymbol{x})),...,\tau(s_{L-1}(\boldsymbol{x}))^T$ and it precisely copies decisions of inner nodes, with +1 indicating that the input instance belongs to the right side of the hyperplane and -1 otherwise (and +1 if it belongs to the hyperplane). This is also done for the inner nodes outside the decision tree path of the input instance. The illustration can be seen in Figure \ref{fig:first_hid_layer}.
 
 
 \begin{figure}[ht]
@@ -1219,11 +1229,11 @@ In order to obtain all decisions of inner nodes in the corresponding neurons of 
 
 \subsection{Second hidden layer}
 
-From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of the input vector $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer. If there are $L-1$ neurons in the first hidden layer, then the second hidden layer consists of $L$ neurons, each one corresponding to the one individual leaf in the decision tree.
+From all inner node decisions obtained by the first hidden layer it should be possible to reconstruct the exact leaf membership of input instance $\boldsymbol{x}$. This is the main task to accomplish by the second hidden layer. If there are $L-1$ neurons in the first hidden layer, then the second hidden layer consists of $L$ neurons, each one corresponding to the one individual leaf in the decision tree.
 
-We connect neuron $m$ in the first hidden layer to neuron $m'$ in the second hidden layer with not null weight if and only if inner node corresponding to the neuron $m$ belongs to the path from root node to the leaf corresponding to the neuron $m'$. The weight is initialized to +1 if the split by inner node $m$ is to the right child and -1 otherwise. If neuron $m$ is not part of the path from root to the leaf, the weight is initialized always to 0.
+We connect neuron $m$ in the first hidden layer to neuron $m'$ in the second hidden layer with not null weight if and only if inner node corresponding to the neuron $m$ belongs to the path from root node to the leaf corresponding to the neuron $m'$. The weight is initialized to +1 if the split by inner node $m$ is to the right child and -1 otherwise. If neuron $m$ is not part of the path from the root node to the leaf, the weight is initialized always to 0.
 
-Based on this setting, it could be simply deduced that number of not null connections from the first hidden layer (weights) to the (arbitrary) neuron $m'$ in the second hidden layer is same as length of the path from root to the leaf $m'$. This is illustrated in Figure \ref{fig:sec_hidd_len}.
+Based on this setting, it could be simply deduced that number of not null weights of connections from the first hidden layer to arbitrary neuron $m'$ in the second hidden layer is same as length of the path from the root node to the leaf $m'$. This is illustrated in Figure \ref{fig:sec_hidd_len}.
 
 \begin{figure}[ht]
 \centering
@@ -1232,9 +1242,9 @@ Based on this setting, it could be simply deduced that number of not null connec
 \label{fig:sec_hidd_len}
 \end{figure}
 
-If output from the first hidden layer is $\boldsymbol{v} = (\pm 1, \pm 1,....,\pm 1)^T$, which encodes all decisions of inner nodes of the decision tree, then output from the neuron $m'$ in the second hidden layer is $\tau(\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m'))$, where\\ $\boldsymbol{w}^{m'} = (w_1^{m'},w_2^{m'},...,w_{L-1}^{m'})^T$ is a vector of  weights for connections to neuron $m'$. These weights are not null if the corresponding inner node is involved in the path from root to the leaf $m'$ and are +1 if it is sent to the right child and -1 otherwise. For all inner nodes that are not involved in the root-leaf path are weights initialized to 0.
+If output from the first hidden layer is $\boldsymbol{v} = (\pm 1, \pm 1,....,\pm 1)^T$, which encodes all decisions of inner nodes of the decision tree, then output from the neuron $m'$ in the second hidden layer is $\tau(\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m'))$, where\\ $\boldsymbol{w}^{m'} = (w_1^{m'},w_2^{m'},...,w_{L-1}^{m'})^T$ is a vector of  weights for connections to neuron $m'$. These weights are not null if the corresponding inner node is involved in the path from the root node to the leaf $m'$ and are +1 if it is sent to the right child and -1 otherwise. For all inner nodes that are not involved in the root-leaf path are weights initialized to 0.
 
-Desired behaviour of the neuron $m'$ in the second hidden layer is to output +1 if the input vector ends in leaf $m'$ and -1 otherwise. For this purpose, $bias(m')$ must be correctly set. To do so, it is sufficient to notice that the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i)$ as the first term in the argument of $\tau(\cdot)$ function equals to the length of the path from root node to leaf $m'$, if and only if the input ends in leaf $m'$. For convenience, let us denote this length as $l(m')$. It is a simple consequence of the fact, that the number of not null weights $w_{i_k}^{m'}$ is same as $l(m')$ and also they have same magnitude ($|w_{i_k}^{m'}| = 1$) and same sign as $v_{i_k}$, where $i_k \in \{1,...,L-1\}, w_{i_k}^{m'} \neq 0$. Therefore, each member of the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i) = \sum_{i_k=1,w_{i_k}^{m'} \neq 0}^{L-1}(w_{i_k}^{m'}v_{i_k})$ equals to +1 and all members sum up to $l(m')$.
+Desired behaviour of the neuron $m'$ in the second hidden layer is to output +1 if the input instance ends in leaf $m'$ and -1 otherwise. For this purpose, $bias(m')$ must be correctly set. To do so, it is sufficient to notice that the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i)$ as the first term in the argument of $\tau(\cdot)$ function equals to the length of the path from root node to leaf $m'$, if and only if the input ends in leaf $m'$. For convenience, let us denote this length as $l(m')$. It is a simple consequence of the fact, that the number of not null weights $w_{i_k}^{m'}$ is same as $l(m')$ and also they have same magnitude ($|w_{i_k}^{m'}| = 1$) and same sign as $v_{i_k}$, where $i_k \in \{1,...,L-1\}, w_{i_k}^{m'} \neq 0$. Therefore, each member of the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i) = \sum_{i_k=1,w_{i_k}^{m'} \neq 0}^{L-1}(w_{i_k}^{m'}v_{i_k})$ equals to +1 and all members sum up to $l(m')$.
 
 Moreover, if the input does not end in leaf $m'$, then in the sum $\sum_{i=1}^{L-1}(w_i^{m'}v_i)$ exists a not null member in which interfere 2 integers (ones) with different signs, resulting in -1. Hence is clear, that if input does not end in leaf $m'$, the sum holds inequality $\sum_{i=1}^{L-1}(w_i^{m'}v_i) \leq l(m')-1 < l(m')$. For more precise intuition, the illustration is provided in Figure \ref{fig:sec_hidd_ilust}.
 
@@ -1259,9 +1269,9 @@ and then $\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')$ has following property:
 \label{eq:sec_hidd_property}
 \end{equation}
 
-With respect to the property of $\tau(\cdot)$ function argument in \eqref{eq:sec_hidd_property}, the second hidden layer outputs a vector of $(-1,...,-1,+1,-1,...,-1)^T$ with a single positive 1 indicating the correct leaf membership of an input.
+With respect to this property, the second hidden layer outputs $(-1,...,-1,+1,-1,...,-1)^T$ after the application of $\tau(\cdot)$, with a single positive +1 indicating the correct leaf membership of an input.
 
-To retain this $\tau(\cdot)$ argument property, it is sufficient to choose any other arbitrary constant in \eqref{eq:bias} in range $(0,1)$ instead of 0.5. But to stay consistent with \cite{NRF}, we also used the proposed value of 0.5 in conducted experiments.
+To retain \eqref{eq:sec_hidd_property}, it is sufficient to choose any other arbitrary constant in \eqref{eq:bias} in range $(0,1)$ instead of 0.5. But to stay consistent with \cite{NRF}, we also used the proposed value of 0.5 in conducted experiments.
 
 At this stage, we already defined architecture and initial weights and biases settings of first two hidden layers in order to transform decision tree into neural network with the same properties. All that remains is to gain classification predictions from the second hidden layer.
 
@@ -1269,36 +1279,38 @@ At this stage, we already defined architecture and initial weights and biases se
 
 In this section is proposed architecture and initial setting for output layer, that will gain same predictions as the decision tree. Unfortunately, same method proposed for regression trees in \cite{NRF} is not directly applicable in the classification case. Therefore we propose an alternative for the classification case, that give same classification outcomes as the corresponding decision tree.
 
-The output layer will be constructed as follows: The number of neurons in output layer is equal to number of classes we desire to classify. Each neuron corresponds to only one particular class (one label). Neuron with the highest activation represents the predicted class of neural network. In the experiments were used two types of neurons in output layer - with sigmoid and softmax activation functions, as were discussed in Chapter [Activation functions].  To get the same performance as the decision tree, we must retrieve probability distributions stored in leaves from the leaf membership encoded in the second hidden layer. If the output layer outcomes the same probability values for classes as the decision tree, hence the neural network performs alike.
+The output layer will be constructed as follows: The number of neurons in output layer is equal to number of classes we desire to classify. Each neuron corresponds to only one particular class (one label). Neuron with the highest activation represents the predicted class of neural network. In the experiments, we primarily applied softmax activation function in the output layer. To get the same performance as the decision tree, we must retrieve probability distributions stored in leaves from the leaf membership encoded in the second hidden layer. If the output layer outcomes the same probability values for classes as the decision tree, hence the neural network performs alike.
 
-Let's denote output from the second hidden layer as\\ $\boldsymbol{r} = (-1,...,-1,+1,-1,...,-1)^T$, where the position of +1 indicates the leaf where the input falls in. For each leaf $l \in \{1,...,L\}$ we denote a probability vector $\boldsymbol{p^l} = (p^l_1,p^l_2,...,p^l_C)^T$ with probabilities of individual classes, that are stored in leaf $l$, where $C$ is total number of classes. If $\boldsymbol{r}$ has +1 as the first element (corresponding to the first leaf), i.e. $r_1 = +1$, the output layer should outcome $\boldsymbol{p}^1$. If $r_2 = +1$, the outcome should be $\boldsymbol{p}^2$ etc.
+Let's denote output from the second hidden layer as $\boldsymbol{r} = (-1,...,-1,+1,-1,...,-1)^T$, where the position of +1 indicates the leaf where the input falls in. For each leaf $l \in \{1,...,L\}$ we denote a probability vector $\boldsymbol{p^l} = (p^l_1,p^l_2,...,p^l_{|\mathbb{C}|})^T$ with probabilities of individual classes, that are stored in leaf $l$, where $|\mathbb{C}|$ is a total number of classes. If $\boldsymbol{r}$ has +1 as the first element (corresponding to the first leaf), i.e. $r_1 = +1$, the output layer should outcome $\boldsymbol{p}^1$. If $r_2 = +1$, the outcome should be $\boldsymbol{p}^2$ etc.
 
 If we initialize biases in the output layer to 0, then appropriate initialization weights could be obtained by solving the system of linear equations with a regular matrix $\mathbb{A}$
 \begin{equation}
-    \mathbb{A}=\begin{pmatrix}
-    1 & -1 & -1 &\hdots & -1 \\
-    -1 & 1 & -1 & \hdots & -1\\
-    \vdots & \ddots & \ddots & \ddots&\vdots \\
-    -1 & \ddots & \ddots & \ddots&-1 \\
-    -1 & -1 & \hdots & -1 & 1
-    \end{pmatrix}\hspace{0.5cm}.
+    \mathbb{A}=\begin{pmatrix*}[r]
+    1 & -1 & -1 &-1&\hdots & -1 \\
+    -1 & 1 & -1 & -1&\hdots & -1\\
+     -1 & -1 & 1 & -1&\hdots & -1\\
+    \vdots & \vdots & \ddots&\ddots & \ddots&\vdots \\
+    -1 & -1&\hdots & -1 & 1&-1 \\
+    -1 & -1 & \hdots&-1 & -1 & 1
+    \end{pmatrix*}\hspace{0.5cm}.
 \end{equation}
 
 Matrix $\mathbb{A} \in \mathbb{R}^{L\times L}$, where $L$ is a total number of leaves in the decision tree. The determinant of matrix $\mathbb{A}$ is
 \begin{equation}
-    \text{det}\mathbb{A} = \begin{vmatrix}
-    1 & -1 & -1 &\hdots & -1 \\
-    -1 & 1 & -1 & \hdots & -1\\
-    \vdots & \ddots & \ddots & \ddots&\vdots \\
-    -1 & \ddots & \ddots & \ddots&-1 \\
-    -1 & -1 & \hdots & -1 & 1
-    \end{vmatrix} = (-1)^{2L-3}\cdot2^{L-1}\cdot(L-2)
+    \text{det}\mathbb{A} = \begin{vmatrix*}[r]
+    1 & -1 & -1 &-1&\hdots & -1 \\
+    -1 & 1 & -1 & -1&\hdots & -1\\
+     -1 & -1 & 1 & -1&\hdots & -1\\
+    \vdots & \vdots & \ddots&\ddots & \ddots&\vdots \\
+    -1 & -1&\hdots & -1 & 1&-1 \\
+    -1 & -1 & \hdots&-1 & -1 & 1
+    \end{vmatrix*} = (-1)^{2L-3}\cdot2^{L-1}\cdot(L-2)
 \label{eq:determinant}
 \end{equation}
 
-For the proof of \eqref{eq:determinant} see Chapter [Proves]. Matrix $\mathbb{A}$ is therefore always regular with except of $L = 2$. In this case, $\text{det}\mathbb{A} = 0$ and matrix $\mathbb{A}$ is singular. But for $L=2$, the decision tree has only root node and 2 leaves, which is rarely a well-functional model in practical use. It could have a good performance almost only in case of data with significantly unambigous geometric deployment, where occurs only 2 classes and exists one hyperplane that sufficiently separates them. In practice, we will almost never encounter such an elementary model.
+For the proof of \eqref{eq:determinant} see Proof 1 in Appendix B. Matrix $\mathbb{A}$ is therefore always regular with except of $L = 2$. In this case, $\text{det}\mathbb{A} = 0$ and matrix $\mathbb{A}$ is singular. But for $L=2$, the decision tree has only root node and 2 leaves, which is rarely a well-functional model in practical use. It could have a good performance almost only in case of data with significantly unambigous geometric deployment, where occurs only 2 classes and exists one hyperplane that sufficiently separates them. In practice, we will almost never encounter such an elementary model.
 
-In case of invertible activation function $\boldsymbol{\phi}(\cdot)$ in the output layer, we obtain appropriate weights for neuron $c$ (also represents class $c \in \{1,...,\mathbb{C}\}$ that this neuron corresponds to) in output layer after solving the following system of linear equations:
+In case of invertible activation function $\boldsymbol{\phi}(\cdot)$ in the output layer, we obtain appropriate weights for neuron $c \in \{1,...,|\mathbb{C}|\}$ in the output layer after solving the following system of linear equations:
 
 \begin{equation}
     \mathbb{A}\begin{pmatrix}
@@ -1345,7 +1357,7 @@ Fortunately, we are interested in arbitrary solution, which would produce probab
 \label{softmax_inversion}
 \end{equation}
 
-This definition fulfills condition $\boldsymbol{\theta}(\boldsymbol{\theta}^{-1}(\boldsymbol{z})) = \boldsymbol{z}$, because $\forall k \in \{1,...,L\}$ holds
+This definition fulfills condition $\boldsymbol{\theta}(\boldsymbol{\theta}^{-1}(\boldsymbol{z})) = \boldsymbol{z}$, because $\forall k \in \{1,...,L\}$ applies
 
 $$\frac{e^{\ln z_k}}{\sum_i^{}e^{\ln z_i}} = \frac{z_k}{\sum_i^{}z_i} = z_k \hspace{0.2cm},$$
 
@@ -1378,11 +1390,11 @@ The higher $\beta$ is, the better approximation of perceptron activation functio
 
 \section{Competitive decision-tree-motivated models}
 \label{competitive_models}
-In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in Chapter 3, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases up, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model from Chapter 3 has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $(l+1)$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
+In this section is provided overview of all decision-tree-motivated models examined in the experimental part of the thesis. Alongside the reference model proposed in \autoref{tree_transf_net}, we propose another competitive models motivated by original decision tree structure. These models exploits knowledge acquired by training the decision tree and use it for setting the proper weights and biases, but not all of them. Especially they relax conditions on weights and biases corresponding to the output layer (the reference model has deterministic weights and biases gained from the decision tree in all layers) and initialize them randomly. This does not provide accurate decision tree transformation as our reference model, but instead gives neural network more space to adapt in its own direction. Generally, in the experimental part were all random weights of connections pointing from arbitrary layer $l$ to following layer $(l+1)$ initialized randomly from Gaussian distribution of mean equal 0 and standard deviation equal $\frac{1}{\sqrt{n_l}}$, where $n_l$ denotes number of neurons in layer $l$. All biases were initialized randomly from normalized Gaussian distribution of mean equal 0 and standard deviation equal 1. This random weight initialization was inspired by recommendation from \cite{feedforward}.
 
 \subsubsection{Reference model (NT)}
 
-Acquisition of this model is described in Chapter 3. Its main purpose is to simulate corresponding decision tree behaviour as good as possible from the very beginning (quality of simulation is controlled by $\beta_1$ and $\beta_2$ transition parameters of hyperbolic tangent in the first and second hidden layer). With both $\beta$s approach infinity, the reference model gives same predictions as decision tree. Essentially, with respect to the predicting procedure of the decision tree based on picking label with the highest probability, it could converge to predicting same results with $\beta$s only "high enough".
+Acquisition of this model is described in \autoref{tree_transf_net}. Its main purpose is to simulate corresponding decision tree behaviour as good as possible from the very beginning (quality of simulation is controlled by $\beta_1$ and $\beta_2$ transition parameters of hyperbolic tangent in the first and second hidden layer). With both $\beta$s approach infinity, the reference model gives same predictions as decision tree. Essentially, with respect to the predicting procedure of the decision tree based on picking label with the highest probability, it could converge to predicting same results with $\beta$s only "high enough".
 % sem dát možná nějaké vysvětlení, jaká vliv má změna v beta na prediction, použít nějaký horní odhad výstupního vektoru, maticové normy
 After transformation the neural network is already a sufficient model capable of making relevant predictions, because it could produce similar predictions as corresponding decision tree. This makes neural network to share resembling features as the decision tree, mainly regarding adjustments of decisions, inclination to overfitting, etc. The closeness of this model to the corresponding decision tree gives good opportunity to enhance performance of the decision tree by further backpropagation training, achieving improvement only after few epochs of training. Analysis of these issues will be provided in later chapters.
 
@@ -1395,7 +1407,7 @@ This modification should reveal some properties related to advantages or disadva
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.5\textwidth]{nrt_basic.png}
-\caption{NT\_basic model. In contrast with the reference model, the weights and biases corresponding to the output layer are initialized randomly.}
+\caption{NT\_basic. In contrast with the reference model, the weights and biases corresponding to the output layer are initialized randomly.}
 \label{fig:nrt_basic}
 \end{figure}
 
@@ -1416,11 +1428,11 @@ Adding one extra layer increases complexity, but could have positive impact on t
 
 This model is motivated by NT\_EL model. The weights and biases up to the extra layer are initialized same as in the case of NT\_EL model. On the contrary, the weights and biases corresponding to the output layer are initialized deterministically. The goal is to adjust the weights in a way that neural network can output same predictions as the decision tree already at the beginning of backpropagation (for sufficiently high transition parameters $\beta_1$ and $\beta_2$), similarly as the reference model. Since the extra layer can output same probabilities as the decision tree, it would be sufficient to traverse the output of the extra layer to the output layer. We achieve this by initializing weights of connections from the extra layer to the output layer by identity matrix. In other words, the weight of the connection from $j$-th neuron of the extra layer to $j$-th neuron of the output layer is initialized to 1 and other weights pointing from $j$-th neuron to the output layer are initialized to 0. This procedure is applied for each neuron of the extra layer. Biases corresponding to the output layer are initialized to 0. Then if we use softmax in the output layer, the probabilities would be modified, but order of these values remain same. Since the final prediction corresponds to the class with the highest probability, we end up with same predictions as the decision tree even that individual values are not exactly same as in the case of the decision tree.
 
-\section{Neural Random Forest}
+\section{Neural random forest}
 
 We already defined several transformations of single decision tree to the neural network. Our main interest is primarily to transform ensemble of decision trees to the ensemble of neural networks. Specifically, we focus on transforming random forest classifier into the ensemble of neural networks, which we refer to as \textit{neural random forest} (NF).
 
-Neural random forest is obtained by transforming each decision tree into the neural network by predefined procedure (we described 4 different ways in the previous chapter). Then all neural networks are further trained by backpropagation.
+Neural random forest is obtained by transforming each decision tree into the neural network by predefined procedure (we described 4 different ways in the previous section). Then all neural networks are further trained by backpropagation and gradient-based methods.
 
 To extract the final prediction we combine decisions from individual neural networks. We adopted two different ways to extract predictions.
 
@@ -1431,13 +1443,16 @@ To extract the final prediction we combine decisions from individual neural netw
 
 \subsubsection{Commentary on the complexity}
 
+Neural random forests have to be initialized by a trained random forest in order to establish the architecture of individual neural networks. This fact naturally increases the time and space complexity in comparison with the initialization random forest. Also the number of hyperparameters of neural random forest is larger than in the case of the random forest. On the contrary, since the architecture is defined beforehand, we significantly reduce the number of hyperparameters in comparison with regular feedforward neural network.
+
+The substantial inconvenience of neural random forest is caused by the subsequent training of every single neural network in the ensemble after the initialization. This operation is computationally very expensive. Fortunately, we can parallelize the training procedure, since the training of individual neural networks is completely independent. Moreover, we can accelerate the matrix-based operations (matrix multiplications, etc.) in the backpropagation algorithm by usage of graphics processing units (GPU), which is already a common practice among neural networks. These optimizations significantly accelerate the training time and therefore reduce the training time requirements of the neural random forests. On a sufficiently powerful machine, we can roughly match a training time of neural random forest (after initialization) to a training time of a single feedforward neural network of similar architecture as the individual estimators in an ensemble. This is already a fine compensation, which makes the neural random forests well-applicable to a wide range of applications.
 
 
 \chapter{Experiments}
 \label{experiments}
 \setlength\footnotemargin{8pt}
 
-This chapter focuses on the experimental part of the thesis. Proposed models were applied to several experimental datasets under various parametric settings. The performance were analysed among all models to provide quantitative comparison of quality and stability of outcomes. The main emphasis is put especially on the comparison of the Neural Random Forest (NF) models with the corresponding Random Forest (RF) models. Moreover, the results of NF and RF models are also compared to the performance of other popular classification algorithms, such as Logistic Regression (LR) and Feedforward Neural Network (NN). The experiments are divided into three separate parts.
+This chapter focuses on the experimental part of the thesis. Proposed models were applied to several experimental datasets under various parametric settings. The performance were analysed among all models to provide quantitative comparison of quality and stability of outcomes. The main emphasis is put especially on the comparison of the neural random forest (NF) models with the corresponding random forest (RF) models. Moreover, the results of NF and RF models are also compared to the performance of other popular classification algorithms, such as logistic regression (LR) and feedforward neural network (NN). The experiments are divided into three separate parts.
 
 The first part is dedicated to the evaluation on the pre-selected public datasets. All proposed NF models are evaluated on these datasets and compared with RF and other models. Additionally, the effect of NF and RF hyperparameters on the classification performance is examined and visualized on the supporting graphs.
 
@@ -1511,7 +1526,7 @@ All applied models are summarized in Table \ref{table::public_models} with their
 
 
 
-Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NF models. We adopted logistic regression with L2 regularization and neural network with ReLU activation function in the hidden layers and softmax in the output layer. We apply Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the Stochastic Gradient Descent). The hyperparameters of Adam was chosen as follows: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. We use same notation as defined in \autoref{other_training_methods}. The implementation of LR and NN was taken from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
+Models in Table \ref{table::public_models} are color-coded into three different areas. Yellow area includes competitive models to the RF and NF models. We adopted logistic regression with L2 regularization and neural network with ReLU activation function in the hidden layers and softmax in the output layer. We apply Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the stochastic gradient descent). The hyperparameters of Adam was chosen as follows: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. We use same notation as defined in \autoref{other_training_methods}. The implementation of LR and NN was taken from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
 
 The green area comprises RF models. We adopted three variations with different number of estimators. All decision trees were trained with entire training dataset and we use entropy as the impurity function in the information gain criterion. We use implementation from Scikit learn.
 
@@ -1610,7 +1625,7 @@ In this section are studied various combinations of hyperparameters of NF and RF
 
 We use Vehicle and Diabetes datasets to analyze performance based on hyperparameter choice. RF model performed faintly on Vehicle dataset and finely on Diabetes dataset in comparison with other models, thus NF models initialized with RF models trained on those two datasets cover situations that could arise in practical use: boosting well-performing RF or poor-performing RF by NF. If we choose bad hyperparameters in the case of poor RF, the resulting NF could be poor as well and if we choose bad hyperparameters in the case of fine RF, the resulting NF could perform worse than the corresponding RF, which is undesirable.
 
-All graphical visualizations are presented in the \autoref{figures} and referenced in this section.  Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results of RF models are presented together with results of NF models in one figure, then these RF models were used to initialize all coresponding NF models in the same figure. In all following experiments, the hyperparameters and settings of models which are not examined at the time remain same as defined in Table \ref{table::public_models} and \autoref{overall_public_results}.
+All graphical visualizations are presented in Appendix A and referenced in this section. Unless stated otherwise, all experiments were performed as 2 subsequent independent 5-fold cross validations (10 iterations in total) and outcomes are shown in the form "$\text{mean} \pm \text{std}$" in the corresponding figures. Also if the results of RF models are presented together with results of NF models in one figure, then these RF models were used to initialize all coresponding NF models in the same figure. In all following experiments, the hyperparameters and settings of models which are not examined at the time remain same as defined in Table \ref{table::public_models} and \autoref{overall_public_results}.
 
 \subsubsection{Learning rate}
 \label{public:learning_rate}
@@ -1621,7 +1636,7 @@ We study different settings for learning rates in our model and research the sen
 
 Other hyperparameters of NF and RF models except of learning rate remain same as defined in Table \ref{table::public_models}. NF and RF have 20 estimators.
 
-Graphs for varying learning rates are presented in the Picture \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure \ref{figures:learning_rates_diabetes}. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
+Graphs for varying learning rates are presented in Figure \ref{learning_rates} for the case of Vehicle dataset. Graphs for Diabetes dataset are in the Figure \ref{figures:learning_rates_diabetes}. We present only accuracy results, since both visualizations of accuracy and F1-score have very similar trend and shape. Moreover, both datasets are balanced or have very low degree of imbalance between classes, so referring to accuracy is safe in this case.
 
 
 Based on the Figure \ref{learning_rates}, we can see that in all cases the optimal value for learning rates could be found close to zero, approximately in the range $(0.001,0.02)$. With increasing value of learning rate, the performance of models is declining. The steepest downfall is registered in the case of NN model, where for the learning rate equals 0.1 drops accuracy to approximately 50\% of maximum reached accuracy. On the other hand, NF models did not suffer from such eminent decrease in the given range. This experiment suggests, that NF models could be slightly less sensitive to learning rate as single NN, but it really depends on the specific application. Resembling trend could be seen in the Figure \ref{figures:learning_rates_diabetes} on Diabetes dataset, altough not that vigorous. In this case the accuracy of NF models fluctuates a bit around almost constant value (mild decrease at the end of the range) in the given range of learning rates, whereas in the case of NN we can notice early decrease of accuracy in the range $(0.001,0.12)$ and then it remains basically constant. Consequently, we could choose suitable learning rates from wider range in the case of NF models than in the case of single NN.
@@ -1991,15 +2006,15 @@ In the conducted experiments of binary classification on LUCAS dataset were only
 
 \chapter{Conclusion}
 
-This thesis focused mainly on the research of relationship between random forest and feedforward neural network classifiers in terms of transformation of a single decision tree into the neural network. Moreover, we proposed and developed four different hybrid classifiers belonging to the group of neural random forests.
+This thesis focused mainly on the research of relationship between random forest and feedforward neural network classifiers in terms of transformation of a single decision tree into the neural network. We provided detailed theoretical descriptions of related domains and proposed four different hybrid classifiers belonging to the group of neural random forests.
 
-We compared the performance of all proposed models to each other and also to the performance of initialization random forest, a single neural network and logistic regression. Firstly, the performance has been tested on several public datasets. All NF models reported favourable performance in comparison with other competitive models with respect to various evaluation metrics. The most favourable performance reported NRF\_DW and NRF\_EL\_DW models among all models. We also investigated the effect of neural random forest parameters on the performance and inclination to overfitting. Interestingly, we found a correlation between initialization random forest and neural random forest, when the transition parameters $\beta_1$ and $\beta_2$ are sufficiently high.
+We compared the performance of all proposed models to each other and also to the performance of initialization random forest, a single neural network and logistic regression. Firstly, the performance has been tested on several public datasets. All neural random forest models reported favourable performance in comparison with other competitive models with respect to various evaluation methods. The most favourable performance reported neural random forests NRF\_DW and NRF\_EL\_DW among all models. We also investigated the effect of neural random forest parameters on the performance and inclination to overfitting. Interestingly, we found a correlation between initialization random forest and neural random forest, when the transition parameters $\beta_1$ and $\beta_2$ are sufficiently high.
 
 Certain similarities between random forests and neural random forests have been detected especially in the case of NRF\_DW and NRF\_EL\_DW models. This is further supported by illustrations of decision boundaries on 2D toy datasets, where we can see a strong resemblance between decision boundary of random forest and neural random forest, when the transition parameters are increased. Also, NRF\_DW and NRF\_EL\_DW models needed fewer number of training epochs to converge to a reasonable solution than concurrent models NRF and NRF\_EL, especially in the case of datasets with less data instances.
 
-Finally, we tested the performance of NRF\_DW and NRF\_EL\_DW models on the real dataset, consisting of data obtained by LUCAS project. This dataset has 91 features and 1133 instances divided into 2 classes, which represent different kinds of treatment. There is a significant imbalance between the number of positive instances and the number of negative instances. Even in this case the performance of neural random forest models was more favourable than the performance of other competitive models. This case also higlighted the benefit of increasing the transition parameters, since the random forest model produced better results than a single neural network.
+Finally, we tested the performance of NRF\_DW and NRF\_EL\_DW models on the real dataset, consisting of medical data obtained by LUCAS project. This dataset has 91 features and 1133 instances divided into 2 classes, which represent different kinds of treatment. There is a significant imbalance between the number of positive instances and the number of negative instances. Even in this case the performance of neural random forest models was more favourable than the performance of other competitive models. This case also higlighted the benefit of increasing the transition parameters, since the random forest model produced better results than an examined single neural network.
 
-Neural random forests showed a good classification ability with an ambition to overcome other classic models. Even though the time and space complexity is higher than in the case of initialization random forest or a single neural network of similar architecture as individual estimators, the training time can be significantly reduced by usage of parallelization and possibly acceleration on graphical computational units (GPU). If the machine possesses a sufficient number of computational units, the training time of an entire ensemble equals roughly to the training time of a single decision tree and a single feedforward neural network, which makes neural random forests well-applicable even in the case of large datasets. 
+Neural random forests showed a good classification ability with an ambition to overcome other classic models. Even though the time and space complexity is higher than in the case of initialization random forest or a single neural network of similar architecture as individual estimators, the training time can be significantly reduced by usage of parallelization and possibly acceleration on graphical processing units (GPU). If the machine possesses a sufficient number of computational units, the training time of an entire ensemble equals roughly to the training time of a single decision tree and a single feedforward neural network, which makes neural random forests well-applicable even in the case of large datasets. 
 
 
 
@@ -2627,13 +2642,20 @@ DOI: 10.3233/IDA-130592
 
 \bibitem{konkurence2}https://www.ijcai.org/Proceedings/16/Papers/628.pdf
 
+\bibitem{logregression}Maher Maalouf, 2011. "Logistic regression in data analysis: an overview," International Journal of Data Analysis Techniques and Strategies, Inderscience Enterprises Ltd, vol. 3(3), pages 281-299.
+
+\bibitem{svm}AWAD, Mariette a Rahul KHANNA. Support Vector Machines for Classification. AWAD, Mariette a Rahul KHANNA. Efficient Learning Machines [online]. Berkeley, CA: Apress, 2015, 2015-04-27, s. 39-66 [cit. 2020-06-26]. DOI: 10.1007/978-1-4302-5990-9\_3. ISBN 978-1-4302-5989-3. Available at: http://link.springer.com/10.1007/978-1-4302-5990-9\_3
+
 
 \end{thebibliography}
 
 \newpage
-\begin{center}
-\Huge{\textbf{Appendix 2}}    
-\end{center}
+\pagestyle{fancy}
+\chead{\huge{\textbf{Appendix B}}}
+%\begin{flushleft}
+%\huge{\textbf{Appendix B}}    
+%\end{flushleft}
+%\addcontentsline{toc}{toc}{Appendix B}
 \subsubsection{Proof 1:}
 \label{proof1}
 
@@ -2713,9 +2735,6 @@ DOI: 10.3233/IDA-130592
     \item The matrix is upper triangular, so the result is obtained by the multiplication of diagonal entries.
 \end{enumerate}
 \endgroup
-
-
-
 
 
 
