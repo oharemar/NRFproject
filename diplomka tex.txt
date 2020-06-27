@@ -2167,10 +2167,16 @@ DOI: 10.3233/IDA-130592
 
 
 \end{thebibliography}
+
 %\chapter{Figures}
 %\label{figures}
 \newpage
-\appendix
+
+\addcontentsline{toc}{chapter}{Appendix A}
+
+\setlength{\headsep}{0.1in}
+%\addcontentsline{toc}{chapter}{Appendix A}
+%\appendix
 \renewcommand\thefigure{A\arabic{figure}}
 \setcounter{figure}{0}
 \thispagestyle{fancy}
@@ -2217,6 +2223,7 @@ DOI: 10.3233/IDA-130592
 \fancyhf{}
 \pagestyle{fancy}
 \rhead{\thepage}
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2248,6 +2255,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:learning_rates_diabetes}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2284,6 +2292,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:estimators_epochs_vehicle}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2321,6 +2330,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:estimators_epochs_diabetes}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2352,6 +2362,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:depth_epochs}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2379,6 +2390,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:depth_epochs_reg}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2410,6 +2422,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:beta_epochs}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2441,6 +2454,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:beta_epochs_dia}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2472,6 +2486,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:features}
 \end{figure}
 \vfill
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2492,6 +2507,7 @@ DOI: 10.3233/IDA-130592
 \end{figure}
 %\restoregeometry
 \vfill
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2512,6 +2528,7 @@ DOI: 10.3233/IDA-130592
 \end{figure}
 %\restoregeometry
 \vfill
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2533,6 +2550,7 @@ DOI: 10.3233/IDA-130592
 %\restoregeometry
 \vfill
 
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2553,6 +2571,7 @@ DOI: 10.3233/IDA-130592
 \end{figure}
 %\restoregeometry
 \vfill
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2572,6 +2591,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:betas_toy2}
 \end{figure}
 %\restoregeometry
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2592,6 +2612,7 @@ DOI: 10.3233/IDA-130592
 \end{figure}
 %\restoregeometry
 
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2611,6 +2632,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:noise_toy}
 \end{figure}
 %\restoregeometry
+\setlength{\headsep}{0.1in}
 
 %\newgeometry{bottom=0.1cm,top=0.1cm}
 \vfill
@@ -2627,6 +2649,7 @@ DOI: 10.3233/IDA-130592
 \label{figures:toy_reg}
 \end{figure}
 %\restoregeometry
+\setlength{\headsep}{0.1in}
 
 \vfill
 \begin{figure}[h!]
@@ -2664,7 +2687,10 @@ DOI: 10.3233/IDA-130592
 \label{figures:pr_curves}
 \end{figure}
 \vfill
+
 \newpage
+\setlength{\headsep}{0.2in}
+
 \clearpage
 \fancyhf{}
 \pagestyle{fancy}
@@ -2750,9 +2776,7 @@ DOI: 10.3233/IDA-130592
     \item The matrix is upper triangular, so the result is obtained by the multiplication of diagonal entries.
 \end{enumerate}
 \endgroup
-
-
-
+\addcontentsline{toc}{chapter}{Appendix B}
 
 
 
