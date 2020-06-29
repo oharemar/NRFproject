@@ -309,7 +309,7 @@ To clarify \ref{definition_pos_neg}, if we test the  classification performance 
 Accuracy is probably the most frequently applied evaluation metric in the machine learning society, which provides quick and simple evaluation of the classification performance. The outcome of this metric is the ratio between the number of correctly classified instances and the number of all instances. It is usually a single value per classifier (not specific to individual classes) and it is defined as
 
 \begin{equation}
-    accuracy = \frac{\text{number of correctly classified instances}}{\text{number of all instances}} \hspace{0.2cm}
+    accuracy = \frac{\text{number of correctly classified instances}}{\text{number of all instances}} \hspace{0.2cm}.
 \end{equation}
 
 Altough accuracy can simply provide an evaluation of the quality of classification, it possesses some significant drawbacks \cite{multieval1} and therefore relying only on this metric in final evaluation is dangerous. It does not take into account whether the instances belong into a positive or a negative class. A serious problem arises especially when processing imbalanced data \cite{imbalance}, which is the case of many real-world applications.
@@ -320,7 +320,7 @@ For instance, imagine data distributed into two classes, class 0 with 98\% occur
 
 Another evaluation metric is called precision and is class-sensitive. In contrast to accuracy, it is computed for any particular class $c \in \mathbb{C}$ as
 \begin{equation}
-    precision(c) = \frac{\text{TP}(c)}{\text{TP}(c)+\text{FP}(c)}
+    precision(c) = \frac{\text{TP}(c)}{\text{TP}(c)+\text{FP}(c)} \hspace{0.2cm}.
 \end{equation}
 
 It expresses the ratio between correctly predicted positive instances and all instances predicted as positive. In other words, it shows how precise our classification model is in predicting a positive class.
@@ -336,7 +336,7 @@ So even if our classifier predicts all positive instances correctly, the precisi
 This metric is computed for class $c \in \mathbb{C}$ as
 
 \begin{equation}
-    recall(c) = \frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)}
+    recall(c) = \frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)} \hspace{0.2cm}.
 \end{equation}
 
 Recall expresses the ratio between the number of correctly classified positive instances and the number of all positive instances. Clearly, this metric does not depend on the rate of imbalance in our data and therefore is a suitable choice for the evaluation on imbalance datasets.
@@ -348,7 +348,7 @@ In many applications of classification on imbalance datasets, there is a strong 
 F-measure metric combines precision and recall into a single value as
 
 \begin{equation}
-    F_\beta(c) = \frac{(1+\beta^2)\cdot precision(c) \cdot recall(c)}{\beta^2 \cdot precision(c) + recall(c)}\hspace{0.5cm} ,
+    F_\beta(c) = \frac{(1+\beta^2)\cdot precision(c) \cdot recall(c)}{\beta^2 \cdot precision(c) + recall(c)}\hspace{0.2cm} ,
 \end{equation}
 where $c \in \mathbb{C}$ and $\beta$ is a coefficient which serves to adjust relative importance between precision and recall (often $\beta = 1$). For $\beta = 1$ it expresses harmonic mean of precision and recall. As $\beta \rightarrow 0$ the formula considers only precision and as $\beta \rightarrow \infty$ the formula considers only recall. Generally, $\beta < 1$ favors precision and $\beta > 1$ favors recall. It depends on each individual application to choose $\beta$ appropriately. For $\beta = 1$ we refer to the corresponding F-measure as F1-score.
 
@@ -357,7 +357,7 @@ where $c \in \mathbb{C}$ and $\beta$ is a coefficient which serves to adjust rel
 G-measure is computed as
 
 \begin{equation}
-    G(c) = \sqrt{\frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)} \cdot \frac{\text{TN}(c)}{\text{TN}(c) + \text{FP}(c)}} \hspace{0.5cm},
+    G(c) = \sqrt{\frac{\text{TP}(c)}{\text{TP}(c) + \text{FN}(c)} \cdot \frac{\text{TN}(c)}{\text{TN}(c) + \text{FP}(c)}} \hspace{0.2cm},
     \label{g-meas}
 \end{equation}
 where $c \in \mathbb{C}$. The left factor in multiplication under the square root in \eqref{g-meas} is called \textit{sensitivity} or \textit{true positive rate} (the same as recall) and the right factor is called \textit{specificity} or \textit{true negative rate}.
@@ -372,7 +372,7 @@ For arbitrary (class-sensitive) evaluation metric $f$, macro/weighted average is
     macroAvg(f) = \frac{\sum_{l=1}^{M}f(c_l)}{M}
 \end{equation}
 \begin{equation}
-    weightedAvg(f) = \frac{\sum_{l=1}^{M}n_l \cdot f(c_l)}{\sum_{l=1}^{M}n_l} \hspace{0.5cm},
+    weightedAvg(f) = \frac{\sum_{l=1}^{M}n_l \cdot f(c_l)}{\sum_{l=1}^{M}n_l} \hspace{0.2cm},
 \end{equation}
 where $c_l, l \in \{1,2,...,M\}$ is $l$-th class, $n_l$ is the number of (testing) instances belonging to $c_l$ and $M$ is the total number of classes.
 
@@ -385,7 +385,7 @@ It is also worth mentioning \textbf{micro average} of precision and recall, whic
 
 \begin{equation}
     microAvg(recall) = \frac{\sum_{l=1}^{M}\text{TP}(c_l)}{\sum_{l=1}^{M}(\text{TP}(c_l) + \text{FN}(c_l))}
-    \label{micRe}
+    \label{micRe} \hspace{0.2cm}.
 \end{equation}
 
 $microAvg(precision)$ computes basically fraction of the number of all correctly predicted instances and the number of all correctly and incorrectly predicted instances, which is the number of all instances. Therefore, it expresses the same value as accuracy of the model. Furthermore, since $\sum_{l=1}^{M}\text{FN}(c_l) = \sum_{l=1}^{M}\text{FP}(c_l)$, both values \eqref{micPrec} and \eqref{micRe} are equal. Note that this may not apply in the case of multi-label classification.
@@ -397,7 +397,7 @@ ROC (receiver operating characteristics) curve \cite{roc} is a popular graphical
 
 \begin{align}
     \text{TPR} &= \frac{\text{TP}}{\text{TP} + \text{FN}} \\
-    \text{FPR} &= \frac{\text{FP}}{\text{FP} + \text{TN}} \hspace{0.2cm}
+    \text{FPR} &= \frac{\text{FP}}{\text{FP} + \text{TN}} \hspace{0.2cm},
 \end{align}
 where we omit parentheses (as defined in Table \ref{definition_pos_neg}) since there is only one positive class and one negative class.
 
@@ -497,7 +497,7 @@ The training begins always from the root node. Starting with the training set $\
     s(\boldsymbol{x},\boldsymbol{\theta}) = \begin{cases}
     0,  & \boldsymbol{x} \text{ is sent to the left child}\\
       1, & \boldsymbol{x} \text{ is sent to the right child}
-    \end{cases}
+    \end{cases} \hspace{0.2cm}.
 \end{equation}
 
 The parameters of the split functions are the input instance $\boldsymbol{x}$ and the parameter vector $\boldsymbol{\theta}$, which defines geometric separation of the data (e.g. hyperplanes). This comprises thresholds, a group of data features which will be considered in the split function and other necessary values needed for complete determination of the split function.
@@ -508,7 +508,7 @@ In practice, a widely chosen split function is \cite{rf_main}
     \psi(\boldsymbol{x}, i, \tau) = \begin{cases}
     0,  & x_i < \tau\\
       1, & \text{otherwise}
-    \end{cases}
+    \end{cases} \hspace{0.2cm}.
     \label{split_func}
 \end{equation}
 
@@ -521,11 +521,11 @@ Among widely applied impurity functions belong \textbf{Entropy}, \textbf{Gini in
 \begin{align}
     H_E(\mathbb{M}) &= -\sum_{c \in \mathbb{C}}^{}p(c)\log p(c) \\
     H_G(\mathbb{M}) &= \sum_{c \in \mathbb{C}}^{}p(c)(1-p(c))\\
-    H_{CE}(\mathbb{M}) &= 1 - \max_{c \in \mathbb{C}}[p(c)] \hspace{0.5cm},
+    H_{CE}(\mathbb{M}) &= 1 - \max_{c \in \mathbb{C}}[p(c)] \hspace{0.2cm},
 \end{align}
 where the sum iterates over all classes $c \in \mathbb{C}$, $\mathbb{C}$ is a set of all classes, and
 \begin{equation}
-    p(c) = \frac{\sum_{\boldsymbol{x} \in \mathbb{M}}^{} 1|_{\boldsymbol{x} \in c}}{|\mathbb{M}|} \hspace{0.5cm},
+    p(c) = \frac{\sum_{\boldsymbol{x} \in \mathbb{M}}^{} 1|_{\boldsymbol{x} \in c}}{|\mathbb{M}|} \hspace{0.2cm},
 \end{equation}
 which is the probability of an instance in $\mathbb{M}$ belonging to class $c$. $|\mathbb{M}|$ represents the number of instances in set $\mathbb{M}$ and
 
@@ -533,21 +533,21 @@ which is the probability of an instance in $\mathbb{M}$ belonging to class $c$. 
     1|_{\boldsymbol{x} \in c} = \begin{cases}
     1, & \boldsymbol{x} \in c \\
     0, & \text{otherwise}
-    \end{cases}
+    \end{cases} \hspace{0.2cm}.
 \end{equation}
 
 These impurity functions are in general exploited in the split criteria, which are then optimized in order to obtain the best possible split. By optimizing these criteria should decrease the impurity function value after each split.
 There are plenty of possibilities to choose a split criterion that suits our problem, but the most popular choice is often considered to be the \textbf{Information gain} criterion, which is defined as \cite{rf_main}
 
 \begin{equation}
-    I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau))
+    I(i,\tau,\mathbb{M}) = H(\mathbb{M}) - \sum_{i \in \{1,2\}}^{} \frac{|\mathbb{M}_j(i,\tau)|}{|\mathbb{M}|}H(\mathbb{M}_j(i,\tau)) \hspace{0.2cm}.
     \label{inf_gain}
 \end{equation}
 
 $H(\mathbb{M})$ is the arbitrary impurity function (e.g. entropy, gini index etc.) of set $\mathbb{M}$. $\mathbb{M}_j(i,\tau), j \in \{1,2\}$, represent the subsets of $\mathbb{M}$ proceeding to the left or right child. It is given in the parentheses, that these subsets strictly depend on parameters $i,\tau$ of the split function. By maximizing information gain in each node final parameters $i^*, \tau^*$ are obtained. These are stored and used in the testing stage. Thus, parameters of the split function of the $j$-th node are acquired as
 
 \begin{equation}
-    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*)^T = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.5cm},
+    \boldsymbol{\theta}_j^* = (i_j^*,\tau_j^*)^T = \text{arg}\max_{(i,\tau)}I(i,\tau,\mathbb{M}_j)\hspace{0.2cm},
 \end{equation}
 where $\mathbb{M}_j \subset \mathbb{M}$ is the subset of $\mathbb{M}$ in the $j$-th node.
 
@@ -593,7 +593,7 @@ For this reason, \textit{postpruning methods} can be adopted for the large-depth
 
 When the growth of the tree is successfully finished, the class distributions of the instances that ended in each leaf node form a probability distribution of classes, which is stored in the leaf node. For probability $p^j(c)$ of class $c \in \mathbb{C}$ in the leaf node $j \in \{1,...,L\}$, where $L$ is a total number of leaf nodes applies
 \begin{equation}
-    p^j(c) = \frac{n^j_c}{N^j} \hspace{0.5cm},
+    p^j(c) = \frac{n^j_c}{N^j} \hspace{0.2cm},
 \end{equation}
 where $n^j_c$ is the total number of instances of class $c$ in the leaf node $j$ and $N^j$ is the total number of instances in the entire leaf node $j$.
 
@@ -602,7 +602,7 @@ where $n^j_c$ is the total number of instances of class $c$ in the leaf node $j$
 After the training stage, the decision tree is obtained and could be applied in practice. Starting from the root node, the testing instance $x \in \mathbb{X} \subset \mathbb{R}^d$ is traversed down the tree by iterative application of the split functions associated with individual nodes. When the instance reaches the leaf node, the probability distribution of classes in the leaf node is extracted and the values are observed. The class which has the maximum value is output as the final prediction. Mathematically, the output of the single decision tree is
 
 \begin{equation}
-    c^* = \text{arg}\max_{c \in \mathbb{C}}p^j(c) \hspace{0.5cm},
+    c^* = \text{arg}\max_{c \in \mathbb{C}}p^j(c) \hspace{0.2cm},
 \end{equation}
 where $j$ is the leaf node where $x$ ended.
 
@@ -625,7 +625,7 @@ In the experimental part of this thesis an entire training dataset is used for t
 As mentioned previously, either probability distribution of classes from the leaf node or directly predicted class label could be extracted from every decision tree. Naturally, there are numerous possibilities of merging these results. Unless there is a special requirement, two ways are used in practice. If the outputs are discrete class labels, than the voting scheme is applied and the class with maximum votes is taken as the final prediction. If the outputs are probability distributions, those values are averaged and the class with maximum probability is taken. To be more precise, the final prediction in this case is
 
 \begin{equation}
-    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|\mathbb{T}|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.5cm},
+    c^* = \text{arg}\max_{c in \mathbb{C}}\frac{1}{|\mathbb{T}|}\sum_{t \in \mathbb{T}}p_t(c) \hspace{0.2cm},
     \label{final_pred}
 \end{equation}
 where $\mathbb{T}$ is a set of all trees in the random forest and $p_t(c)$ is a resulting probability distribution from the tree $t \in \mathbb{T}$. In \eqref{final_pred} a weighted average could be used instead, which is applied e.g. if predicting a certain class is more preferred over predicting others.
@@ -652,7 +652,7 @@ In this section we are going to describe the main components of an artificial ne
 As the propagation function is almost solely used a simple weighted sum of all inputs generally with an addition of a constant (called bias). Consider the input as a vector (if a single neuron is connected by the connections from multiple neurons) $\boldsymbol{x} = (x_1,x_2,...,x_k)^T$, where $k \in \mathbb{N}$ is the number of inputs to neuron and $b \in \mathbb{R}$ is a bias and $\boldsymbol{w} = (w_1,...,w_k)^T \in \mathbb{R}^k$ are connection weights used for the weighted sum. Then the output $z \in \mathbb{R}$ of the propagation function $f: \mathbb{R}^k \rightarrow \mathbb{R}$ is
 
 \begin{equation}
-    z = f(\boldsymbol{x}) = \sum_{i=1}^{k}(w_i \cdot x_i) + b   
+    z = f(\boldsymbol{x}) = \sum_{i=1}^{k}(w_i \cdot x_i) + b  \hspace{0.2cm}. 
 \end{equation}
 
 
@@ -676,7 +676,7 @@ The bias term might be thought as the negative threshold of the neuron ($b = - \
     \tau(z) = \begin{cases}
     1 & z > 0 \\
     0 & \text{otherwise}
-    \end{cases} \hspace{0.5cm}
+    \end{cases} \hspace{0.2cm}.
 \end{equation}
 
 If the argument of $\tau$ is positive (the threshold value for this neuron is 0), the output is 1, otherwise it is 0. Even though this simple model is applicable to many different tasks, it reliably solves only problems with linearly-separable data. This is due to the determinative equation $\sum_{i=1}^{k}(w_i \cdot x_i) + b = 0$, which defines a hyperplane in $\mathbb{R}^k$ and divides the space in two half-spaces. This drawback was surpassed by the application of multilayer perceptrons, which is a term for interconnected layers of multiple perceptrons (neural network with perceptrons).
@@ -732,7 +732,7 @@ One way of solving a discontinuity problem of perceptron is to replace $\tau$ wi
 For real input $z \in \mathbb{R}$ the sigmoid function $\sigma$ is defined as
 
 \begin{equation}
-    \sigma(z) = \frac{1}{1 + e^{-z}}
+    \sigma(z) = \frac{1}{1 + e^{-z}} \hspace{0.2cm}.
 \end{equation}
 This function is bounded, nonlinear, differentiable and has positive derivatives. It is successfully applied especially in the output layers of deep neural networks (output lies within (0,1) range, so in the case of classification it could be thought as the probability of the instance acquiring a particular label) or in the shallow neural networks (with 1 or max. 2 hidden layers) \cite{actfunc}. Despite some of its favourable properties, it suffers from significant drawbacks related to popular training methods. These drawbacks will be mentioned later once the gradient descent and backpropagation algorithm for training have been described.
 
@@ -750,7 +750,7 @@ Hyperbolic tangent (tanh) is another alternative used as the activation function
 For real input $z \in \mathbb{R}$ is defined as
 
 \begin{equation}
-    tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}
+    tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}} \hspace{0.2cm}.
 \end{equation}
 
 Hyperbolic tangent has very similar properties as the sigmoid function, but inherents some more beneficial properties, e.g. its range lies within (-1,1) and therefore is zero-centered, which produces advantegous behaviour in backpropagation training. Hyperbolic tangent has also become a preferred choice over the sigmoid function in the case of multilayer neural networks due to the fact that it shows usually a better training performance \cite{tanh_prefer}.
@@ -762,7 +762,7 @@ On the other hand, it shares a few drawbacks common with the sigmoid function, e
 The last of the exponential-based activation functions mentioned in this section is called the softmax activation function $\boldsymbol{\theta} : \mathbb{R}^k \rightarrow \mathbb{R}^k$. It is defined for the input vector $\boldsymbol{a} \in \mathbb{R}^k$ and $j \in \{1,...,k\}$, where $k \in \mathbb{N}$ as
 
 \begin{equation}
-    [\boldsymbol{\theta}(\boldsymbol{a})]_j = \frac{e^{a_j}}{\sum_{i=1}^{k}e^{a_i}}
+    [\boldsymbol{\theta}(\boldsymbol{a})]_j = \frac{e^{a_j}}{\sum_{i=1}^{k}e^{a_i}} \hspace{0.2cm}.
 \end{equation}
 
 The softmax activation function is frequently used especially in the output layers of neural networks, because its definition ensures that the output vector of softmax is interpretable as probability distribution (output components can be added to 1 and the range of softmax is (0,1)).
@@ -788,7 +788,7 @@ The ReLU activation function was introduced in 2010 by Nair and Hinto \cite{relu
 
 It is defined for real input $z \in \mathbb{R}$ as
 \begin{equation}
-    \text{ReLU}(z) = \max\{0,z\}
+    \text{ReLU}(z) = \max\{0,z\} \hspace{0.2cm}.
 \end{equation}
 For positive values of $z$ it behaves as a simple linear function and for negative values the output value remains 0. Its similarity to simple linear functions makes it easy to optimize learning algorithms and therefore the training of ReLU neurons is more effective and quicker (it does not need to count exponentials and divisions). The generalization ability, speed of convergence and often better performance in comparison with the sigmoid and tanh functions cause that ReLU functions are much more often used mainly in the hidden layers than competitive exponentially-based activation functions \cite{actfunc}. In addition, the ReLU function lacks the vanishing gradient drawback, which will be discussed later.
 
@@ -799,7 +799,7 @@ The problem of dead neurons could be solved by the adoption of the Leaky ReLU ac
     \text{LeakyReLU}(z) = \begin{cases}
     z & z > 0 \\
     \alpha z & \text{otherwise}
-    \end{cases}
+    \end{cases} \hspace{0.2cm}.
 \end{equation}
 The values of parameter $\alpha$ should be small, a popular choice is $\alpha = 0.01$. The shape of the Leaky ReLU can be seen in the right-hand part of Figure \ref{fig:relu}.
 
@@ -809,7 +809,7 @@ We have already sufficiently defined the neural network architecture and the way
 
 Let us define some notation in order to describe this issue more clearly. The notation is inspired by \cite{feedforward}. We denote the correct (desired) output of neural network as $\boldsymbol{y}(\boldsymbol{x})$ for input instance $\boldsymbol{x}$ and real output (estimation) of the neural network as $\hat{\boldsymbol{y}}(\boldsymbol{x})$. The quality of performance is evaluated by the means of minimizing the so called \textit{loss function} (in literature it can also be found as the objective function or the cost function). We denote the general loss function as $\Lambda$. One typical example of the loss function is \textit{Mean Squared Error} (MSE), also known as the quadratic cost function, which is defined as
 \begin{equation}
-    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \frac{1}{2n} \sum_{i=1}^{n}||\boldsymbol{y}({\boldsymbol{x}}_i)- \hat{\boldsymbol{y}}({\boldsymbol{x}}_i)||^2 \hspace{0.5cm},
+    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) = \frac{1}{2n} \sum_{i=1}^{n}||\boldsymbol{y}({\boldsymbol{x}}_i)- \hat{\boldsymbol{y}}({\boldsymbol{x}}_i)||^2 \hspace{0.2cm},
     \label{mse}
 \end{equation}
 where $\mathbb{W}$ is a set of all weights, $\mathbb{B}$ is a set of all biases and $\mathbb{X} = \{\boldsymbol{x}_1,...,\boldsymbol{x}_n\}$ is a set of all training instances, where $n \in \mathbb{N}$ is a number of all training instances. Norm $||\cdot|| = ||\cdot||_2$ is Euclidean norm. It is evident that estimation $\hat{\boldsymbol{y}}({\boldsymbol{x}})$ depends on $\boldsymbol{x}$ as well as on all weights and biases in the neural network. Later we will mention other frequently used loss functions with better functionality, especially in the task of classification.
@@ -820,25 +820,25 @@ Now we are going to describe the most popular algorithm used for finding optimal
 
 Gradient descent algorithm is a popular nonlinear programming technique for a wide range of minimization tasks. It is considered a benchmark for the minimization of loss functions in the field of neural networks. Let us consider general loss function $\Lambda(\boldsymbol{v})$ depending on vector $\boldsymbol{v}$. Gradient descent constructs the sequence of $\boldsymbol{v}^{(k)}$, which for each $k \in \mathbb{N}$ satisfies the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$ (except when $\boldsymbol{v}^{(k)}$ is optimal). The sequence is constructed as
 \begin{equation}
-    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} + \eta\Delta \boldsymbol{d} ^{(k)} \hspace{0.5cm},
+    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} + \eta\Delta \boldsymbol{d} ^{(k)} \hspace{0.2cm},
 \end{equation}
-where $\Delta \boldsymbol{d}^{(k)}$ is a real vector called the step or search direction, with the same dimension as $\boldsymbol{v}^{(k)}$ and $\eta > 0$ is called a learning rate \cite{grad}. The uestion is how to choose $\Delta \boldsymbol{d}^{(k)}$ in order to fulfill the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$.
+where $\Delta \boldsymbol{d}^{(k)}$ is a real vector called the step or search direction, with the same dimension as $\boldsymbol{v}^{(k)}$ and $\eta > 0$ is called a learning rate \cite{grad}. The question is how to choose $\Delta \boldsymbol{d}^{(k)}$ in order to fulfill the condition $\Lambda(\boldsymbol{v}^{(k+1)}) < \Lambda(\boldsymbol{v}^{(k)})$.
 
 We must choose $\Delta \boldsymbol{d}^{(k)}$ in such a way the $\Lambda$ function decreases in that direction. We could apply the calculus and search the direction in which the following condition is met:
 \begin{equation}
     \nabla_{\Delta \boldsymbol{d}^{(k)}} \Lambda(\boldsymbol{v}^{(k)}) = \Delta \boldsymbol{d}^{(k)} \cdot \nabla \Lambda(\boldsymbol{v}^{(k)}) < 0
-    \label{condition_calculus} \hspace{0.5cm},
+    \label{condition_calculus} \hspace{0.2cm},
 \end{equation}
 where $\nabla \Lambda(\boldsymbol{v}^{(k)})$ is the gradient of function $\Lambda$ and is defined for vector $\boldsymbol{v} = (v_1,...,v_m)^T$, $m \in \mathbb{N}$ as
 
 \begin{equation}
-    \nabla \Lambda(\boldsymbol{v}) = (\frac{\partial \Lambda}{\partial v_1}(\boldsymbol{v}),...,\frac{\partial \Lambda}{\partial v_m}(\boldsymbol{v}))^T.
+    \nabla \Lambda(\boldsymbol{v}) = (\frac{\partial \Lambda}{\partial v_1}(\boldsymbol{v}),...,\frac{\partial \Lambda}{\partial v_m}(\boldsymbol{v}))^T \hspace{0.2cm}.
 \end{equation}
 Condition \eqref{condition_calculus} expresses derivative of $\Lambda(\boldsymbol{v}^{(k)})$ in the direction of $\Delta \boldsymbol{d}^{(k)}$. If this derivative is negative, we can be sure that $\Lambda$ decreases in that direction.
 
 Suppose choosing $\Delta \boldsymbol{d}^{(k)} = - \nabla \Lambda(\boldsymbol{v}^{(k)})$. Then
 \begin{equation}
-    \Delta \boldsymbol{d}^{(k)} \cdot \nabla \Lambda(\boldsymbol{v}^{(k)}) = - ||\nabla \Lambda(\boldsymbol{v}^{(k)})||^2 \leq 0
+    \Delta \boldsymbol{d}^{(k)} \cdot \nabla \Lambda(\boldsymbol{v}^{(k)}) = - ||\nabla \Lambda(\boldsymbol{v}^{(k)})||^2 \leq 0 \hspace{0.2cm}.
     \label{condition_full}
 \end{equation}
 
@@ -847,7 +847,7 @@ Moreover, equality in \eqref{condition_full} is held only if $\nabla \Lambda(\bo
 The final equation for constructing the sequence is therefore
 
 \begin{equation}
-    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} - \eta\nabla \Lambda(\boldsymbol{v}^{(k)})
+    \boldsymbol{v}^{(k+1)} = \boldsymbol{v}^{(k)} - \eta\nabla \Lambda(\boldsymbol{v}^{(k)}) \hspace{0.2cm}.
 \end{equation}
 
 To provide a more intuitive perspective, the gradient descent algorithm iteratively searches for directions in which the value of the loss function is decreasing and stops when it is sufficiently close to the optimum (it can be local or global minimum). The initial (starting) point of the algorithm needs to be selected in advance. It is usually chosen randomly. The procedure is illustrated in Figure \ref{fig:grad}.
@@ -865,7 +865,7 @@ Another factor that significantly affects convergence is the learning rate $\eta
 We should specify the update rule in the case of modifying weights and biases of the neural network by gradient descent. Update rules for arbitrary weight $w$, bias $b$ and $k$-th iteration of gradient descent is
 \begin{align}
     w^{(k+1)} &= w^{(k)} - \eta \frac{\partial \Lambda}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \\
-    b^{(k+1)} &= b^{(k)} - \eta \frac{\partial \Lambda}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
+    b^{(k+1)} &= b^{(k)} - \eta \frac{\partial \Lambda}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \hspace{0.2cm}.
 \end{align}
 
 \subsection{Stochastic gradient descent (SGD)}
@@ -873,24 +873,24 @@ We should specify the update rule in the case of modifying weights and biases of
 In order to accelerate learning of the neural network, the \textit{stochastic gradient descent} algorithm was developed \cite{feedforward}. It is based on estimating the gradient of the loss function instead of computing it precisely.
 For instance, we show the algorithm in the case of the quadratic cost function in \eqref{mse}. It could be rewritten as
 \begin{align}
-    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) &= \frac{1}{n}\sum_{i=1}^{n}\Lambda_{\boldsymbol{x}_i} = \frac{1}{n}\sum_{i=1}^{n}\frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2}\\ \Lambda_{\boldsymbol{x}_i} &= \frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2}
+    \Lambda(\mathbb{W},\mathbb{B},\mathbb{X}) &= \frac{1}{n}\sum_{i=1}^{n}\Lambda_{\boldsymbol{x}_i} = \frac{1}{n}\sum_{i=1}^{n}\frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2}\\ \Lambda_{\boldsymbol{x}_i} &= \frac{||\boldsymbol{y}(\boldsymbol{x}_i) - \hat{\boldsymbol{y}}(\boldsymbol{x}_i)||^2}{2} \hspace{0.2cm}.
 \end{align}
 Therefore, the gradient of the loss function could be written as (we omit the parameters of $\Lambda$ for simplification)
 
 \begin{equation}
-    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i}
+    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i} \hspace{0.2cm}.
     \label{good_shape}
 \end{equation}
 Basically, this term is only the average of gradients of $\Lambda_{\boldsymbol{x}_i}$ across all training instances. The idea of the stochastic gradient descent is to replace averaging across all training instances with averaging only across a randomly sampled mini-batch $x_{i_1},...,x_{i_m}$ of size $m < n$, $m \in \mathbb{N}$. We obtain estimate
 \begin{equation}
-    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i} \approx \frac{1}{m}\sum_{l=1}^{m} \nabla \Lambda_{\boldsymbol{x}_{i_l}}
+    \nabla \Lambda = \frac{1}{n}\sum_{i=1}^{n} \nabla \Lambda_{\boldsymbol{x}_i} \approx \frac{1}{m}\sum_{l=1}^{m} \nabla \Lambda_{\boldsymbol{x}_{i_l}} \hspace{0.2cm}.
 \end{equation}
 
 If the size of the mini-batch is large enough, we can expect that this approximation will be roughly equal to the real gradient. This algorithm works for loss functions that could be rewritten in the same manner as quadratic cost function from the example. Of course, there might be some statistical deviations and the estimation is not always precise, but what we need is to move in the direction where the loss function is expected to decrease, it does not need to be exactly the direction of the gradient, so working with an estimation is justified. We shall rewrite the update rule in the case of SGD as
 \begin{align}
     w^{(k+1)} &= w^{(k)} - \frac{\eta}{m}\sum_{l=1}^{m} \frac{\partial \Lambda_{\boldsymbol{x}_{i_l}}}{\partial w}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
     \label{sgd_weight}\\
-    b^{(k+1)} &= b^{(k)} - \frac{\eta}{m}\sum_{l=1}^{m} \frac{\partial \Lambda_{\boldsymbol{x}_{i_l}}}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X})
+    b^{(k+1)} &= b^{(k)} - \frac{\eta}{m}\sum_{l=1}^{m} \frac{\partial \Lambda_{\boldsymbol{x}_{i_l}}}{\partial b}(\mathbb{W}^{(k)},\mathbb{B}^{(k)},\mathbb{X}) \hspace{0.2cm}.
     \label{sgd_bias}
 \end{align}
 
@@ -920,7 +920,7 @@ The SGD with momentum works in the way that it gradually accumulates fractions o
 
 \begin{align}
     \boldsymbol{s}^{(k+1)} &= \gamma\boldsymbol{s}^{(k)} + \eta \nabla\Lambda(\boldsymbol{v}^{(k)}) \\
-    \boldsymbol{v}^{(k+1)} &= \boldsymbol{v}^{(k)} - \boldsymbol{s}^{(k+1)}
+    \boldsymbol{v}^{(k+1)} &= \boldsymbol{v}^{(k)} - \boldsymbol{s}^{(k+1)} \hspace{0.2cm}.
 \end{align}
 
 This mechanism could also be interpreted in the physical point of view. Imagine ball rolling down the hill. It gradually accelerates and accumulates momentum, approaching the bottom faster and faster. It is afterwards more difficult to change suddenly its direction of movement by some lateral impulses and conversely the impulses in the direction of movement can increase the speed rapidly. Same reasoning could be applied to our case of optimization, where the effect of gradients that are deviated from the direction of movement is suppressed. This ensures faster convergence and smaller fluctuations.
@@ -961,18 +961,18 @@ We have already presented the idea of training the neural network via different 
 
 The derivation and description of the backpropagation algorithm is motivated by papers \cite{backprop} and \cite{feedforward}. We define some helpful notation in advance in order to simplify the derivation. Let us denote the output from $l$-th layer of the neural network and $j$-th neuron of that layer as $a_j^l$, the entire output vector of $l$-th layer will be denoted as $\boldsymbol{a}^l$. Term $w_{jk}^l$ denotes weight of the connection going from neuron $k$ in the previous layer $(l-1)$ to neuron $j$ in layer $l$ (it is in reversed order on purpose, it will simplify further notation with respect to the matrix multiplication) and term $\mathbb{W}^l = (w_{jk}^l)_{j,k}$ denotes matrix of weights directed from layer $(l-1)$ to $l$. The bias of node $j$ in layer $l$ is denoted as $b_j^l$ and biases folded into vector of biases of layer $l$ is $\boldsymbol{b}^l$. By applying this notation, we could write comfortably a feedforward dependency for the output from layer $l$ as
 \begin{equation}
-    \boldsymbol{a}^l = \phi(\mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l) \hspace{0.5cm},
+    \boldsymbol{a}^l = \phi(\mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l) \hspace{0.2cm},
     \label{comfort_write}
 \end{equation}
 where $\phi$ is the arbitrary activation function used in neurons of layer $l$ (this definition apparently depends on the current layer $l$, but we omit notation of this dependence for simplification), which is applied in element-wise fashion. We also denote argument of $\phi$ in \eqref{comfort_write} as
 \begin{equation}
-    \boldsymbol{z}^l = \mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l
+    \boldsymbol{z}^l = \mathbb{W}^l \boldsymbol{a}^{l-1} + \boldsymbol{b}^l \hspace{0.2cm}.
 \end{equation}
 The aim of the backpropagation algorithm is to compute $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$ (we will omit arguments of the functions for simplification, all of them are evaluated in the values of current weights, biases and training instances) with respect to arbitrary weight $w$ and bias $b$. These partial derivatives express, how much the loss function changes when $w$ or $b$ is changed. Of course, the main goal is to find optimal weights and biases, which corresponds to the local (global) minimum of the loss function. Intuitively, we could imagine that in each layer of the neural network a certain error arises (from imperfection of current weights and biases), which causes flaws in the output layer. Furthermore, we could say that even individual neurons produce these errors, which consequently leads to a corrupted output. But what we can measure is only the deviation of the current output (extracted from the output layer) of the neural network from the desired value, because we do not know in advance the "correct" output (activation values) of other layers. Basically, what backpropagation really does is that it \textit{backpropagates} an error from the output layer to the previous layers and then from these error terms computes corresponding partial derivatives $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
 
 We will now define this error term heuristically. The output of $j$-th neuron of layer $l$ could be written as $a_j^l = \phi(z_j^l)$. Let's imagine for a moment that layer $l$ has a corrupted output (not corresponding to the optimal value) denoted as $\hat{a}_j^l$. This corrupted value could be written as $\hat{a}_j^l = \phi(\hat{z}_j^l) =\phi(z_j^l + \Delta z_j^l)$, where $\Delta z_j^l$ expresses the deviation of argument $z_j^l$ from the optimal value. In case that other weights and biases are already optimal, the difference between the optimal cost and the "corrupted" cost would be approximately $\frac{\partial \Lambda}{\partial z_j^l}\Delta z_j^l$ (from Taylor expansion, we suppose that $\Delta z_j^l$ is "small enough"). The deviation is getting larger, when value of $\frac{\partial \Lambda}{\partial z_j^l}$ is getting larger. On the other hand, when the value of $\frac{\partial \Lambda}{\partial z_j^l}$ is close to 0, then the neuron is very close to the optimal state. Therefore, we could define the error term as
 \begin{equation}
-    \delta_j^l = \frac{\partial \Lambda}{\partial z_j^l}
+    \delta_j^l = \frac{\partial \Lambda}{\partial z_j^l} \hspace{0.2cm}.
 \end{equation}
 This is a heuristic derivation and of course, it is not absolutely precise and certainly requires deeper math behind (e.g. we omitted trade-off between $\frac{\partial \Lambda}{\partial z_j^l}$ and $\Delta z_j^l$ in estimating the deviation), but this derivation serves mainly for the description of intuitive behaviour of $\delta_j^l$. What is more important is the fact that $\delta_j^l$ is only a provisional term, which will lead us to the derivation of values of real interest - $\frac{\partial \Lambda}{\partial w}$ and $\frac{\partial \Lambda}{\partial b}$.
 
@@ -984,7 +984,7 @@ Since we have defined $\delta_j^l$, we now need to find equations for values of 
 \begin{enumerate}
     \item \textbf{Equation to calculate error $\boldsymbol{\delta}^L$ of the output layer L}:
     \begin{equation}
-        \delta_j^L = \frac{\partial \Lambda}{\partial a_j^L}\phi'(z_j^L)
+        \delta_j^L = \frac{\partial \Lambda}{\partial a_j^L}\phi'(z_j^L) \hspace{0.2cm}.
         \label{BP1}
     \end{equation}
     As mentioned before, the backpropagation algorithm runs backwards. First, we need to compute error in the output layer. It is calculated by multiplication of partial derivative of the loss function with respect to the output $a_j^L$ of $j$-th neuron of layer $L$ and derivative of the activation function $\phi$ in $z_j^L$. This equation is perfectly intuitively understandable, because the error term is basically expressed as the trade-off between "how much the loss function changes with respect to the output from the neuron (represented by $\frac{\partial \Lambda}{\partial a_j^L}$)" and "how much the output of the neuron changes with respect to the input value to the activation function (represented by $\phi'(z_j^L)$)". If any of these values are low, then the error of that neuron is also low. Furthermore, both values could easily be retrieved and the shape of derivatives is usually computed analytically (obviously depending on the shape of the loss function and the activation function). We may also notice that the partial derivative of $\Lambda$ is computed with respect to $a_j^L$. This is the reason why we need the assumption of $\Lambda$ depending on $\boldsymbol{a}^L$. Note that this shape corresponds to the sigmoid function $\sigma$ used in the output layer (or any arbitrary scalar function with the scalar input). For softmax function $\boldsymbol{\theta}$ it would be 
@@ -995,21 +995,21 @@ since $\forall k \in \{1,...,|\mathbb{C}|\}$, the function $[\boldsymbol{\theta}
     
     \item \textbf{Equation to backpropagate the error from layer $(l+1)$ to previous layer $l$}
     \begin{equation}
-        \delta_j^l = [(\mathbb{W}^{(l+1)})^T\boldsymbol{\delta}^{(l+1)}]_j \phi'(z_j^l)
+        \delta_j^l = [(\mathbb{W}^{(l+1)})^T\boldsymbol{\delta}^{(l+1)}]_j \phi'(z_j^l) \hspace{0.2cm}.
         \label{BP2}
     \end{equation}
     This equation gives us a way to backpropagate the error backwards. Together with \eqref{BP1}, we can compute $\boldsymbol{\delta}^l$ (vector of errors $\delta_j^l$ of neurons in layer $l$) in the arbitrary layer $l$. It is obtained by multiplying the transpose of weight matrix $\mathbb{W}^{(l+1)}$ with vector of errors of $(l+1)$ layer $\boldsymbol{\delta}^{(l+1)}$. This could be thought as a "projection" of error to the previous layer. Then the result is multiplied by $\phi'(z_j^l)$, similarly to the case \eqref{BP1}, because the error is also influenced by the speed of change of the activation function.
     
     \item \textbf{Equation to calculate} $\frac{\partial \Lambda}{\partial b_j^l}$
     \begin{equation}
-        \frac{\partial \Lambda}{\partial b_j^l} = \delta_j^l
+        \frac{\partial \Lambda}{\partial b_j^l} = \delta_j^l \hspace{0.2cm}.
         \label{BP3}
     \end{equation}
     This first value of real interest could be determined easily, because equation \eqref{BP3} states that it is equal directly to the error term. And \eqref{BP1} and \eqref{BP2} already give us tools to compute the error in the arbitrary layer.
     
     \item \textbf{Equation to calculate} $\frac{\partial \Lambda}{\partial w_{jk}^l}$
     \begin{equation}
-        \frac{\partial \Lambda}{\partial w_{jk}^l} = a_k^{(l-1)}\delta_j^l
+        \frac{\partial \Lambda}{\partial w_{jk}^l} = a_k^{(l-1)}\delta_j^l \hspace{0.2cm}.
         \label{BP4}
     \end{equation}
     This equation computes the partial derivative of the loss function with respect to any weight. It depends on the activation (output) of $k$-th neuron of layer $(l-1)$ and error of $j$-th neuron of the consecutive layer $l$.
@@ -1044,7 +1044,7 @@ Now we substitute this term in the equations \eqref{BP3} and \eqref{BP4}.
 
 \begin{align}
     \frac{\partial \Lambda}{\partial b_j^L} &= (y_j - a_j^L)\phi'(z_j^L)\\
-    \frac{\partial \Lambda}{\partial w_{jk}^L} &= a_k^{(L-1)}(y_j - a_j^L)\phi'(z_j^L)
+    \frac{\partial \Lambda}{\partial w_{jk}^L} &= a_k^{(L-1)}(y_j - a_j^L)\phi'(z_j^L) \hspace{0.2cm}.
 \end{align}
 
 In these equations occur derivatives of the activation function (sigmoid in this example) in the output layer. Consequently, this causes the learning slowdown problem. If the values of sigmoid are close to 0 or 1 (asymptotic tails), the derivative is very close to 0 and therefore it produces very low updates, since the corresponding partial derivatives are low. Switching the values in the output layer, which are close to asymptotic tails of sigmoid (if this is incorrect state), is very slow, hence the learning slowdown.
@@ -1151,14 +1151,14 @@ This reformulation provides a sensible opportunity to enhance the decision tree 
 
 The initial weights and biases of neurons and architecture of the input layer and the first two hidden layers will remain same among all proposed models. A sample of such architecture (only the input layer and first two hidden layers) is illustrated in Figure \ref{fig:basic_arch} copying the decisions of the decision tree depicted in Figure \ref{fig:dec_ilust}, which splits the space by two hyperplanes as illustrated also in \ref{fig:dec_ilust}. Let's first consider neurons in the first and second hidden layers of the network as perceptrons. In our case, the activation function is specific threshold function
 \begin{equation}
-    \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.5cm},
+    \tau(\boldsymbol{x}) = 2\mathbf{1}_{\boldsymbol{x} \geq 0} - 1\hspace{0.2cm},
 \end{equation}
 where all math operations on instance $\boldsymbol{x}$ are element-wise. Also
 \begin{equation}
     (\mathbf{1}_{\boldsymbol{x} \geq 0})_i = \begin{cases}
     1, & \text{if}\hspace{0.25cm} x_i \geq 0 \\
     0, & \text{otherwise}
-    \end{cases}\hspace{0.5cm},
+    \end{cases}\hspace{0.2cm},
 \end{equation}
 
 where $(\mathbf{1}_{\boldsymbol{x} \geq 0})_i$ is $i$-th element of $\mathbf{1}_{\boldsymbol{x} \geq 0}$.
@@ -1189,7 +1189,7 @@ So perceptrons from the first and second hidden layers output $+1$ or $-1$. Why 
 
 The first hidden layer should copy the decisions of all inner nodes present in the corresponding decision tree. The first hidden layer has the same number of neurons as the number of inner nodes in the decision tree. As explained in the chapter about decision trees and random forests, each inner node $k \in \{1,...,L-1\}$ of the decision tree, where $L-1$ is the total number of inner nodes (in fact, if $L-1$ is the total number of inner nodes, then $L$ is the total number of leaves present in the decision tree), possesses split function with parameters $j_k \in \{1,...,n\}$, which is one dimension in a $n$-dimensional space that is used for split and also $\alpha_{j_k}$, which is a threshold. Let us also define function $s_k$ as 
 \begin{equation}
-    s_k(\boldsymbol{x}) = x_{j_k} - \alpha_{j_k}\hspace{0.5cm}.
+    s_k(\boldsymbol{x}) = x_{j_k} - \alpha_{j_k}\hspace{0.2cm}.
 \end{equation}
 It is apparent that equation $s_k(\boldsymbol{x}) = 0$ defines a hyperplane in $\mathbb{R}^n$, which splits the space in inner node $k$.
 
@@ -1248,7 +1248,7 @@ and then $\sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')$ has the following property:
     \sum_{i=1}^{L-1}(w_i^{m'}v_i) + bias(m')\begin{cases}
     > 0, & \text{if input ends in leaf}\hspace{0.18cm} m' \\
     < 0, & \text{otherwise}
-    \end{cases}
+    \end{cases} \hspace{0.2cm}.
 \label{eq:sec_hidd_property}
 \end{equation}
 
@@ -1275,7 +1275,7 @@ If we initialize biases in the output layer to 0, then the appropriate initializ
     \vdots & \vdots & \ddots&\ddots & \ddots&\vdots \\
     -1 & -1&\hdots & -1 & 1&-1 \\
     -1 & -1 & \hdots&-1 & -1 & 1
-    \end{pmatrix*}\hspace{0.5cm}.
+    \end{pmatrix*}\hspace{0.2cm}.
 \end{equation}
 
 Matrix $\mathbb{A} \in \mathbb{R}^{L\times L}$, where $L$ is the total number of leaves in the decision tree. The determinant of matrix $\mathbb{A}$ is
@@ -1287,7 +1287,7 @@ Matrix $\mathbb{A} \in \mathbb{R}^{L\times L}$, where $L$ is the total number of
     \vdots & \vdots & \ddots&\ddots & \ddots&\vdots \\
     -1 & -1&\hdots & -1 & 1&-1 \\
     -1 & -1 & \hdots&-1 & -1 & 1
-    \end{vmatrix*} = (-1)^{2L-3}\cdot2^{L-1}\cdot(L-2)
+    \end{vmatrix*} = (-1)^{2L-3}\cdot2^{L-1}\cdot(L-2) \hspace{0.2cm}.
 \label{eq:determinant}
 \end{equation}
 
@@ -1306,7 +1306,7 @@ In case of invertible activation function $\boldsymbol{\phi}$ in the output laye
     p^2_c\\
     \vdots\\
     p^L_c
-    \end{pmatrix})\hspace{0.5cm},
+    \end{pmatrix})\hspace{0.2cm},
     \label{eq:lin_eq}
 \end{equation}
 
@@ -1325,7 +1325,7 @@ In other words, the appropriate weights for neuron $c$ in the output layer are o
     p^2_c\\
     \vdots\\
     p^L_c
-    \end{pmatrix}))\hspace{0.5cm}.
+    \end{pmatrix}))\hspace{0.2cm}.
     \label{eq:weights_output}
 \end{equation}
 
@@ -2002,7 +2002,16 @@ Neural random forests showed a good classification ability with an ambition to o
 
 
 \begin{thebibliography}{}
+\bibitem{konkurence}WANG, Suhang, AGGARWAL, Charu and LIU, Huan, 2018. Random-Forest-Inspired Neural Networks. ACM Transactions on Intelligent Systems and Technology [online]. 15 November 2018. Vol. 9, no. 6p. 1-25. DOI 10.1145/3232230. \\ Available at: https://dl.acm.org/doi/10.1145/3232230
+
+\bibitem{konkurence2}KONTSCHIEDER, Peter, FITERAU, Madalina, CRIMINISI, Antonio and BULO, Samuel Rota, 2015. Deep Neural Decision Forests. In: 2015 IEEE International Conference on Computer Vision (ICCV) [online]. IEEE. 2015. p. 1467-1475. ISBN 978-1-4673-8391-2. \\ Available at: http://ieeexplore.ieee.org/document/7410529/
+
 \bibitem{NRF} BIAU, Gérard, WELBL, Johannes and SCORNET, Erwan, 2016. Neural Random Forest. [online]. 2016. Available at: arxiv.org/abs/1604.07143
+
+\bibitem{data_reduction}SAMMUT, Claude and WEBB, Geoffrey I. (eds.), 2010. Encyclopedia of Machine Learning. Boston, MA: Springer US. ISBN 978-0-387-30768-8.
+
+
+\bibitem{clustering}ROKACH, Lior and MAIMON, Oded. Data Mining and Knowledge Discovery Handbook. ISBN 978-0-387-24435-8.
 
 \bibitem{evaluation1}CANBEK, Gurol, SAGIROGLU, Seref, TEMIZEL, Tugba Taskaya and BAYKAL, Nazife, 2017. Binary classification performance measures/metrics: A comprehensive visualized roadmap to gain new insights. In: 2017 International Conference on Computer Science and Engineering (UBMK) [online]. IEEE. 2017. p. 821-826. ISBN 978-1-5386-0930-9. \\ Available at: http://ieeexplore.ieee.org/document/8093539/
 
@@ -2014,26 +2023,34 @@ Neural random forests showed a good classification ability with an ambition to o
 
 \bibitem{imbalance}CHAWLA, Nitesh V., 2005. Data Mining for Imbalanced Datasets: An Overview. In: Data Mining and Knowledge Discovery Handbook [online]. New York: Springer-Verlag. p. 853-867. ISBN 0-387-24435-2. \\ Available at: http://link.springer.com/10.1007/0-387-25465-X\_40
 
-\bibitem{egypt} OHAREK, Martin. Analysis of the Ancient Egyptian Society with Utilization of Decision Tree. In: SPMS 2019 – Stochastic and Physical Monitoring Systems, Proceedings of the international conference. ISBN 978-80-01-06659-1.
-
-
 \bibitem{imbalance_data}HAIBO, HE and GARCIA, E.A., 2009. Learning from Imbalanced Data.\\ IEEE Transactions on Knowledge and Data Engineering [online]. 2009. Vol. 21, no. 9p. 1263-1284. DOI 10.1109/TKDE.2008.239. \\ Available at: http://ieeexplore.ieee.org/document/5128907/
 
 \bibitem{imbalance3} AKOSA, Josephine Sarpong. Predictive Accuracy : A Misleading Performance Measure for Highly Imbalanced Data. 2017. Available at: \\ https://support.sas.com/resources/papers/proceedings17/0942-2017.pdf
 
-\bibitem{random_forest_intrusion}FARNAAZ, Nabila and JABBAR, M.A., 2016. Random Forest Modeling for Network Intrusion Detection System. Procedia Computer Science [online]. 2016. Vol. 89, p. 213-217. DOI 10.1016/j.procs.2016.06.047. \\ Available at: https://linkinghub.elsevier.com/retrieve/pii/S1877050916311127
+\bibitem{roc} FAWCETT, Tom, 2006. An introduction to ROC analysis. Pattern Recognition Letters [online]. 2006. Vol. 27, no. 8p. 861-874. DOI 10.1016/j.patrec.2005.10.010. \\ Available at: https://linkinghub.elsevier.com/retrieve/pii/S016786550500303X
 
-\bibitem{bioinf}DÍAZ-URIARTE, Ramón and ALVAREZ DE ANDRÉS, Sara. Gene selection and classification of microarray data using random forest. BMC Bioinformatics [online]. Vol. 7, no. 1. DOI 10.1186/1471-2105-7-3. \\ Available at: http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-7-3
+
+\bibitem{roc_analysis} MAJNIK, Matjaž and BOSNIĆ, Zoran, 2013. ROC analysis of classifiers in machine learning: A survey. Intelligent Data Analysis [online]. 16 May 2013. Vol. 17, no. 3p. 531-558. DOI 10.3233/IDA-130592. Available at: \\ https://www.medra.org/servlet/aliasResolver?alias=iospress\&doi=10.3233/IDA-130592
+
+
+\bibitem{pr_roc_diff} DAVIS, Jesse and GOADRICH, Mark, 2006. The relationship between Precision-Recall and ROC curves. In: Proceedings of the 23rd international conference on Machine learning - ICML '06 [online]. New York, New York, USA: ACM Press. 2006. p. 233-240. ISBN 1595933832. \\ Available at: http://portal.acm.org/citation.cfm?doid=1143844.1143874
 
 
 \bibitem{text_rec}BERNARD, S., ADAM, S. and HEUTTE, L., 2007. Using Random Forests for Handwritten Digit Recognition. In: Ninth International Conference on Document Analysis and Recognition (ICDAR 2007) Vol 2 [online]. IEEE. 2007. p. 1043-1047. ISBN 0-7695-2822-8. \\ Available at: http://ieeexplore.ieee.org/document/4377074/
 
+\bibitem{bioinf}DÍAZ-URIARTE, Ramón and ALVAREZ DE ANDRÉS, Sara. Gene selection and classification of microarray data using random forest. BMC Bioinformatics [online]. Vol. 7, no. 1. DOI 10.1186/1471-2105-7-3. \\ Available at: http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-7-3
+
+\bibitem{random_forest_intrusion}FARNAAZ, Nabila and JABBAR, M.A., 2016. Random Forest Modeling for Network Intrusion Detection System. Procedia Computer Science [online]. 2016. Vol. 89, p. 213-217. DOI 10.1016/j.procs.2016.06.047. \\ Available at: https://linkinghub.elsevier.com/retrieve/pii/S1877050916311127
+
+\bibitem{egypt} OHAREK, Martin and BUKÁČEK, Marek. Analysis of the Ancient Egyptian Society with Utilization of Decision Tree. In: SPMS 2019 – Stochastic and Physical Monitoring Systems, Proceedings of the international conference. ISBN 978-80-01-06659-1.
+
+\bibitem{logregression}MAALOUF, Maher, 2011. Logistic regression in data analysis: an overview. International Journal of Data Analysis Techniques and Strategies [online]. 2011. Vol. 3, no. 3. DOI 10.1504/IJDATS.2011.041335. \\ Available at: http://www.inderscience.com/link.php?id=41335
+
+\bibitem{svm}AWAD, Mariette and KHANNA, Rahul, 2015. Support Vector Machines for Classification. In: AWAD, Mariette and KHANNA, Rahul, Efficient Learning Machines [online]. Berkeley, CA: Apress. p. 39-66. ISBN 978-1-4302-5989-3. \\ Available at: http://link.springer.com/10.1007/978-1-4302-5990-9\_3
 
 \bibitem{rf_overfit}JEHAD, Ali, REHANULLAH, Khan, NASIR, Ahmad and IMRAN, Maqsood. Random Forests and Decision Trees. IJCSI International Journal of Computer Science Issues [online]. \\ Available at: http://ijcsi.org/papers/IJCSI-9-5-3-272-278.pdf
 
 \bibitem{rf_main}CRIMINISI, Antonio, 2011. Decision Forests: A Unified Framework for Classification, Regression, Density Estimation, Manifold Learning and Semi-Supervised Learning. Foundations and Trends® in Computer Graphics and Vision [online]. 2011. Vol. 7, no. 2-3p. 81-227. DOI 10.1561/0600000035. \\ Available at: http://www.nowpublishers.com/article/Details/CGV-035
-
-
 \bibitem{c45}KORTING, Thales Sehn. C4.5 algorithm and Multivariate Decision Trees [online]. \\ Available at: https://www.academia.edu/1983952/C4.\_5\_algorithm\_and\_Multivariate\_Decision\_Trees
 
 
@@ -2055,7 +2072,6 @@ BREIMAN, Leo, FRIEDMAN, J. H., OLSHEN, R. A. and STONE, C. J., 1984. Classificat
 
 \bibitem{variance_rf} VAISHNAVI, S, 2017. Ensemble Methods and Random Forests. [online]. 2017. Available at: \\https://courses.engr.illinois.edu/ece543/sp2017/projects/Vaishnavi\%20Subramanian.pdf
 
-
 \bibitem{adaboost2}CHENGSHENG, Tu, HUACHENG, Liu, BING, Xu, XU, Bing and CHEN, Yinong, 2017. AdaBoost typical Algorithm and its application research. MATEC Web of Conferences [online]. 2017. Vol. 139. DOI 10.1051/matecconf/201713900222. \\ Available at: http://www.matec-conferences.org/10.1051/matecconf/201713900222
 
 \bibitem{culloch}MCCULLOCH, Warren S. and PITTS, Walter, 1943. A logical calculus of the ideas immanent in nervous activity. The Bulletin of Mathematical Biophysics [online]. 1943. Vol. 5, no. 4p. 115-133. DOI 10.1007/BF02478259. \\ Available at: http://link.springer.com/10.1007/BF02478259
@@ -2066,6 +2082,7 @@ BREIMAN, Leo, FRIEDMAN, J. H., OLSHEN, R. A. and STONE, C. J., 1984. Classificat
 
 \bibitem{werbos} WERBOS, Paul John, 1974. Beyond regression : new tools for prediction and analysis in the behavioral sciences. PhD thesis.
 
+
 \bibitem{backprop-cit}RUMELHART, David E., HINTON, Geoffrey E. and WILLIAMS, Ronald J., 1986. Learning representations by back-propagating errors. Nature [online]. 1986. Vol. 323, no. 6088p. 533-536. DOI 10.1038/323533a0. \\ Available at: http://www.nature.com/articles/323533a0
 
 
@@ -2075,6 +2092,8 @@ BREIMAN, Leo, FRIEDMAN, J. H., OLSHEN, R. A. and STONE, C. J., 1984. Classificat
 \bibitem{nn-application}HORDRI, Hordri Nur, YUHANIZ, Siti and SHAMSUDDIN, Siti Mariyam, 2016. Deep Learning and Its Applications: A Review.
 
 \bibitem{feedforward} NIELSEN, Michael. Neural Networks and Deep Learning [online]. \\ Available at: http://static.latexstudio.net/article/2018/0912/neuralnetworksanddeeplearning.pdf
+
+
 
 \bibitem{cybenko}CYBENKO, G., 1989. Approximation by superpositions of a sigmoidal function. Mathematics of Control, Signals, and Systems [online]. 1989. Vol. 2, no. 4p. 303-314. DOI 10.1007/BF02551274. \\ Available at: http://link.springer.com/10.1007/BF02551274
 
@@ -2095,31 +2114,15 @@ BREIMAN, Leo, FRIEDMAN, J. H., OLSHEN, R. A. and STONE, C. J., 1984. Classificat
 
 \bibitem{grad}BOYD, Stephen P. and VANDENBERGHE, Lieven, 2004. Convex optimization. Cambridge: Cambridge University Press. ISBN 0521833787.
 
-
-\bibitem{backprop}MAKIN, J.G. Backpropagation. [online]. \\ Available at: http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf
-
-
-\bibitem{scikit} PEDREGOSA, Fabian et al. Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research [online]. P. 2825-2830. \\ Available at: http://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf
-
-
-\bibitem{keras} CHOLLET, Francois. Keras. [online]. \\ Available at: https://keras.io/
-
-
-\bibitem{saturation}RAKITIANSKAIA, Anna and ENGELBRECHT, Andries, 2015. Measuring Saturation in Neural Networks. In: 2015 IEEE Symposium Series on Computational Intelligence [online]. IEEE. 2015. p. 1423-1430. ISBN 978-1-4799-7560-0. \\ Available at: http://ieeexplore.ieee.org/document/7376778/
-
-\bibitem{roc} FAWCETT, Tom, 2006. An introduction to ROC analysis. Pattern Recognition Letters [online]. 2006. Vol. 27, no. 8p. 861-874. DOI 10.1016/j.patrec.2005.10.010. \\ Available at: https://linkinghub.elsevier.com/retrieve/pii/S016786550500303X
-
-\bibitem{roc_analysis} MAJNIK, Matjaž and BOSNIĆ, Zoran, 2013. ROC analysis of classifiers in machine learning: A survey. Intelligent Data Analysis [online]. 16 May 2013. Vol. 17, no. 3p. 531-558. DOI 10.3233/IDA-130592. Available at: \\ https://www.medra.org/servlet/aliasResolver?alias=iospress\&doi=10.3233/IDA-130592
-
-\bibitem{pr_roc_diff} DAVIS, Jesse and GOADRICH, Mark, 2006. The relationship between Precision-Recall and ROC curves. In: Proceedings of the 23rd international conference on Machine learning - ICML '06 [online]. New York, New York, USA: ACM Press. 2006. p. 233-240. ISBN 1595933832. \\ Available at: http://portal.acm.org/citation.cfm?doid=1143844.1143874
-
 \bibitem{adam}RUDER, Sebastian. An overview of gradient descent optimization algorithms. [online]. \\ Available at: https://arxiv.org/abs/1609.04747v2
 
 \bibitem{adam3}BA, Jimmy and KINGMA, Diederik P. Adam: A Method for Stochastic Optimization. [online]. \\ Available at: https://arxiv.org/abs/1412.6980
 
-\bibitem{learn_slow}GOLIK, P., DOETSCH, P. and HEY, N. Cross-Entropy vs. Squared Error Training: a Theoretical and Experimental Comparison. Proceedings of the Annual Conference of the International Speech Communication Association, INTERSPEECH 2013. 1756-1760. 
+\bibitem{backprop}MAKIN, J.G. Backpropagation. [online]. \\ Available at: http://www.cs.cornell.edu/courses/cs5740/2016sp/resources/backprop.pdf
 
 \bibitem{note_backprop}SADOWSKI, Petr. Notes on Backpropagation. [online]. \\ Available at: https://www.ics.uci.edu/~pjsadows/notes.pdf
+
+\bibitem{learn_slow}GOLIK, P., DOETSCH, P. and HEY, N. Cross-Entropy vs. Squared Error Training: a Theoretical and Experimental Comparison. Proceedings of the Annual Conference of the International Speech Communication Association, INTERSPEECH 2013. 1756-1760.
 
 \bibitem{loss_func}JANOCHA, Katarzyna and CZARNECKI, Wojciech Marian, 2017. On Loss Functions for Deep Neural Networks in Classification. Schedae Informaticae [online]. 2017. Vol. 1/2016. DOI 10.4467/20838476SI.16.004.6185. \\ Available at: http://www.ejournals.eu/Schedae-Informaticae/2016/Volume-25/art/9009/
 
@@ -2129,18 +2132,10 @@ BREIMAN, Leo, FRIEDMAN, J. H., OLSHEN, R. A. and STONE, C. J., 1984. Classificat
 
 \bibitem{dropout} BALDI, Pierre and SADOWSKI, Peter, 2013. Understanding Dropout. In: Advances in Neural Information Processing Systems 26. Curran Associates. 2013.
 
-\bibitem{data_reduction}SAMMUT, Claude and WEBB, Geoffrey I. (eds.), 2010. Encyclopedia of Machine Learning. Boston, MA: Springer US. ISBN 978-0-387-30768-8.
+\bibitem{scikit} PEDREGOSA, Fabian et al. Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research [online]. P. 2825-2830. \\ Available at: http://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf
 
-\bibitem{clustering}ROKACH, Lior and MAIMON, Oded. Data Mining and Knowledge Discovery Handbook. ISBN 978-0-387-24435-8.
 
-\bibitem{konkurence}WANG, Suhang, AGGARWAL, Charu and LIU, Huan, 2018. Random-Forest-Inspired Neural Networks. ACM Transactions on Intelligent Systems and Technology [online]. 15 November 2018. Vol. 9, no. 6p. 1-25. DOI 10.1145/3232230. \\ Available at: https://dl.acm.org/doi/10.1145/3232230
-
-\bibitem{konkurence2}KONTSCHIEDER, Peter, FITERAU, Madalina, CRIMINISI, Antonio and BULO, Samuel Rota, 2015. Deep Neural Decision Forests. In: 2015 IEEE International Conference on Computer Vision (ICCV) [online]. IEEE. 2015. p. 1467-1475. ISBN 978-1-4673-8391-2. \\ Available at: http://ieeexplore.ieee.org/document/7410529/
-
-\bibitem{logregression}MAALOUF, Maher, 2011. Logistic regression in data analysis: an overview. International Journal of Data Analysis Techniques and Strategies [online]. 2011. Vol. 3, no. 3. DOI 10.1504/IJDATS.2011.041335. \\ Available at: http://www.inderscience.com/link.php?id=41335
-
-\bibitem{svm}AWAD, Mariette and KHANNA, Rahul, 2015. Support Vector Machines for Classification. In: AWAD, Mariette and KHANNA, Rahul, Efficient Learning Machines [online]. Berkeley, CA: Apress. p. 39-66. ISBN 978-1-4302-5989-3. \\ Available at: http://link.springer.com/10.1007/978-1-4302-5990-9\_3
-
+\bibitem{keras} CHOLLET, Francois. Keras. [online]. \\ Available at: https://keras.io/
 
 \end{thebibliography}
 %\chapter{Figures}
