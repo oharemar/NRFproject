@@ -9,7 +9,8 @@
 \usepackage{array}
 \usepackage{mathtools}
 \usepackage{fancyhdr}% pro appendixy, kdyžtak odstranit
-\usepackage{babel}
+\usepackage[czech,american]{babel}
+%\usepackage[american]{babel}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{adjustbox}
@@ -23,7 +24,7 @@
 \usepackage{color, colortbl}
 \usepackage{tabularx}
 \usepackage{hyperref}
-\usepackage{microtype} %% tohle kdyžtak oddělat
+%\usepackage{microtype} %% tohle kdyžtak oddělat
 \usepackage{makecell}
 %\usepackage{subcaption}
 \usepackage{subfig}
@@ -142,6 +143,7 @@
 
 ~\newpage{}
 
+\selectlanguage{czech}
 %\begin{onehalfspace}
 \noindent \emph{Název práce:}
 
@@ -180,7 +182,7 @@
 ~
 
 %\selectlanguage{american}%
-
+\selectlanguage{american}
 \noindent \emph{Title:}
 
 \noindent \textbf{Stochastic methods combining neural networks with random forests and their \\ applications to medical data analysis}
@@ -1505,13 +1507,22 @@ The models are compared with respect to the accuracy and macro-average of F1-sco
 
 All applied models are summarized in Table \ref{table::public_models} with their shortcut notations (column MODEL).
 
-
-
 Models in Table \ref{table::public_models} are color-coded into three different areas. The yellow area includes competitive models to the RF and NF models. We adopted logistic regression with L2 regularization and neural network with ReLU activation function in the hidden layers and softmax in the output layer. We apply Cross Entropy as loss function and optimization is done via Adam optimization algorithm (Adam had superior results in comparison with the stochastic gradient descent). The hyperparameters of Adam was chosen as follows: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. We use same notation as defined in \autoref{other_training_methods}. The implementation of the LR and NN was taken from Python modules - Scikit learn \cite{scikit} and Keras \cite{keras}. 
 
 The green area comprises the RF models. We adopted three variations with different numbers of estimators. All decision trees were trained with the entire training dataset and we use entropy as the impurity function in the information gain criterion. We use the implementation from Scikit learn.
 
 The orange area includes all NF models. We tested many different combinations of hyperparameters and choices of different loss functions and activation functions (in layers where it is possible) and we present the best obtained solution. All NF models were built from the RF20 model and use Cross Entropy as loss function and softmax in the output layer of all individual neural networks. Transition parameters $\beta_1$ and $\beta_2$ in the first and second hidden layer were set to 1. Learning rates were chosen as a compromise through a grid search so it is as suitable as possible for all our datasets. We use Adam as optimization algorithm instead of SGD since the results were more favourable. The parameters of Adam were selected equally as in the case of NN: $\gamma_1 = 0.9$, $\gamma_2 = 0.99$, $\epsilon = 10^{-8}$. Single neural network estimators in the NF models were trained for 30 epochs each. We added L2 regularization term to the loss function with regularization constant $\lambda = 0.01$. Finally, the voting scheme is applied as an ensemble method to obtain final predictions from the NF (differences between results obtained by voting or averaging were negligible).
+
+We use our own implementation of the NF models in Python. Datasets used in the experiments are summarized in Table \ref{table::public_datasets}. All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined $\forall j,l \in \{1,...,m\}$ as 
+\begin{equation}
+    [\zeta(k_j)]_l = \begin{cases}
+    1, & j = l \\
+    0, & \text{otherwise}
+    \end{cases} \hspace{0.2cm}.
+\end{equation}
+Eventually, all dataset features (including the newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1) to ensure the better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of the $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of the $j$-th feature. This normalization also had a positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
+
+The final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public} (the results in both tables correspond to the original values multiplied by 100).
 
 \begingroup
 \begin{table}[h!]
@@ -1537,16 +1548,7 @@ The orange area includes all NF models. We tested many different combinations of
 \end{table}
 \endgroup
 
-We use our own implementation of the NF models in Python. Datasets used in the experiments are summarized in Table \ref{table::public_datasets}. All categorical features were one-hot encoded, ie. transformed by function $\zeta: \{k_1,...,k_m\} \rightarrow \mathbb{R}^m$, where $\{k_1,...,k_m\}$ is a set of categories and $m \in \mathbb{N}$ is a number of categories. It is defined $\forall j,l \in \{1,...,m\}$ as 
-\begin{equation}
-    [\zeta(k_j)]_l = \begin{cases}
-    1, & j = l \\
-    0, & \text{otherwise}
-    \end{cases} \hspace{0.2cm}.
-\end{equation}
-Eventually, all dataset features (including the newly created ones by one-hot encoding) were standardized (normalized to mean equals 0 and standard deviation equals 1) to ensure the better numerical stability. It is done by formula $\hat{x}_j = \frac{x_j-\mu_j}{\sigma_j}$, where $x_j$ is a single realization of the $j$-th feature, $\hat{x}_j$ is a new value of this realization, $\mu$ is the mean value of realizations of $j$-th feature and $\sigma_j$ is the standard deviation of realizations of the $j$-th feature. This normalization also had a positive effect on performance since all evaluation metrics were more favourable in the case of normalization than without normalization.
 
-The final results of macro-average of F1-score resp. accuracy are presented in Table \ref{tab:results_macro_public} resp. Table \ref{tab:results_accuracy_public} (the results in both tables correspond to the original values multiplied by 100).
 
 \begingroup
 %\verb|\medmuskip=0mu:|
@@ -1952,6 +1954,7 @@ The results of individual models are presented in Table \ref{table::real_dataset
     \centering
     %\small\addtolength{\tabcolsep}{-5pt}
     \small\addtolength{\tabcolsep}{-5pt}
+    \shorthandoff{-}
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
     \hline
      \multirow{2}{*}{MODEL}&\multicolumn{3}{c|}{Class 0} &\multicolumn{3}{c|}{Class 1}& \multirow{2}{*}{Macro-avg F1}& \multirow{2}{*}{Accuracy}\\ \cline{2-7}
@@ -1964,7 +1967,7 @@ The results of individual models are presented in Table \ref{table::real_dataset
      
     
     \end{tabular}
-
+ \shorthandon{+}
     \caption{LUCAS dataset results.}
     \label{table::real_dataset}
 \end{table}
@@ -1976,14 +1979,14 @@ We may notice that in the case of the positive class, the standard deviations of
 
 If we compare the individual runs, we can see that in most cases, NRF\_DW and NRF\_EL\_DW models reached higher AP values in comparison with other models. We can also notice the resemblance of the PR curves corresponding to the NF models and the PR curves corresponding to the initialization RF model, which is also the result of high transition parameters. In the summary graph in Figure \ref{fig:summary}, it is visible that the aggregation PR curves of NRF\_DW, NRF\_EL\_DW and RF are similar in shape as well.
 
-In the conducted experiments of binary classification on the LUCAS dataset were only slight differences between the individual models, but the NF models showed the most favourable performance. On the contrary, the NN model could not achieve a competitive performance with other models, which could stand as a warning and the reason to increase the transition parameters in our NF models.
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\textwidth]{summary_pr.png}
     \caption{Visualizations of individual aggregation PR curves. The AP values correspond to the "mean$\pm$std" of all iterations.}
     \label{fig:summary}
 \end{figure}
+In the conducted experiments of binary classification on the LUCAS dataset were only slight differences between the individual models, but the NF models showed the most favourable performance. On the contrary, the NN model could not achieve a competitive performance with other models, which could stand as a warning and the reason to increase the transition parameters in our NF models.
+
 
 \chapter{Conclusion}
 
